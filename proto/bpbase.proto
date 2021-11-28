@@ -1,0 +1,14 @@
+syntax = "proto3";
+package bp_pb;
+
+message BpInt {
+    int32 var = 1;
+}
+
+message BpFloat {
+    float var = 1;
+}
+
+message BpString {
+    string var = 1;
+}

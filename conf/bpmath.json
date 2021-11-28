@@ -1,0 +1,20 @@
+{
+    "_lib":"libbpmath.so",
+    "np":{
+        "math":{
+            "_func":{
+                "add":{
+                    "_input":[
+                        "bp.math.BpIntPair"
+                    ],
+                    "_output":[
+                        "bp.base.BpInt"
+                    ]
+                }
+            },
+            "_val":[
+                "bp.base.BpIntPair"
+            ]
+        }
+    }
+}
