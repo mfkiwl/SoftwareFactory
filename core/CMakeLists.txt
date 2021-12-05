@@ -2,8 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(BP_CORE_SRC
 	BpContents.hpp
-	BpLib.hpp
-	BpLib.cpp
+	BpModule.hpp
+	BpModule.cpp
+    BpModuleLinux.hpp
+    BpModuleLinux.cpp
 )
 
 ADD_LIBRARY(bpcore ${BP_CORE_SRC})

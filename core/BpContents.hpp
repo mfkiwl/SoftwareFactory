@@ -1,9 +1,10 @@
 #ifndef __BPCONTENTS_HPP__
 #define __BPCONTENTS_HPP__
+#include <memory>
 #include <string>
 #include <vector>
 
-class BpContents {
+class BpContents : public std::enable_shared_from_this<BpContents> {
 public:
     enum class Type {
         CONTENTS,
@@ -11,26 +12,40 @@ public:
         VAL,
     };
 
-    BpContents(BpContents* parent, Type t, std::string name)
-        : _parent(parent)
+    BpContents(std::shared_ptr<BpContents> parent, Type t, std::string name)
+        : std::enable_shared_from_this<BpContents>()
+        , _parent(parent)
         , _type(t)
         , _name(name)
     {}
     
-    bool AddChild(BpContents& contents) {
+    bool AddChild(std::shared_ptr<BpContents> contents) {
+        if (contents == nullptr) {
+            return false;
+        }
+        contents->_parent.reset();
+        contents->_parent = shared_from_this();
         _next_contents.emplace_back(contents);
         return true;
     }
 
-    void SetParent(BpContents* parent) {
-        _parent = parent;
+    bool SetParent(std::shared_ptr<BpContents> parent) {
+        if (parent == nullptr) {
+            return false;
+        }
+        parent->AddChild(shared_from_this());
+        return true;
+    }
+
+    std::string GetName() { 
+        return _name;
     }
 
     std::string GetFullPath() {
-        if (_parent == nullptr) {
+        if (_parent.expired()) {
             return _name;
         }
-        return _parent->GetFullPath() + "." + _name;
+        return _parent.lock()->GetFullPath() + "." + _name;
     }
 
     bool HasChild() {
@@ -52,8 +67,8 @@ public:
 private:
     Type _type;
     std::string _name;
-    BpContents* _parent;
-    std::vector<BpContents> _next_contents;
+    std::weak_ptr<BpContents> _parent;
+    std::vector<std::shared_ptr<BpContents>> _next_contents;
 };
 
 #endif
