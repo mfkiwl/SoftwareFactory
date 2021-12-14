@@ -6,9 +6,13 @@ SET(BP_CORE_SRC
 	BpModule.cpp
     BpModuleLinux.hpp
     BpModuleLinux.cpp
+    BpLib.hpp
+    BpLibLinux.hpp
+    BpLibLinux.cpp
 )
 
-ADD_LIBRARY(bpcore ${BP_CORE_SRC})
+ADD_LIBRARY(bpcore SHARED ${BP_CORE_SRC})
+TARGET_LINK_LIBRARIES(bpcore dl jsoncpp)
 
 INSTALL(TARGETS bpcore
     LIBRARY DESTINATION ${ITOOLS_INSTALL_LIB_DIR}
