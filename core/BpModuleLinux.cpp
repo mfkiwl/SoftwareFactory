@@ -23,6 +23,7 @@ bool BpModuleLinux::Init(const char* dll_path) {
     return true;
 }
 
+// FIXME: 使用模糊搜索函数名,对于重载的函数可能会搞混
 void* BpModuleLinux::GetFunc(const std::string& func_name) {
     int idx = -1;
     for (int i = 0; i < _symbols.size(); ++i) {

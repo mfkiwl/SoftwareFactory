@@ -44,8 +44,13 @@ bool BpModule::LoadModule(const std::string& json_file) {
         std::cerr << "load dll " << dll_path << " failed" << std::endl;
         return false;
     }
-    // TODO 加载创建变量函数
-
+    // 加载创建变量函数
+    auto f = GetFunc("create_msg");
+    if (f == nullptr) {
+        std::cerr << "find " << lib_name << " create_msg func failed" << std::endl;
+    } else {
+        _create_var_funcs = reinterpret_cast<module_create_val_func_t>(f);
+    }
     BuildContents(root, _contents);
     return true;
 }
@@ -65,20 +70,19 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                     auto f = GetFunc(*func_it);
                     if (f == nullptr) {
                         std::cerr << "find func " << *func_it << " failed" << std::endl;
+                        continue;
                     }
-                    // TODO 函数符号添加到_module_funcs中
-                    continue;
+                    // 函数符号添加到_module_funcs中
+                    AddFunc(*func_it, func, f);
                     contents->AddChild(leaf_func);
-                    std::cout << "get func " << *func_it << std::endl;
-                    std::cout << "-- args " << func.toStyledString() << std::endl;
+                    std::cout << "-- " << *func_it << " " << func.toStyledString() << std::endl;
                 }
             }
             if ((*it) == "_val") {
-                std::cout << "get vals" << std::endl;
-                std::cout << "-- type " << v[*it].toStyledString() << std::endl;
                 if (!v[*it].isArray()) {
                     continue;
                 }
+                std::cout << "-- vals " << v[*it].toStyledString() << std::endl;
                 for (int i = 0; i < v[*it].size(); ++i) {
                     auto leaf_val = std::make_shared<BpContents>(contents, BpContents::Type::VAL, v[*it][i].asString());
                     contents->AddChild(leaf_val);
@@ -93,17 +97,51 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
     }
 }
 
+void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
+    BpModuleFunc f;
+    int in_n = v["_input"].size();
+    int out_n = v["_output"].size();
+    for (int i = 0; i < in_n; ++i) {
+        f.args.emplace_back(v["_input"][i].asString());
+    }
+    for (int i = 0; i < in_n; ++i) {
+        f.res.emplace_back(v["_output"][i].asString());
+    }
+    if (in_n == 0 && out_n == 1) {
+        f.type = BpModuleFuncType::RES1_ARG0;
+        f.func = reinterpret_cast<module_func0_t>(func);
+    } else if (in_n == 0 && out_n > 1) {
+        f.type = BpModuleFuncType::RESN_ARG0;
+        f.func = reinterpret_cast<module_func1_t>(func);
+    } else if (in_n == 1 && out_n == 1) {
+        f.type = BpModuleFuncType::RES1_ARG1;
+        f.func = reinterpret_cast<module_func2_t>(func);
+    } else if (in_n == 1 && out_n > 1) {
+        f.type = BpModuleFuncType::RESN_ARG1;
+        f.func = reinterpret_cast<module_func3_t>(func);
+    } else if (in_n > 1 && out_n == 1) {
+        f.type = BpModuleFuncType::RES1_ARGN;
+        f.func = reinterpret_cast<module_func4_t>(func);
+    } else if (in_n > 1 && out_n > 1) {
+        f.type = BpModuleFuncType::RESN_ARGN;
+        f.func = reinterpret_cast<module_func5_t>(func);
+    }
+    _module_funcs[func_name] = f;
+    _name = func_name;
+}
+
 std::shared_ptr<BpContents> BpModule::GetContents() {
     return _contents;
 }
 
-BpModule::pb_msg_t BpModule::CreateModuleVal(const std::string& msg_name) {
+pb_msg_t BpModule::CreateModuleVal(const std::string& msg_name) {
     if (_var_names.find(msg_name) == _var_names.end()) {
         return nullptr;
     }
     if (_create_var_funcs == nullptr) {
         return nullptr;
     }
+    std::cout << "create var " << msg_name << std::endl;
     return _create_var_funcs(msg_name);
 }
 
@@ -111,7 +149,7 @@ BpModuleFunc BpModule::GetModuleFunc(const std::string& func_name) {
     if (_module_funcs.find(func_name) == _module_funcs.end()) {
         return BpModuleFunc();
     }
-    return BpModuleFunc();
+    return _module_funcs[func_name];
 }
 
 } // namespace bp

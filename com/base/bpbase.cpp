@@ -2,9 +2,6 @@
 #include <functional>
 #include "bpbase.hpp"
 
-namespace bp {
-namespace base {
-
 static std::unordered_map<std::string, std::function<std::shared_ptr<::google::protobuf::Message>()>> g_msg_map = {
     {"bp.base.BpInt", [](){ return std::make_shared<bp_pb::BpInt>(); }},
     {"bp.base.BpFloat", [](){ return std::make_shared<bp_pb::BpFloat>(); }},
@@ -17,6 +14,3 @@ std::shared_ptr<::google::protobuf::Message> create_msg(const std::string& msg_n
     }
     return g_msg_map[msg_name]();
 }
-
-} // namespace base
-} // namespace bp

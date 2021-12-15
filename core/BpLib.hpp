@@ -35,6 +35,17 @@ public:
     std::vector<std::shared_ptr<BpModule>>& GetMods() {
         return _mods;
     }
+
+    pb_msg_t CreateVal(const std::string& msg_name) {
+        // TODO 解析全路径,搜索到对应模块,调用对应模块创建变量对象
+        return nullptr;
+    }
+
+    BpModuleFunc GetFunc(const std::string& func_name) {
+        // TODO 解析全路径,搜索到对应模块,获得对应模块函数指针
+        return BpModuleFunc();
+    }
+
 protected:
     virtual std::vector<std::string> GetDirFiles(const std::string& conf_path) = 0;
     virtual std::shared_ptr<BpModule> CreateModule(const std::string& mod_name) = 0;

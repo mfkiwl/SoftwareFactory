@@ -1,26 +1,24 @@
 {
     "_lib":"libbpmath.so",
-    "math":{
-        "_func":{
-            "add":{
-                "_input":[
-                    "bp.math.BpIntPair"
-                ],
-                "_output":[
-                    "bp.base.BpInt"
-                ]
-            },
-            "sub":{
-                "_input":[
-                    "bp.math.BpIntPair"
-                ],
-                "_output":[
-                    "bp.base.BpInt"
-                ]
-            }
+    "_func":{
+        "add_int":{
+            "_input":[
+                "bp.math.BpIntPair"
+            ],
+            "_output":[
+                "bp.base.BpInt"
+            ]
         },
-        "_val":[
-            "bp.base.BpIntPair"
-        ]
-    }
+        "sub_int":{
+            "_input":[
+                "bp.math.BpIntPair"
+            ],
+            "_output":[
+                "bp.base.BpInt"
+            ]
+        }
+    },
+    "_val":[
+        "bp.math.BpIntPair"
+    ]
 }
