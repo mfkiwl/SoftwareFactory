@@ -3,22 +3,22 @@
     "_func":{
         "add_int":{
             "_input":[
-                "bp.math.BpIntPair"
+                "bpmath.BpIntPair"
             ],
             "_output":[
-                "bp.base.BpInt"
+                "bpbase.BpInt"
             ]
         },
         "sub_int":{
             "_input":[
-                "bp.math.BpIntPair"
+                "bpmath.BpIntPair"
             ],
             "_output":[
-                "bp.base.BpInt"
+                "bpbase.BpInt"
             ]
         }
     },
     "_val":[
-        "bp.math.BpIntPair"
+        "bpmath.BpIntPair"
     ]
 }

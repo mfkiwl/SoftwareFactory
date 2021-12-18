@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <gtest/gtest.h>
+#include <glog/logging.h>
 
 #include "../BpContents.hpp"
 #include "../BpModule.hpp"
@@ -30,6 +31,8 @@ TEST(bpcore, BpContents) {
     bp3->SetParent(bp1);
     bp4->SetParent(bp3);
     EXPECT_EQ(bp4->GetFullPath(), "bp.math.pb_int_a");
+
+    LOG(INFO) << "\n" << bp1->PrintContents();
 }
 
 TEST(bpcore, BpModule) {
@@ -37,22 +40,37 @@ TEST(bpcore, BpModule) {
     bp::BpModuleLinux bml;
     EXPECT_FALSE(bml.LoadModule(""));
     EXPECT_TRUE(bml.LoadModule(cur_path + "/../conf/bpmath.json"));
+    LOG(INFO) << "bpmath.json contents:";
+    LOG(INFO) << "\n" << bml.GetContents()->PrintContents();
 
-    auto pbmsg = bml.CreateModuleVal("bp.math.BpIntPair");
+    auto pbmsg = bml.CreateModuleVal("bpmath.BpIntPair");
     EXPECT_TRUE(nullptr != pbmsg);
     auto pbintpair = std::static_pointer_cast<::bp_pb::BpIntPair>(pbmsg);
     pbintpair->set_a(100);
 
-    auto func = bml.GetModuleFunc("add_int");
-    auto p = std::make_shared<::bp_pb::BpIntPair>();
-    p->set_a(1);
-    p->set_b(1);
-    auto res = std::any_cast<module_func2_t>(func.func)(p);
-    EXPECT_EQ(std::static_pointer_cast<::bp_pb::BpInt>(res)->var(), 2);
+    {
+        auto func = bml.GetModuleFunc("add_int");
+        auto p = std::make_shared<::bp_pb::BpIntPair>();
+        p->set_a(1);
+        p->set_b(1);
+        auto res = std::any_cast<module_func2_t>(func.func)(p);
+        EXPECT_EQ(std::static_pointer_cast<::bp_pb::BpInt>(res)->var(), 2);
+    }
+    {
+        auto func = bml.GetModuleFunc("sub_int");
+        auto p = std::make_shared<::bp_pb::BpIntPair>();
+        p->set_a(1);
+        p->set_b(1);
+        auto res = std::any_cast<module_func2_t>(func.func)(p);
+        EXPECT_EQ(std::static_pointer_cast<::bp_pb::BpInt>(res)->var(), 0);
+    }
 }
 
 TEST(bpcore, BpLib) {
     auto cur_path = std::filesystem::current_path().string();
     bp::BpLibLinux bll;
     EXPECT_TRUE(bll.Init(cur_path + "/../conf/"));
+    EXPECT_TRUE(nullptr != bll.CreateVal("bpmath.BpIntPair"));
+    auto func = bll.GetFunc("bpmath.add_int");
+    EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
 }

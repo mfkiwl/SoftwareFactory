@@ -71,30 +71,26 @@ fun(std::vector<std::shared_ptr<::google::protobuf::Message>>);
 > 注2: 关键字都以下划线开头
 ```json
 {
-    "_comment":"定义包名为bp",
-    "np":{
-        "_comment":"定义包名为math",
-        "math":{
-            "_comment":"定义包含的函数",
-            "_func":{
-                "_comment":"定义函数名add",
-                "add":{
-                    "_comment":"定义函数输入参数",
-                    "_input":[
-                        "bp.math.BpIntPair"
-                    ],
-                    "_comment":"定义函数输出参数",
-                    "_output":[
-                        "bp.base.BpInt"
-                    ]
-                }
-            },
-            "_comment":"定义该模块包含的消息",
-            "_val":[
-                "bp.base.BpIntPair"
+    "_comment":"库模块名称",
+    "_lib":"libbpmath.so",
+    "_comment":"定义函数",
+    "_func":{
+        "_comment":"定义函数名add",
+        "add":{
+            "_comment":"定义函数输入参数",
+            "_input":[
+                "bpmath.BpIntPair"
+            ],
+            "_comment":"定义函数输出参数",
+            "_output":[
+                "bpbase.BpInt"
             ]
         }
-    }
+    },
+    "_comment":"该模块定义的消息",
+    "_val":[
+        "bpmath.BpIntPair"
+    ]
 }
 ```
 ## 开发模块需要定义的proto文件

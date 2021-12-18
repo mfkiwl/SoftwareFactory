@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <glog/logging.h>
 #include "BpModuleLinux.hpp"
 
 namespace bp {
@@ -36,7 +37,7 @@ void* BpModuleLinux::GetFunc(const std::string& func_name) {
     if (idx == -1) {
         return nullptr;
     }
-    std::cout << "load func \"" << func_name << "\" : " << _symbols[idx] << std::endl;
+    LOG(INFO) << "load func \"" << func_name << "\" : " << _symbols[idx];
     return dlsym(_dl, _symbols[idx].c_str());
 }
 
@@ -56,7 +57,6 @@ int BpModuleLinux::GetDllSymbol(const char* cmd) {
             continue;
         }
         _symbols.emplace_back(symbol);
-        // std::cout << _symbols[_symbols.size() - 1] << std::endl;
     }
     if (pclose(fp) == -1) {
         return -1;

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <fstream>
 #include <filesystem>
+#include <glog/logging.h>
 #include "BpModule.hpp"
 
 namespace bp {
@@ -14,44 +15,46 @@ bool BpModule::LoadModule(const std::string& json_file) {
     // 使用module名作为根节点
     // 搜索遍历命名区域
     //   搜索命名域下的函数和变量
+    LOG(INFO) << "begin load \"" << json_file << "\"...";
     std::ifstream ifs;
     ifs.open(json_file);
     if (!ifs.is_open()) {
-        std::cerr << "open " << json_file << " failed" << std::endl;
+        LOG(ERROR) << "open \"" << json_file << "\" failed";
         return false;
     }
 
     Json::Reader reader;
     Json::Value root;
     if (!reader.parse(ifs, root, false)) {
-        std::cerr << "parse failed" << std::endl;
+        LOG(ERROR) << "parse \"" << json_file << "\" failed";
         return false;
     }
     ifs.close();
 
     if (!root.isMember("_lib")) {
-        std::cerr << json_file <<" no key _lib" << std::endl;
+        LOG(ERROR) << json_file <<" has no key \"_lib\"";
         return false;
     }
     // 提取模块名称
-    auto lib_name = root["_lib"].asString();
-    lib_name = lib_name.substr(3, lib_name.size() - 6);
-    _contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, lib_name);
+    _mod_name = root["_lib"].asString();
+    _mod_name = _mod_name.substr(3, _mod_name.size() - 6);
+    _contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, _mod_name);
     // 初始化dll
     std::filesystem::path p(json_file);
     std::string dll_path = p.parent_path().string() + "/../lib/" + root["_lib"].asString();
     if (!Init(dll_path.c_str())) {
-        std::cerr << "load dll " << dll_path << " failed" << std::endl;
+        LOG(ERROR) << "load dll " << dll_path << " failed";
         return false;
     }
     // 加载创建变量函数
     auto f = GetFunc("create_msg");
     if (f == nullptr) {
-        std::cerr << "find " << lib_name << " create_msg func failed" << std::endl;
+        LOG(ERROR) << "find " << _mod_name << " \"create_msg\" func failed";
     } else {
         _create_var_funcs = reinterpret_cast<module_create_val_func_t>(f);
     }
     BuildContents(root, _contents);
+    LOG(INFO) << "load " << json_file << ": \n" << _contents->PrintContents();
     return true;
 }
 
@@ -69,20 +72,19 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                     // 加载函数符号
                     auto f = GetFunc(*func_it);
                     if (f == nullptr) {
-                        std::cerr << "find func " << *func_it << " failed" << std::endl;
+                        LOG(ERROR) << "find func " << *func_it << " failed, skip";
                         continue;
                     }
                     // 函数符号添加到_module_funcs中
                     AddFunc(*func_it, func, f);
                     contents->AddChild(leaf_func);
-                    std::cout << "-- " << *func_it << " " << func.toStyledString() << std::endl;
                 }
             }
             if ((*it) == "_val") {
                 if (!v[*it].isArray()) {
+                    LOG(ERROR) << "_val is nor array: " << v[*it].toStyledString();
                     continue;
                 }
-                std::cout << "-- vals " << v[*it].toStyledString() << std::endl;
                 for (int i = 0; i < v[*it].size(); ++i) {
                     auto leaf_val = std::make_shared<BpContents>(contents, BpContents::Type::VAL, v[*it][i].asString());
                     contents->AddChild(leaf_val);
@@ -90,7 +92,6 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                 }
             }
         } else {
-            std::cout << "get namesapce " << *it << std::endl;
             auto child = std::make_shared<BpContents>(contents, BpContents::Type::CONTENTS, *it);
             BuildContents(v[*it], child);
         }
@@ -127,7 +128,6 @@ void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
         f.func = reinterpret_cast<module_func5_t>(func);
     }
     _module_funcs[func_name] = f;
-    _name = func_name;
 }
 
 std::shared_ptr<BpContents> BpModule::GetContents() {
@@ -136,17 +136,19 @@ std::shared_ptr<BpContents> BpModule::GetContents() {
 
 pb_msg_t BpModule::CreateModuleVal(const std::string& msg_name) {
     if (_var_names.find(msg_name) == _var_names.end()) {
+        LOG(ERROR) << _mod_name << ": can't find var " << msg_name;
         return nullptr;
     }
     if (_create_var_funcs == nullptr) {
+        LOG(ERROR) << _mod_name << ": create_msg is nullptr";
         return nullptr;
     }
-    std::cout << "create var " << msg_name << std::endl;
     return _create_var_funcs(msg_name);
 }
 
 BpModuleFunc BpModule::GetModuleFunc(const std::string& func_name) {
     if (_module_funcs.find(func_name) == _module_funcs.end()) {
+        LOG(ERROR) << _mod_name << ": cat't find func " << func_name;
         return BpModuleFunc();
     }
     return _module_funcs[func_name];

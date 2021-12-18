@@ -1,8 +1,8 @@
 {
     "_lib":"libbpbase.so",
     "_val":[
-        "bp.base.BpInt",
-        "bp.base.BpFloat",
-        "bp.base.BpString"
+        "bpbase.BpInt",
+        "bpbase.BpFloat",
+        "bpbase.BpString"
     ]
 }

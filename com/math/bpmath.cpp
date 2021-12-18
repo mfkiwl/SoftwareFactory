@@ -4,7 +4,7 @@
 #include "bpbase.pb.h"
 
 static std::unordered_map<std::string, std::function<std::shared_ptr<::google::protobuf::Message>()>> g_msg_map = {
-    {"bp.math.BpIntPair", [](){ return std::make_shared<bp_pb::BpIntPair>(); }}
+    {"bpmath.BpIntPair", [](){ return std::make_shared<bp_pb::BpIntPair>(); }}
 };
 
 std::shared_ptr<::google::protobuf::Message> create_msg(const std::string& msg_name) {

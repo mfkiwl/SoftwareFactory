@@ -64,7 +64,36 @@ public:
         return _type == Type::VAL;
     }
 
+    std::string PrintContents() {
+        std::string content_str;
+        TraverseContents(shared_from_this(), 0, content_str);
+        return content_str;
+    }
+
 private:
+    void TraverseContents(std::shared_ptr<BpContents> c, int depth, std::string& content_str) {
+        if (c == nullptr) {
+            return;
+        }
+        std::string pre = "";
+        for (int i = 0; i < depth; ++i) {
+            if (i == depth -1) {
+                pre += "|--";
+            } else {
+                pre += "|  ";
+            }
+        }
+        content_str += pre;
+        content_str += c->_name;
+        if (c->IsLeaf()) {
+            content_str += c->IsFunc() ? "(func)" : "(var)";
+        }
+        content_str += "\n";
+        for (int i = 0; i < c->_next_contents.size(); ++i) {
+            TraverseContents(c->_next_contents[i], depth + 1, content_str);
+        }
+    }
+
     Type _type;
     std::string _name;
     std::weak_ptr<BpContents> _parent;

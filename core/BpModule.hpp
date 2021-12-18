@@ -51,7 +51,7 @@ public:
     BpModuleFunc GetModuleFunc(const std::string& func_name);
 
     std::string Name() {
-        return _name;
+        return _mod_name;
     }
 protected:
     /*
@@ -71,7 +71,7 @@ protected:
     std::unordered_set<std::string> _var_names;
     module_create_val_func_t _create_var_funcs = nullptr;
     std::shared_ptr<BpContents> _contents;
-    std::string _name;
+    std::string _mod_name;
 };
 
 } // namespace bp
