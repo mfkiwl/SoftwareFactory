@@ -1,13 +1,13 @@
-#ifndef __BP_LIB_LINUX_HPP__
-#define __BP_LIB_LINUX_HPP__
-#include "BpLib.hpp"
+#pragma once
+
+#include "BpModLib.hpp"
 
 namespace bp {
 
-class BpLibLinux : public BpLib
+class BpModLibLinux : public BpModLib
 {
 public:
-    BpLibLinux() = default;
+    BpModLibLinux() = default;
 
 protected:
     std::vector<std::string> GetDirFiles(const std::string& conf_path) override;
@@ -15,5 +15,3 @@ protected:
 };
 
 } // namespace bp
-
-#endif

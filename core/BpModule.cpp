@@ -54,7 +54,7 @@ bool BpModule::LoadModule(const std::string& json_file) {
         _create_var_funcs = reinterpret_cast<module_create_val_func_t>(f);
     }
     BuildContents(root, _contents);
-    LOG(INFO) << "load " << json_file << ": \n" << _contents->PrintContents();
+    LOG(INFO) << "load \"" << json_file << "\": \n" << _contents->PrintContents();
     return true;
 }
 

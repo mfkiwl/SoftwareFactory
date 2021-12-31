@@ -11,10 +11,10 @@ namespace bp {
 /*
  搜索配置文件，并根据配置文件加载模块
  */
-class BpLib
+class BpModLib
 {
 public:
-    BpLib() = default;
+    BpModLib() = default;
 
     bool Init(const std::string& conf_path) {
         auto confs = GetDirFiles(conf_path);
@@ -45,7 +45,7 @@ public:
                 return _mods[i]->CreateModuleVal(msg_name);
             }
         }
-        LOG(ERROR) << "Can't find \"" << msg_name << "\"";
+        LOG(ERROR) << "Can't find var type \"" << msg_name << "\"";
         return nullptr;
     }
 

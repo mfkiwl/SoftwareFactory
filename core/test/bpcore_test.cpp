@@ -2,12 +2,15 @@
 #include <gtest/gtest.h>
 #include <glog/logging.h>
 
+#include "bpmath.pb.h"
+#include "bpbase.pb.h"
+
 #include "../BpContents.hpp"
 #include "../BpModule.hpp"
 #include "../BpModuleLinux.hpp"
-#include "../BpLibLinux.hpp"
-#include "bpmath.pb.h"
-#include "bpbase.pb.h"
+#include "../BpModLibLinux.hpp"
+#include "../BpGraph.hpp"
+#include "../Bp.hpp"
 
 TEST(bpcore, BpContents) {
     auto bpcontents = std::make_shared<BpContents>(nullptr, BpContents::Type::VAL, "pb_int_a");
@@ -66,11 +69,24 @@ TEST(bpcore, BpModule) {
     }
 }
 
-TEST(bpcore, BpLib) {
+TEST(bpcore, BpModLib) {
     auto cur_path = std::filesystem::current_path().string();
-    bp::BpLibLinux bll;
+    bp::BpModLibLinux bll;
     EXPECT_TRUE(bll.Init(cur_path + "/../conf/"));
     EXPECT_TRUE(nullptr != bll.CreateVal("bpmath.BpIntPair"));
     auto func = bll.GetFunc("bpmath.add_int");
     EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
+}
+
+TEST(bpcore, Bp) {
+    auto& b = bp::Bp::Instance();
+    LOG(INFO) << "bp version: " << bp::Bp::Instance().Version();
+    auto g = std::make_shared<bp::BpGraph>();
+    EXPECT_EQ(bp::LoadState::ERR_OPEN_FILE, b.LoadGraph(std::string(""), g));
+    EXPECT_NE(bp::LoadState::OK, b.LoadGraph(std::string("../conf/com_random.json"), g));
+}
+
+TEST(bpcore, BpGraph) {
+    auto g = std::make_shared<bp::BpGraph>(nullptr);
+   
 }

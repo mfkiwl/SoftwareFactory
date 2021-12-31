@@ -6,13 +6,29 @@ SET(BP_CORE_SRC
 	BpModule.cpp
     BpModuleLinux.hpp
     BpModuleLinux.cpp
-    BpLib.hpp
-    BpLibLinux.hpp
-    BpLibLinux.cpp
+    BpModLib.hpp
+    BpModLibLinux.hpp
+    BpModLibLinux.cpp
+    BpNodeLib.hpp
+    BpNodeLib.cpp
+
+    BpVariable.hpp
+    BpVariable.cpp
+    BpLink.hpp
+    BpPin.hpp
+    BpPin.cpp
+    BpObj.hpp
+    BpObj.cpp
+    BpNode.hpp
+    BpNode.cpp
+    BpGraph.hpp
+    BpGraph.cpp
+    Bp.hpp
+    Bp.cpp
 )
 
 ADD_LIBRARY(bpcore SHARED ${BP_CORE_SRC})
-TARGET_LINK_LIBRARIES(bpcore dl jsoncpp)
+TARGET_LINK_LIBRARIES(bpcore bpcommon)
 
 INSTALL(TARGETS bpcore
     LIBRARY DESTINATION ${ITOOLS_INSTALL_LIB_DIR}
@@ -28,8 +44,7 @@ foreach(ut_file ${bpcore_files})
         gtest_main    
         gtest
         bp_pb
-        pthread
         bpcore
-        jsoncpp
+        bpcommon
     )
 endforeach(ut_file ${bpcore_files})
