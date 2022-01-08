@@ -11,7 +11,7 @@ BpVariable::BpVariable()
 	, _var(nullptr)
 {}
 
-BpVariable::BpVariable(const std::string& vt, const std::string& name, var_t& v) 
+BpVariable::BpVariable(const std::string& vt, const std::string& name, const pb_msg_ptr_t& v) 
 	: _var_type(vt)
 	, _var_name(name)
 	, _var(v)
@@ -32,7 +32,7 @@ BpVariable& BpVariable::operator=(const BpVariable& o)
 	return *this;
 }
 
-bool BpVariable::SetValue(const var_t& v) {
+bool BpVariable::SetValue(const pb_msg_ptr_t& v) {
 	if (v == nullptr || _var == nullptr) {
 		LOG(ERROR) << "value is nullptr";
 		return false;
@@ -52,7 +52,7 @@ bool BpVariable::SetValue(const std::string& json_desc) {
 	return true;
 }
 
-void BpVariable::SetValueByRef(const var_t& v) {
+void BpVariable::SetValueByRef(const pb_msg_ptr_t& v) {
 	_var = v;
 }
 

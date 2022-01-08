@@ -47,24 +47,23 @@ public:
 		return ID == o.ID;
 	}
 
-	std::shared_ptr<google::protobuf::Message> GetValue() { return _v.Get(); }
+	const pb_msg_ptr_t GetValue() { return _v.Get<pb_msg_t>(); }
 	void SetValue(const std::string& json_desc, bool b = false/* 不要设置该值 */) {
 		_vaild = b;
 		_v.SetValue(json_desc);
 	}
-	void SetValue(const std::shared_ptr<google::protobuf::Message>& v, bool b = false/* 不要设置该值 */) {
+	void SetValue(const pb_msg_ptr_t& v, bool b = false/* 不要设置该值 */) {
 		_vaild = b;
 		_v.SetValue(v);
 	}
+	/* 该Pin是否已经执行过 */
 	bool IsVaild() { return _vaild; }
 	void SetVaild(bool b) { _vaild = b; }
 
 	bool IsLinked() const { return _linked; }
 	void SetLinked(bool b = true) { _linked = b; }
 
-	/*
-		目前主要用于延时，分支判断使用
-	*/
+	/* 设置该Pin是否可执行 */
 	void SetExecutable(bool b = true) { _executable = b; }
 	bool IsExecutable() { return _executable; }
 
@@ -73,9 +72,9 @@ public:
 
 	BpPinKind GetPinKind() const { return _kind; }
 	BpPinType GetPinType() const { return _type; }
-	std::string GetVarType() { return _v.GetType(); }
+	const std::string& GetVarType() { return _v.GetType(); }
 	void SetPinType(BpPinType t) { _type = t; }
-	std::shared_ptr<BpObj> GetObj() { return _node.lock(); }
+	const std::shared_ptr<BpObj> GetObj() { return _node.lock(); }
 
     int           ID;
 

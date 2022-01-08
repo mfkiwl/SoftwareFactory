@@ -37,7 +37,7 @@ public:
         return _mods;
     }
 
-    pb_msg_t CreateVal(const std::string& msg_name) {
+    pb_msg_ptr_t CreateVal(const std::string& msg_name) {
         // 搜索到对应模块,调用对应模块创建变量对象
         auto mod_name = GetModName(msg_name);
         for (int i = 0; i < _mods.size(); ++i) {

@@ -9,14 +9,15 @@
 #include <jsoncpp/json/json.h>
 #include "BpContents.hpp"
 
-typedef std::shared_ptr<google::protobuf::Message> pb_msg_t;
-typedef pb_msg_t (*module_create_val_func_t)(const std::string& msg_name);
-typedef pb_msg_t (*module_func0_t)();
-typedef std::vector<pb_msg_t> (*module_func1_t)();
-typedef pb_msg_t (*module_func2_t)(pb_msg_t);
-typedef std::vector<pb_msg_t> (*module_func3_t)(pb_msg_t);
-typedef pb_msg_t (*module_func4_t)(std::vector<pb_msg_t>);
-typedef std::vector<pb_msg_t> (*module_func5_t)(std::vector<pb_msg_t>);
+typedef google::protobuf::Message pb_msg_t;
+typedef std::shared_ptr<google::protobuf::Message> pb_msg_ptr_t;
+typedef pb_msg_ptr_t (*module_create_val_func_t)(const std::string& msg_name);
+typedef pb_msg_ptr_t (*module_func0_t)();
+typedef std::vector<pb_msg_ptr_t> (*module_func1_t)();
+typedef pb_msg_ptr_t (*module_func2_t)(pb_msg_ptr_t);
+typedef std::vector<pb_msg_ptr_t> (*module_func3_t)(pb_msg_ptr_t);
+typedef pb_msg_ptr_t (*module_func4_t)(std::vector<pb_msg_ptr_t>);
+typedef std::vector<pb_msg_ptr_t> (*module_func5_t)(std::vector<pb_msg_ptr_t>);
 
 namespace bp {
 
@@ -46,11 +47,11 @@ public:
 
     std::shared_ptr<BpContents> GetContents();
 
-    pb_msg_t CreateModuleVal(const std::string& msg_name);
+    pb_msg_ptr_t CreateModuleVal(const std::string& msg_name);
 
     BpModuleFunc GetModuleFunc(const std::string& func_name);
 
-    std::string Name() {
+    const std::string& Name() {
         return _mod_name;
     }
 protected:

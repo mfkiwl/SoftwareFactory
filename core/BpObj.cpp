@@ -97,6 +97,22 @@ BpPin& BpObj::AddPin(const std::string& name, BpPinKind k, BpPinType t, const Bp
     return _null_pin;
 }
 
+bool BpObj::DelPin(int id) {
+	for (auto it = _inputs.begin(); it != _inputs.end(); ++it) {
+		if ((*it).ID == id) {
+			_inputs.erase(it);
+			return true;
+		}
+	}
+	for (auto it = _outputs.begin(); it != _outputs.end(); ++it) {
+		if ((*it).ID == id) {
+			_outputs.erase(it);
+			return true;
+		}
+	}
+    return false;
+}
+
 std::vector<BpPin>& BpObj::GetPins(BpPinKind k) {
 	if (k == BpPinKind::BP_INPUT)
 		return _inputs;

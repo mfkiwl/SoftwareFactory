@@ -134,7 +134,7 @@ std::shared_ptr<BpContents> BpModule::GetContents() {
     return _contents;
 }
 
-pb_msg_t BpModule::CreateModuleVal(const std::string& msg_name) {
+pb_msg_ptr_t BpModule::CreateModuleVal(const std::string& msg_name) {
     if (_var_names.find(msg_name) == _var_names.end()) {
         LOG(ERROR) << _mod_name << ": can't find var " << msg_name;
         return nullptr;

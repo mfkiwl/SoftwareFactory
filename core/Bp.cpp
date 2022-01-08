@@ -16,6 +16,7 @@ Bp& Bp::Instance() {
 Bp::Bp() {
 	_base_mods = std::make_shared<BpModLibLinux>();
 	_base_mods->Init("../conf/");
+	_nodes_lib = std::make_shared<BpNodeLib>();
 }
 
 Bp::~Bp() {}

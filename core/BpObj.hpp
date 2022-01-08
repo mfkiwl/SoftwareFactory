@@ -44,8 +44,10 @@ public:
 	virtual std::string& GetName() { return _name; }
 
 	virtual BpPin& AddPin(const std::string& name, BpPinKind k, BpPinType t, const BpVariable& v);
+	virtual bool DelPin(int id);
 	virtual std::vector<BpPin>& GetPins(BpPinKind k);
 	
+	/* 设置Pin都是未赋值状态 */
 	void ClearFlag();
 
 protected:

@@ -7,6 +7,7 @@
 
 namespace bp {
 
+/* 常规的函数节点 */
 class BpNodeNormal : public BpNode
 {
 public:
