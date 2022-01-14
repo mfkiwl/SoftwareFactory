@@ -15,13 +15,14 @@ include_directories(${SDL2_INCLUDE_DIRS})
 
 find_package(imgui REQUIRED)
 include_directories(${imgui_INCLUDE_DIRS})
-
+include_directories(${CMAKE_SOURCE_DIR}/3rd/glew-cmake-2.2.0/include)
 set(editor_srcs
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_opengl3.cpp
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_sdl.cpp
     main.cpp
     SFEditor.cpp
     SFEPanel.cpp
+    SFEPanelMainMenu.cpp
 )
 add_executable(SoftwareFactoryEditor ${editor_srcs})
 target_compile_definitions(SoftwareFactoryEditor PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
@@ -31,7 +32,12 @@ target_link_libraries(SoftwareFactoryEditor
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libglew.a
     OpenGL
     GL
+    
     imgui 
     imgui_canvas
     imgui_node_editor
+    
+    bp_pb
+    bpcore
+    bpcommon
 )
