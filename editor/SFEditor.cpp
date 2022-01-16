@@ -1,11 +1,17 @@
 #include "SFEditor.hpp"
 #include "SFEPanelMainMenu.hpp"
+#include "SFEPanelBp.hpp"
+#include "SFEPanelLib.hpp"
+#include "SFEPanelDragTip.hpp"
 #include "Bp.hpp"
 
 namespace sfe {
 
 bool SFEditor::Init() {
     _panels.emplace_back(std::make_shared<SFEPanelMainMenu>());
+    _panels.emplace_back(std::make_shared<SFEPanelBp>());
+    _panels.emplace_back(std::make_shared<SFEPanelLib>());
+    _panels.emplace_back(std::make_shared<SFEPanelDragTip>());
 
     for (auto it = _panels.begin(); it != _panels.end(); ++it) {
         (*it)->Init();
@@ -55,12 +61,6 @@ void SFEditor::ProcMessage() {
     }
 }
 
-void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
-    if (msg.msg == "showdemo") {
-        _show_demo = !_show_demo;
-    }
-}
-
 void SFEditor::Exit() {
     for (auto it = _panels.begin(); it != _panels.end(); ++it) {
         (*it)->Exit();
@@ -74,6 +74,57 @@ const std::shared_ptr<SFEPanel> SFEditor::GetPanel(const std::string& name) {
         }
     }
     return nullptr;
+}
+
+void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
+    if (msg.msg == "show_demo") {
+        _show_demo = !_show_demo;
+    }
+    if (msg.msg.empty()) {
+        auto cmd = msg.json_msg["command"];
+        if (cmd == "create_new") {
+            auto graph_name = msg.json_msg["graph_name"].asString();
+            auto graph_type = msg.json_msg["graph_type"].asString() == "mod graph" ? bp::BpObjType::BP_GRAPH : bp::BpObjType::BP_GRAPH_EXEC;
+            auto g = std::make_shared<bp::BpGraph>(graph_name, graph_type);
+            bp::Bp::Instance().AddEditGraph(graph_name, g);
+            bp::Bp::Instance().SetCurEditGraph(g);
+        } else if (cmd == "spawn_node") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            if (g == nullptr) {
+                LOG(WARNING) << "cur edit graph is nullptr";
+                return;
+            }
+            auto obj_type = bp::BpObjType::BP_NONE;
+            int contents_type = msg.json_msg["type"].asInt();
+            if (contents_type == (int)BpContents::Type::EV) {
+                obj_type = bp::BpObjType::BP_NODE_EV;
+            } else if (contents_type == (int)BpContents::Type::FUNC) {
+                obj_type = bp::BpObjType::BP_NODE_NORMAL;
+            } else if (contents_type == (int)BpContents::Type::VAL) {
+                obj_type = bp::BpObjType::BP_NODE_VAR;
+            }
+            auto node = bp::Bp::Instance().SpawnNode(msg.json_msg["node_name"].asString(), obj_type);
+            if (node == nullptr) {
+                LOG(WARNING) << "SpawnNode failed";
+                return;
+            }
+            if (node->GetObjType() == bp::BpObjType::BP_NODE_EV) {
+                LOG(INFO) << "Create ev node " << node->GetName();
+                g->AddEventNode(node);
+            } else {
+                LOG(INFO) << "Create node " << node->GetName();
+                g->AddNode(node);
+            }
+            // 发送给bp editor消息,设置node的坐标
+            Json::Value v;
+            v["command"] = "set_node_pos";
+            v["node_id"] = node->GetID();
+            v["x"] = msg.json_msg["x"];
+            v["y"] = msg.json_msg["y"];
+            auto panel = GetPanel("bp editor");
+            panel->RecvMessage({"editor", "bp editor", "", v});
+        }
+    }
 }
 
 } // namespace sfe

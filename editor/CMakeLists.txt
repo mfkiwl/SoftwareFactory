@@ -23,6 +23,9 @@ set(editor_srcs
     SFEditor.cpp
     SFEPanel.cpp
     SFEPanelMainMenu.cpp
+    SFEPanelBp.cpp
+    SFEPanelLib.cpp
+    SFEPanelDragTip.cpp
 )
 add_executable(SoftwareFactoryEditor ${editor_srcs})
 target_compile_definitions(SoftwareFactoryEditor PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
@@ -41,3 +44,15 @@ target_link_libraries(SoftwareFactoryEditor
     bpcore
     bpcommon
 )
+
+FILE(GLOB assets_files "assets/*")
+INSTALL(FILES 
+    ${assets_files}
+    PERMISSIONS
+    OWNER_READ
+    GROUP_READ
+    WORLD_READ
+    DESTINATION ${ITOOLS_INSTALL_ASSETS_DIR}
+)
+
+FILE(COPY ${assets_files} DESTINATION "${CMAKE_BINARY_DIR}/build/assets/")

@@ -14,12 +14,29 @@ Bp& Bp::Instance() {
 }
 
 Bp::Bp() {
+	_cur_edit_graph.reset();
+
 	_base_mods = std::make_shared<BpModLibLinux>();
 	_base_mods->Init("../conf/");
 	_nodes_lib = std::make_shared<BpNodeLib>();
+
+	_contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, "");
+	// 事件节点
+	auto& node_contents = _nodes_lib->GetContents()->GetChildren();
+	for (int i = 0; i < node_contents.size(); ++i) {
+		_contents->AddChild(node_contents[i]);
+	}
+	// 函数变量节点
+	auto& mods = _base_mods->GetMods();
+	for (int i = 0; i < mods.size(); ++i) {
+		_contents->AddChild(mods[i]->GetContents());
+	}
 }
 
-Bp::~Bp() {}
+Bp::~Bp() {
+	_edit_graphs.clear();
+	_graphs.clear();
+}
 
 BpVariable Bp::CreateVariable(const std::string& type, const std::string& name) {
 	return CreateVariable(type, name, "");
@@ -95,10 +112,12 @@ LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 		if (t == BpObjType::BP_NODE_NORMAL) {
 			auto node_name = nodes[i]["name"].asString();
 			auto func_name = nodes[i]["func"].asString();
-			// 从BpModLib中获得函数指针
-			// 从BpNodeLib中获得节点对象
-			// 组合成Node添加到graph
-			// TODO
+			auto node = SpawnNode(func_name);
+			if (node == nullptr) {
+				LOG(ERROR) << "load node " << func_name << " failed";
+				continue;
+			}
+			g->AddNode(node);
 		}
 		if (t == BpObjType::BP_NODE_EV) {
 			// 从BpNodeLib中创建事件Node
@@ -144,7 +163,7 @@ LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 	return LoadState::OK;
 }
 
-void Bp::SaveGraph(const std::shared_ptr<BpGraph>& g, const std::string& file) {
+bool Bp::SaveGraph(const std::shared_ptr<BpGraph>& g, const std::string& file) {
 	// TODO
 	// pt::ptree tree;
 	// tree.add("version", Version());
@@ -217,6 +236,58 @@ void Bp::SaveGraph(const std::shared_ptr<BpGraph>& g, const std::string& file) {
 	// tree.add_child("variables", variables);
 	// tree.add("max_id", g->GetNextID());
 	// return tree;
+	return false;
+}
+
+std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpObjType t) {
+	// 从BpModLib中获得函数指针和描述
+	// 从BpNodeLib中获得节点对象
+	// 组合成Node添加到graph
+	// _base_mods->GetMods()[0]->GetContents();
+	if (t == BpObjType::BP_NODE_NORMAL) {
+		auto func_info = _base_mods->GetFunc(node_name);
+		if (func_info.type == BpModuleFuncType::UNKNOWN) {
+			LOG(ERROR) << "get func " << node_name << " failed";
+			return nullptr;
+		}
+		func_info.name = node_name;
+		// args init
+		std::vector<BpVariable> args;
+		for (int i = 0; i < func_info.type_args.size(); ++i) {
+			auto var = CreateVariable(func_info.type_args[i], func_info.type_args[i]);
+			if (var.IsNone()) {
+				LOG(ERROR) << "create var " << func_info.type_args[i] << " failed";
+				return nullptr;
+			}
+			args.emplace_back(var);
+		}
+		// res init
+		std::vector<BpVariable> res;
+		for (int i = 0; i < func_info.type_res.size(); ++i) {
+			auto var = CreateVariable(func_info.type_res[i], func_info.type_res[i]);
+			if (var.IsNone()) {
+				LOG(ERROR) << "create var " << func_info.type_args[i] << " failed";
+				return nullptr;
+			}
+			res.emplace_back(var);
+		}
+		return _nodes_lib->CreateFuncNode(func_info, args, res);
+	} else if (t == BpObjType::BP_NODE_EV) {
+		return _nodes_lib->CreateEvNode(node_name);
+	}
+	return nullptr;
+}
+
+const std::shared_ptr<BpContents>& Bp::GetContents() const {
+	return _contents;
+}
+
+bool Bp::AddEditGraph(const std::string& name, std::shared_ptr<BpGraph> g) {
+	if (_edit_graphs.find(name) != _edit_graphs.end()) {
+		return false;
+	}
+	_edit_graphs[name] = g;
+	return true;
 }
 
 } // nemespace bp

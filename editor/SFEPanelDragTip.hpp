@@ -3,7 +3,7 @@
 
 namespace sfe {
 
-class SFEPanelMainMenu : public SFEPanel {
+class SFEPanelDragTip : public SFEPanel {
 public:
     virtual bool Init() override;
 
@@ -11,8 +11,11 @@ public:
 
     virtual void Exit() override;
 
+    virtual void OnMessage(const SFEMessage& msg) override;
+
 private:
-    void CreateNewGraph();
+    bool _visible = false;
+    std::string _desc = "";
 };
 
 } // namespace sfe

@@ -10,6 +10,7 @@ public:
         CONTENTS,
         FUNC,
         VAL,
+        EV,
     };
 
     BpContents(std::shared_ptr<BpContents> parent, Type t, std::string name)
@@ -19,6 +20,9 @@ public:
         , _name(name)
     {}
     
+    const std::vector<std::shared_ptr<BpContents>>&
+    GetChildren() { return _next_contents; }
+
     bool AddChild(std::shared_ptr<BpContents> contents) {
         if (contents == nullptr) {
             return false;
@@ -42,10 +46,10 @@ public:
     }
 
     std::string GetFullPath() {
-        if (_parent.expired()) {
+        if (_parent.expired() || _parent.lock()->GetName().empty()) {
             return _name;
         }
-        return _parent.lock()->GetFullPath() + "." + _name;
+        return (_parent.lock()->GetFullPath() + "." + _name);
     }
 
     bool HasChild() {
@@ -56,12 +60,8 @@ public:
         return _type != Type::CONTENTS;
     }
 
-    bool IsFunc() {
-        return _type == Type::FUNC;
-    }
-
-    bool IsVal() {
-        return _type == Type::VAL;
+    Type GetType() {
+        return _type;
     }
 
     std::string PrintContents() {
@@ -85,9 +85,6 @@ private:
         }
         content_str += pre;
         content_str += c->_name;
-        if (c->IsLeaf()) {
-            content_str += c->IsFunc() ? "(func)" : "(var)";
-        }
         content_str += "\n";
         for (int i = 0; i < c->_next_contents.size(); ++i) {
             TraverseContents(c->_next_contents[i], depth + 1, content_str);

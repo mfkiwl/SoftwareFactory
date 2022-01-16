@@ -145,11 +145,20 @@ std::shared_ptr<BpObj> BpGraph::GetNode(int id) {
 }
 
 bool BpGraph::AddEventNode(std::shared_ptr<BpObj> node) {
-	if (_obj_type == BpObjType::BP_GRAPH) return false;
+	if (_obj_type == BpObjType::BP_GRAPH) {
+		LOG(ERROR) << _name << " not exec graph";
+		return false;
+	}
+	if (node->GetObjType() != BpObjType::BP_NODE_EV) {
+		LOG(ERROR) << node->GetName() << " not ev node";
+		return false;
+	}
 	if (_event_nodes.find(node->GetName()) == _event_nodes.end()) {
+		node->SetParentGraph(std::dynamic_pointer_cast<BpGraph>(shared_from_this()));
 		_event_nodes[node->GetName()] = node;
 		return true;
 	}
+	LOG(ERROR) << "add event " << node->GetName() << "failed";
 	return false;
 }
 

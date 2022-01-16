@@ -49,9 +49,11 @@ virtual void Logic() = 0;
 
 ## BpNodeLib(TODO)
 * 创建函数节点
+* 创建事件节点
+
 * 创建变量节点
 * 创建分支结构节点
 
-## BpVariable(TODO)
+## BpVariable
 * 写单测
     * 测试传值,传引用

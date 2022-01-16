@@ -33,8 +33,9 @@ enum class BpModuleFuncType {
 
 struct BpModuleFunc {
     BpModuleFuncType type = BpModuleFuncType::UNKNOWN;
-    std::vector<std::string> args;
-    std::vector<std::string> res;
+    std::string name;
+    std::vector<std::string> type_args;
+    std::vector<std::string> type_res;
     std::any func;
 };
 
@@ -42,6 +43,9 @@ class BpModule
 {
 public:
     BpModule() = default;
+    virtual ~BpModule() {
+        _module_funcs.clear();
+    }
 
     bool LoadModule(const std::string& json_path);
 

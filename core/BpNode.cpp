@@ -7,6 +7,7 @@ BpNode::BpNode(const std::string& name, std::shared_ptr<BpGraph> parent, BpObjTy
 	: BpObj(name, parent)
 {
 	_obj_type = t;
+	// FIXME 此处不能创建PIN
 }
 
 } // namespace bp

@@ -9,9 +9,10 @@ namespace bp {
 BpObj::BpObj(const std::string& name, std::shared_ptr<BpGraph> parent)
 	: std::enable_shared_from_this<BpObj>()
     , _parent_graph(parent)
-	, _obj_type(BpObjType::BP_NONE)
-	, _type(BpNodeType::BP_NONE)
+	, _obj_type(BpObjType::BP_NODE_NORMAL)
+	, _type(BpNodeType::BP_BLUPRINT)
 	, _name(name)
+	, _tmp_next_id(0)
 {
 	if (parent) {
 		_id = parent->GetNextID();
@@ -23,10 +24,29 @@ BpObj::BpObj(const std::string& name, std::shared_ptr<BpGraph> parent)
 
 BpObj::~BpObj()
 {
+	_inputs.clear();
+	_outputs.clear();
 	LOG(INFO) << "Delete node \"" << _name << "\": " << _id;
 }
 
+void BpObj::SetParentGraph(std::shared_ptr<BpGraph> graph) {
+	LOG(INFO) << _name << "(node) --> " << graph->_name << "(graph)";
+	_parent_graph = graph;
+	_id = graph->GetNextID();
+	for (auto& out : _outputs) {
+		out.ID = graph->GetNextID();
+	}
+	for (auto& in : _inputs) {
+		in.ID = graph->GetNextID();
+	}
+	_tmp_next_id = 0;
+}
+
 void BpObj::Run() {
+	if (_parent_graph.expired()) {
+		LOG(ERROR) << _name << " has no graph";
+		return;
+	}
     auto graph = _parent_graph.lock();
 
 	// build input
@@ -83,7 +103,12 @@ void BpObj::Run() {
 }
 
 BpPin& BpObj::AddPin(const std::string& name, BpPinKind k, BpPinType t, const BpVariable& v) {
-	const int id = _parent_graph.lock()->GetNextID();
+	int id = 0;
+	if (_parent_graph.expired()) {
+		id = ++_tmp_next_id;
+	} else {
+		id = _parent_graph.lock()->GetNextID();
+	}
 	
 	if (k == BpPinKind::BP_INPUT) {
 		_inputs.emplace_back(shared_from_this(), k, t, id, name, v);

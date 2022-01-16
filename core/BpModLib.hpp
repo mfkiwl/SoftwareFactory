@@ -15,7 +15,9 @@ class BpModLib
 {
 public:
     BpModLib() = default;
-
+    ~BpModLib() {
+        _mods.clear();
+    }
     bool Init(const std::string& conf_path) {
         auto confs = GetDirFiles(conf_path);
         if (confs.empty()) {

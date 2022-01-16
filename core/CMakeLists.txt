@@ -1,5 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/evnode)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/basenode)
+
 SET(BP_CORE_SRC
 	BpContents.hpp
 	BpModule.hpp
@@ -21,10 +24,14 @@ SET(BP_CORE_SRC
     BpObj.cpp
     BpNode.hpp
     BpNode.cpp
+    BpNodeNormal.hpp
+    BpNodeNormal.cpp
     BpGraph.hpp
     BpGraph.cpp
     Bp.hpp
     Bp.cpp
+
+    evnode/BpEvNodeTick.cpp
 )
 
 ADD_LIBRARY(bpcore SHARED ${BP_CORE_SRC})

@@ -30,7 +30,7 @@ public:
 	void SetNextID(int id);
 
 	event_node_map_t& GetEvNodes() { return _event_nodes; }
-	bool AddEventNode(std::shared_ptr<BpObj> com);
+	bool AddEventNode(std::shared_ptr<BpObj>);
 	void DelEventNode(std::string name);
 
 	node_vec_t& GetNodes() { return _nodes; }

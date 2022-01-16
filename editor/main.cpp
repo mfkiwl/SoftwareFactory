@@ -33,9 +33,8 @@ int main(int, char**)
     // Setup SDL
     // (Some versions of SDL before <2.0.10 appears to have performance/stalling issues on a minority of Windows systems,
     // depending on whether SDL_INIT_GAMECONTROLLER is enabled or disabled.. updating to latest version of SDL is recommended!)
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
-    {
-        printf("Error: %s\n", SDL_GetError());
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
+        LOG(ERROR) << SDL_GetError();
         return -1;
     }
 
@@ -54,7 +53,7 @@ int main(int, char**)
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window* window = SDL_CreateWindow("SoftwareFactoryEditor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
     if (window == nullptr) {
-        printf("Error: %s\n", SDL_GetError());
+        LOG(ERROR) << SDL_GetError();
         return -1;
     }
     SDL_SetWindowMinimumSize(window, 200, 200);
@@ -62,10 +61,10 @@ int main(int, char**)
     SDL_GL_MakeCurrent(window, gl_context);
     SDL_GL_SetSwapInterval(1); // Enable vsync
 
-    fprintf(stdout, "OpenGL Vendor: %s\n", glGetString(GL_VENDOR));
-    fprintf(stdout, "OpenGL Renderer: %s\n", glGetString(GL_RENDERER));
-    fprintf(stdout, "OpenGL Shading Language Version: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    fprintf(stdout, "OpenGL Extensions: %s\n", glGetString(GL_EXTENSIONS));
+    LOG(INFO) << "OpenGL Vendor:" << glGetString(GL_VENDOR);
+    LOG(INFO) << "OpenGL Renderer:" << glGetString(GL_RENDERER);
+    LOG(INFO) << "OpenGL Shading Language Version:" << glGetString(GL_SHADING_LANGUAGE_VERSION);
+    LOG(INFO) << "OpenGL Extensions:" << glGetString(GL_EXTENSIONS);
 
     // Initialize OpenGL loader
 #if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
@@ -85,10 +84,9 @@ int main(int, char**)
 #else
     bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
 #endif
-    if (err)
-    {
-        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
-        return 1;
+    if (err) {
+        LOG(ERROR) << "Failed to initialize OpenGL loader!";
+        return -1;
     }
 
     // Setup Dear ImGui context
@@ -98,6 +96,7 @@ int main(int, char**)
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigDockingWithShift = false;
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -122,18 +121,14 @@ int main(int, char**)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
 
-    // Our state
-    bool show_demo_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
     auto editor = std::make_shared<sfe::SFEditor>();
     if (!editor->Init()) {
+        LOG(ERROR) << "Init editor failed";
         return -1;
     }
     // Main loop
     bool done = false;
-    while (!done)
-    {
+    while (!done) {
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -154,20 +149,54 @@ int main(int, char**)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
+        
+        // fullscreen imgui panel that will host a dockspace
+        bool showMenu = false;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
+        window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+        window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->GetWorkPos());
+        ImGui::SetNextWindowSize(viewport->GetWorkSize());
+        ImGui::SetNextWindowViewport(viewport->ID);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("DockSpaceWnd", 0, window_flags);
+        ImGui::PopStyleVar(3);
 
+        static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+        if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+        window_flags |= ImGuiWindowFlags_NoBackground;
+        // DockSpace
+        if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+            ImGuiID dockspace_id = ImGui::GetID("DockSpace");
+            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+        }
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(2, 2));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 4.0f);
+
+        // Views
         editor->Update();
         editor->DispatchMessage();
         editor->ProcMessage();
 
+        ImGui::PopStyleVar(2);
+        ImGui::End();
+
         // Rendering
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
     }
+    LOG(INFO) << "Exit loop";
     editor->Exit();
+    LOG(INFO) << "Exit editor";
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();

@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <SDL.h>
 #include <glog/logging.h>
+#include <jsoncpp/json/json.h>
 
 #include "imgui.h"
 
@@ -14,10 +15,13 @@ struct SFEMessage {
     std::string src;
     std::string dst;
     std::string msg;
+    Json::Value json_msg;
 
     std::string Print() const {
         std::stringstream ss;
-        ss << "{src: \"" << src << "\", dst: \"" << dst << "\", msg: \"" << msg << "\"}";
+        ss << "{src: \"" << src << "\", dst: \"" << dst << "\", msg: \"" 
+            << msg << ", json msg: "
+            << json_msg.toStyledString() << "}";
         return ss.str();
     }
 };
@@ -26,7 +30,11 @@ struct SFEMessage {
     初始化
     输入系统
     命令
-        来自其它面板的命令
+        {
+            command: "spawnnode",
+            arg1: "bpmath.add_int",
+            ...
+        }
     更新
     退出
 

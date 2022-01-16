@@ -17,7 +17,6 @@ TEST(bpcore, BpContents) {
     auto bpcontents = std::make_shared<BpContents>(nullptr, BpContents::Type::VAL, "pb_int_a");
     EXPECT_FALSE(bpcontents->SetParent(nullptr));
     EXPECT_FALSE(bpcontents->AddChild(nullptr));
-    EXPECT_TRUE(bpcontents->IsVal());
     EXPECT_EQ(bpcontents->GetFullPath(), "pb_int_a");
 
     /*
@@ -119,9 +118,4 @@ TEST(bpcore, Bp) {
     auto g = std::make_shared<bp::BpGraph>();
     EXPECT_EQ(bp::LoadState::ERR_OPEN_FILE, b.LoadGraph(std::string(""), g));
     EXPECT_NE(bp::LoadState::OK, b.LoadGraph(std::string("../conf/com_random.json"), g));
-}
-
-TEST(bpcore, BpGraph) {
-    auto g = std::make_shared<bp::BpGraph>(nullptr);
-   
 }

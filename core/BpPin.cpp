@@ -6,6 +6,7 @@ namespace bp {
 BpPin::BpPin() 
 	: _kind(BpPinKind::BP_NONE)
 	, _type(BpPinType::BP_NONE)
+	, ID(-1)
 {}
 
 BpPin::BpPin(std::shared_ptr<BpObj> n, 

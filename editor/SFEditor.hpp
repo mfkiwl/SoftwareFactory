@@ -27,7 +27,7 @@ private:
     void ProcEditorMessage(const SFEMessage& msg);
 
     std::vector<std::shared_ptr<SFEPanel>> _panels;
-    bool _show_demo = false;
+    bool _show_demo = true;
 };
 
 } // namespace sfe
