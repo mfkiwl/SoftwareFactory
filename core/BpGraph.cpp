@@ -190,7 +190,7 @@ void BpGraph::Run() {
 		BpObj::Run();
 	} else {
 		// TODO 应该按事件优先级依次执行
-		// RunEvent("in");
+		RunEvent("Tick");
 	}
 }
 

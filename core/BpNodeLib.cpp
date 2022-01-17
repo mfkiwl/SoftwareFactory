@@ -29,6 +29,7 @@ std::shared_ptr<BpNode> BpNodeLib::CreateFuncNode(BpModuleFunc func_info,
             std::vector<BpVariable>& res) {
     LOG(INFO) << "create node " << func_info.name;
     auto node = std::make_shared<BpNodeNormal>(func_info.name, nullptr);
+    node->SetFuncInfo(func_info);
     // // 创建一个输入输出flow
     node->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
     node->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());

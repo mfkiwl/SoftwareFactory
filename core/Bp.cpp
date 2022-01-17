@@ -284,6 +284,7 @@ const std::shared_ptr<BpContents>& Bp::GetContents() const {
 
 bool Bp::AddEditGraph(const std::string& name, std::shared_ptr<BpGraph> g) {
 	if (_edit_graphs.find(name) != _edit_graphs.end()) {
+		LOG(ERROR) << "add edit graph " << name << "failed";
 		return false;
 	}
 	_edit_graphs[name] = g;

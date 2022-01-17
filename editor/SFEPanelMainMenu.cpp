@@ -37,9 +37,21 @@ void SFEPanelMainMenu::Update() {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Run")) {
-            if (ImGui::MenuItem("Start", "F5")) {}
+            if (ImGui::MenuItem("Start", "F5", false, !_runing)) {
+                _runing = true;
+                Json::Value v;
+                v["command"] = "run_cur_graph";
+                v["run"] = _runing;
+                SendMessage({PanelName(), "all", "", v});
+            }
             if (ImGui::MenuItem("Pause", "CTRL+F5")) {}
-            if (ImGui::MenuItem("Stop", "SHIFT+F5")) {}
+            if (ImGui::MenuItem("Stop", "SHIFT+F5", false, _runing)) {
+                _runing = false;
+                Json::Value v;
+                v["command"] = "run_cur_graph";
+                v["run"] = _runing;
+                SendMessage({PanelName(), "all", "", v});
+            }
             if (ImGui::MenuItem("Restart", "CTRL+SHIFT+F5")) {}
             ImGui::EndMenu();
         }

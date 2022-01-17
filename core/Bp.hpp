@@ -45,6 +45,7 @@ public:
 	std::shared_ptr<BpGraph> CurEditGraph() { return _cur_edit_graph.lock(); }
 	void SetCurEditGraph(std::shared_ptr<BpGraph> g) { _cur_edit_graph = g; }
 	bool AddEditGraph(const std::string& name, std::shared_ptr<BpGraph> g);
+	const std::unordered_map<std::string, std::shared_ptr<BpGraph>>& GetEditGraphs() { return _edit_graphs; }
 private:
 	Bp();
 	~Bp();

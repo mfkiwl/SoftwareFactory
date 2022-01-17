@@ -3,6 +3,7 @@
 #include "SFEPanelBp.hpp"
 #include "SFEPanelLib.hpp"
 #include "SFEPanelDragTip.hpp"
+#include "SFEPanelGraph.hpp"
 #include "Bp.hpp"
 
 namespace sfe {
@@ -12,6 +13,7 @@ bool SFEditor::Init() {
     _panels.emplace_back(std::make_shared<SFEPanelBp>());
     _panels.emplace_back(std::make_shared<SFEPanelLib>());
     _panels.emplace_back(std::make_shared<SFEPanelDragTip>());
+    _panels.emplace_back(std::make_shared<SFEPanelGraph>());
 
     for (auto it = _panels.begin(); it != _panels.end(); ++it) {
         (*it)->Init();
@@ -42,6 +44,17 @@ void SFEditor::DispatchMessage() {
         for (int j = 0; j < msgs.size(); ++j) {
             if (msgs[j].dst == "editor") {
                 ProcEditorMessage(msgs[j]);
+                continue;
+            }
+            // boardcast
+            if (msgs[j].dst == "all") {
+                ProcEditorMessage(msgs[j]);
+                for (int k = 0; k < _panels.size(); ++k) {
+                    if (_panels[k]->PanelName() == msgs[j].src) {
+                        continue;
+                    }
+                    _panels[k]->RecvMessage(msgs[j]);
+                }
                 continue;
             }
             auto panel = GetPanel(msgs[j].dst);
@@ -88,6 +101,12 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             auto g = std::make_shared<bp::BpGraph>(graph_name, graph_type);
             bp::Bp::Instance().AddEditGraph(graph_name, g);
             bp::Bp::Instance().SetCurEditGraph(g);
+            // send to graph
+            Json::Value v;
+            v["command"] = "set_cur_graph";
+            v["graph_name"] = graph_name;
+            auto panel = GetPanel("graph");
+            panel->RecvMessage({"editor", "graph", "", v});
         } else if (cmd == "spawn_node") {
             auto g = bp::Bp::Instance().CurEditGraph();
             if (g == nullptr) {
