@@ -274,8 +274,29 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpObjT
 		return _nodes_lib->CreateFuncNode(func_info, args, res);
 	} else if (t == BpObjType::BP_NODE_EV) {
 		return _nodes_lib->CreateEvNode(node_name);
+	} else if (t == BpObjType::BP_NODE_BASE) {
+		return _nodes_lib->CreateBaseNode(node_name);
 	}
 	return nullptr;
+}
+
+std::shared_ptr<BpNode> Bp::SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_name, bool is_get) {
+	auto var = g->GetVariable(var_name);
+	if (var.IsNone()) {
+		LOG(ERROR) << "var: " << var_name << "is empty";
+		return nullptr;
+	}
+	return _nodes_lib->CreateVarNode(var, is_get);
+}
+
+std::shared_ptr<BpNode> Bp::SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_type, const std::string& var_name, bool is_get) {
+	auto msg = _base_mods->CreateVal(var_type);
+	if (msg == nullptr) {
+		LOG(ERROR) << "create var failed";
+		return nullptr;
+	}
+	g->AddVariable(var_name, BpVariable(var_type, var_name, msg));
+	return _nodes_lib->CreateVarNode(g->GetVariable(var_name), is_get);
 }
 
 const std::shared_ptr<BpContents>& Bp::GetContents() const {

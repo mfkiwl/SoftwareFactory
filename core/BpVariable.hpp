@@ -22,13 +22,13 @@ public:
 	bool IsNone() { return _var == nullptr; }
 
 	template<typename T>
-	const std::shared_ptr<T> Get() { return std::dynamic_pointer_cast<T>(_var); }
+	std::shared_ptr<T> Get() { return std::dynamic_pointer_cast<T>(_var); }
 
 	const std::string& GetName() const { return _var_name; }
 
 	const std::string& GetType() const { return _var_type; }
 
-	bool IsSameType(const BpVariable& v) { return _var_type == v._var_type; }
+	bool IsSameType(const BpVariable& v) { return ((_var_type == "any") || (_var_type == v._var_type)); }
 
 	// 值传递
 	bool SetValue(const std::string& json_desc);

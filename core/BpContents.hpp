@@ -11,6 +11,7 @@ public:
         FUNC,
         VAL,
         EV,
+        BASE,
     };
 
     BpContents(std::shared_ptr<BpContents> parent, Type t, std::string name)

@@ -39,6 +39,10 @@ public:
 	BpVariable CreateVariable(const std::string& type, const std::string& name, const std::string& value_desc);
 
 	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpObjType t = BpObjType::BP_NODE_NORMAL);
+	/* 生成一个新的变量节点并加入graph */
+	std::shared_ptr<BpNode> SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_type, const std::string& var_name, bool is_get = true);
+	/* 根据已有的变量生成节点 */
+	std::shared_ptr<BpNode> SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_name, bool is_get = true);
 
 	const std::shared_ptr<BpContents>& GetContents() const;
 

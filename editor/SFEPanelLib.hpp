@@ -14,7 +14,8 @@ public:
 
 private:
     void ShowLib(std::shared_ptr<BpContents> c);
-
+    void ShowVarSetting();
+    bool _show_var_setting = false;
     int _drag_state = 0;
     std::weak_ptr<BpContents> _drag_item;
 };

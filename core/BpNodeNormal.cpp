@@ -39,7 +39,7 @@ void BpNodeNormal::Logic() {
     // } else if (_info.type == BpModuleFuncType::RESN_ARGN) {
         
     // }
-    
+    LOG(INFO) << "run " << _name;
 }
 
 } // namespace bp

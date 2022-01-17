@@ -15,6 +15,11 @@ void SFEPanelLib::Update() {
     for (int i = 0; i < children.size(); ++i) {
         ShowLib(children[i]);
     }
+    if (_show_var_setting) {
+        _show_var_setting = false;
+        ImGui::OpenPopup("variable setting");
+    }
+    ShowVarSetting();
     ImGui::End();
 }
 
@@ -51,16 +56,22 @@ void SFEPanelLib::ShowLib(std::shared_ptr<BpContents> c) {
             v["command"] = "close";
             SendMessage({PanelName(), "drag tip", "", v});
             // 给 bp editor发送创建Node消息
-            Json::Value v2;
-            v2["command"] = "spawn_node";
-            v2["node_name"] = (_drag_item.lock()->GetType() == BpContents::Type::FUNC) ? _drag_item.lock()->GetFullPath() : _drag_item.lock()->GetName();
-            v2["type"] = (int)_drag_item.lock()->GetType();
-            ImVec2 xy = ImGui::GetMousePos();
-            v2["x"] = xy.x;
-            v2["y"] = xy.y;
-            SendMessage({PanelName(), "editor", "", v2});
+            // 变量节点, 需要使用界面设置get/set和变量名称
+            if (_drag_item.lock()->GetType() == BpContents::Type::VAL) {
+                // show setting
+                _show_var_setting = true;
+            } else {
+                Json::Value v2;
+                v2["command"] = "spawn_node";
+                v2["node_name"] = (_drag_item.lock()->GetType() == BpContents::Type::FUNC) ? _drag_item.lock()->GetFullPath() : _drag_item.lock()->GetName();
+                v2["type"] = (int)_drag_item.lock()->GetType();
+                ImVec2 xy = ImGui::GetMousePos();
+                v2["x"] = xy.x;
+                v2["y"] = xy.y;
+                SendMessage({PanelName(), "editor", "", v2});
+                _drag_item.reset();
+            }
             _drag_state = 0;
-            _drag_item.reset();
         }
         return;
     }
@@ -70,6 +81,43 @@ void SFEPanelLib::ShowLib(std::shared_ptr<BpContents> c) {
             ShowLib(children[i]);
         }
         ImGui::TreePop();
+    }
+}
+
+void SFEPanelLib::ShowVarSetting() {
+    if (ImGui::BeginPopupModal("variable setting", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        static bool is_get = true;
+        static int style_idx = 0;
+        if (ImGui::Combo("get/set", &style_idx, "get\0set\0")) {
+            switch (style_idx) {
+            case 0: is_get = true; break;
+            case 1: is_get = false; break;
+            }
+        }
+        static char buf[64] = "";
+        ImGui::InputText("variable name", buf, 64, ImGuiInputTextFlags_CharsNoBlank);
+
+        if (ImGui::Button("OK", ImVec2(120, 0))) { 
+            Json::Value v2;
+            v2["command"] = "spawn_node";
+            v2["node_name"] = _drag_item.lock()->GetName();
+            v2["type"] = (int)_drag_item.lock()->GetType();
+            v2["is_get"] = is_get;
+            v2["var_name"] = buf;
+            ImVec2 xy = ImGui::GetMousePos();
+            v2["x"] = xy.x;
+            v2["y"] = xy.y;
+            SendMessage({PanelName(), "editor", "", v2});
+            _drag_item.reset();
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) { 
+            _drag_item.reset();
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::EndPopup();
     }
 }
 

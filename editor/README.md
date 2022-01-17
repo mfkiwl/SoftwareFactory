@@ -16,5 +16,8 @@ sudo apt-get install libsdl2-dev
 * 列出可以创建的节点
     * 函数节点
     * 变量节点
+        * 设置提示面板
+            * get/set
+            * name
     * 事件节点
     * 分支结构结构节点

@@ -11,6 +11,7 @@ class BpGraph;
 class BpNodeLib
 {
     typedef std::shared_ptr<BpEvNode> create_ev_node_t();
+    typedef std::shared_ptr<BpNode> create_base_node_t();
     typedef std::shared_ptr<BpNode> create_func_node_t(BpModuleFunc func_info);
     typedef std::shared_ptr<BpNode> create_var_node_t(pb_msg_ptr_t msg, bool is_get, bool is_ref);
 public:
@@ -23,7 +24,7 @@ public:
             std::vector<BpVariable>& res);
 
     /* 创建变量node */
-    std::shared_ptr<BpNode> CreateVarNode(pb_msg_ptr_t msg, bool is_get, bool is_ref);
+    std::shared_ptr<BpNode> CreateVarNode(BpVariable var, bool is_get);
     
     /* 创建事件Node */
     std::shared_ptr<BpNode> CreateEvNode(const std::string& name);
@@ -40,7 +41,9 @@ public:
 private:
     std::shared_ptr<BpContents> _root_contents;
     std::shared_ptr<BpContents> _ev_contents;
+    std::shared_ptr<BpContents> _base_contents;
     std::unordered_map<std::string, std::function<create_ev_node_t>> _ev_nodes;
+    std::unordered_map<std::string, std::function<create_base_node_t>> _base_nodes;
 };
 
 } // namespace bp

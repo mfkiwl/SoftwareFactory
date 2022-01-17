@@ -45,7 +45,7 @@ BpPin::~BpPin() {
 bool BpPin::IsSameType(BpPin* p)
 {
 	if (_type == BpPinType::BP_FLOW && p->_type == BpPinType::BP_FLOW) return true;
-	return p->GetVarType() == GetVarType();
+	return p->_v.IsSameType(_v);
 }
 
 } // namespace bp

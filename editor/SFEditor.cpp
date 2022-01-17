@@ -121,8 +121,24 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 obj_type = bp::BpObjType::BP_NODE_NORMAL;
             } else if (contents_type == (int)BpContents::Type::VAL) {
                 obj_type = bp::BpObjType::BP_NODE_VAR;
+            } else if (contents_type == (int)BpContents::Type::BASE) {
+                obj_type = bp::BpObjType::BP_NODE_BASE;
             }
-            auto node = bp::Bp::Instance().SpawnNode(msg.json_msg["node_name"].asString(), obj_type);
+            std::shared_ptr<bp::BpNode> node = nullptr;
+            if (obj_type == bp::BpObjType::BP_NODE_VAR) {
+                if (msg.json_msg["node_name"].asString().empty()) {
+                    node = bp::Bp::Instance().SpawnVarNode(g, 
+                                msg.json_msg["var_name"].asString(),
+                                msg.json_msg["is_get"].asBool());
+                } else {
+                    node = bp::Bp::Instance().SpawnVarNode(g, 
+                                msg.json_msg["node_name"].asString(),
+                                msg.json_msg["var_name"].asString(),
+                                msg.json_msg["is_get"].asBool());
+                }
+            } else {
+                node = bp::Bp::Instance().SpawnNode(msg.json_msg["node_name"].asString(), obj_type);
+            }
             if (node == nullptr) {
                 LOG(WARNING) << "SpawnNode failed";
                 return;
