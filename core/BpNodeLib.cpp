@@ -18,7 +18,7 @@ BpNodeLib::BpNodeLib()
         {"Print", [](){ 
             auto node = std::make_shared<BpBaseNodePrint>(nullptr); 
             node->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable()); 
-            node->AddPin("any", BpPinKind::BP_INPUT, BpPinType::BP_VALUE, BpVariable("any", "any", nullptr)); 
+            node->AddPin("any", BpPinKind::BP_INPUT, BpPinType::BP_VALUE, BpVariable("any", "any", nullptr)).SetAssignByRef(true); 
             return node; }
         }
     }

@@ -56,6 +56,10 @@ public:
 		_vaild = b;
 		_v.SetValue(v);
 	}
+	void SetValueByRef(const pb_msg_ptr_t& v, bool b = false/* 不要设置该值 */) {
+		_vaild = b;
+		_v.SetValueByRef(v);
+	}
 	/* 该Pin是否已经执行过 */
 	bool IsVaild() { return _vaild; }
 	void SetVaild(bool b) { _vaild = b; }
@@ -70,6 +74,9 @@ public:
 	const std::string& GetName() { return _name; }
 	void SetName(const std::string& name) { _name = name; }
 
+	bool AssignByRef() { return _assign_by_ref; }
+	void SetAssignByRef(bool b) { _assign_by_ref = b; }
+
 	BpPinKind GetPinKind() const { return _kind; }
 	BpPinType GetPinType() const { return _type; }
 	const std::string& GetVarType() { return _v.GetType(); }
@@ -82,6 +89,7 @@ private:
 	bool          _executable;
 	bool          _linked;
 	bool          _vaild;
+	bool          _assign_by_ref;
 
 	std::string           _name;
     BpPinType             _type;

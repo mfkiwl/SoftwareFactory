@@ -143,9 +143,9 @@ void JsonPbConvert::PbMsg2Json(const ProtobufMsg& src, Json::Value& dst, bool en
             }
             continue;
         }
-        if (!reflection->HasField(src, field)) {
-            continue;
-        }
+        // if (!reflection->HasField(src, field)) {
+        //     continue;
+        // }
  
         switch (field->type()) {
             case ProtobufFieldDescriptor::TYPE_MESSAGE: {

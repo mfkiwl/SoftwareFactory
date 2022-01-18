@@ -83,7 +83,12 @@ void BpObj::Run() {
 			auto links = graph->SearchLinks(out.ID);
 			for (auto& link : links) {
 				if (link.StartPinID == out.ID) {
-					graph->SearchPin(link.EndPinID)->SetValue(out.GetValue(), true);
+					bp:BpPin* p = graph->SearchPin(link.EndPinID);
+					if (p->AssignByRef()) {
+						p->SetValueByRef(out.GetValue(), true);
+					} else {
+						p->SetValue(out.GetValue(), true);
+					}
 				}
 			}
 		}

@@ -21,6 +21,7 @@ BpPin::BpPin(std::shared_ptr<BpObj> n,
 	, _kind(k)
 	, _vaild(false)
 	, _executable(true)
+	, _assign_by_ref(false)
 {
 	LOG(INFO) << "Create pin " << id;
 }
