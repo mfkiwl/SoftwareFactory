@@ -31,7 +31,8 @@ public:
 	bool IsSameType(const BpVariable& v) { return ((_var_type == "any") || (_var_type == v._var_type)); }
 
 	// 值传递
-	bool SetValue(const std::string& json_desc);
+	bool SetValue(const std::string& v);
+	bool SetValue(const Json::Value& v);
 	bool SetValue(const pb_msg_ptr_t& v);
 
 	// 引用传递

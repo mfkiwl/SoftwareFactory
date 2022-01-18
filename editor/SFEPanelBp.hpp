@@ -41,6 +41,7 @@ public:
     virtual void OnMessage(const SFEMessage& msg) override;
 
 private:
+    void ShowVarNodeAttr();
     void ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpObj>& node);
     void DrawPinIcon(bp::BpPin& pin, int alpha);
     ImColor GetNodeKindColor(bp::BpObjType kind);
@@ -51,6 +52,10 @@ private:
     ImTexture _bg_texture;
     ed::EditorContext* _node_editor = nullptr;
     std::weak_ptr<bp::BpGraph> _graph;
+    bool _is_doubleclick_node = false;
+    std::string _doubleclick_node_attr = "";
+    char _doubleclick_node_edit_attr[2048] = {};
+    std::shared_ptr<bp::BpObj> _doubleclick_node = nullptr;
 };
 
 } // namespace sfe

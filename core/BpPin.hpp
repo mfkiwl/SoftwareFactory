@@ -48,9 +48,13 @@ public:
 	}
 
 	const pb_msg_ptr_t GetValue() { return _v.Get<pb_msg_t>(); }
-	void SetValue(const std::string& json_desc, bool b = false/* 不要设置该值 */) {
+	void SetValue(const std::string& v, bool b = false/* 不要设置该值 */) {
 		_vaild = b;
-		_v.SetValue(json_desc);
+		_v.SetValue(v);
+	}
+	void SetValue(const Json::Value& v, bool b = false/* 不要设置该值 */) {
+		_vaild = b;
+		_v.SetValue(v);
 	}
 	void SetValue(const pb_msg_ptr_t& v, bool b = false/* 不要设置该值 */) {
 		_vaild = b;

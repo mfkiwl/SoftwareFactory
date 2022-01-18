@@ -33,22 +33,32 @@ BpVariable& BpVariable::operator=(const BpVariable& o)
 }
 
 bool BpVariable::SetValue(const pb_msg_ptr_t& v) {
-	if (v == nullptr || _var == nullptr) {
-		LOG(ERROR) << "value is nullptr";
+	if (v == nullptr) {
+		LOG(ERROR) << "pb value is nullptr";
 		return false;
 	}
-	std::string json_desc;
+	Json::Value json_v;
 	// FIXME: 值转换会降低效率, 直接赋值可能会导致未知的问题
-	JsonPbConvert::PbMsg2JsonStr(*v, json_desc);
-	return SetValue(json_desc);
+	JsonPbConvert::PbMsg2Json(*v, json_v);
+	return SetValue(json_v);
 }
 
-bool BpVariable::SetValue(const std::string& json_desc) {
-	if (json_desc.empty() || _var == nullptr) {
-		LOG(ERROR) << "json_desc is empty";
+bool BpVariable::SetValue(const std::string& v) {
+	Json::Value value;
+	Json::Reader reader(Json::Features::strictMode());
+	if (!reader.parse(v, value)) {    
+		LOG(ERROR) << "parse json failed";
 		return false;
 	}
-	JsonPbConvert::JsonStr2PbMsg(json_desc, *_var);
+	return SetValue(value);
+}
+
+bool BpVariable::SetValue(const Json::Value& v) {
+	if (v.isNull() || _var == nullptr) {
+		LOG(ERROR) << "json_value is empty";
+		return false;
+	}
+	JsonPbConvert::Json2PbMsg(v, *_var);
 	return true;
 }
 

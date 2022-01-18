@@ -1,6 +1,7 @@
 #include "SFEPanelBp.hpp"
 #include "Bp.hpp"
 #include "BpGraph.hpp"
+#include "bpcommon.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 extern "C" {
@@ -52,13 +53,22 @@ void SFEPanelBp::OnMessage(const SFEMessage& msg) {
 }
 
 void SFEPanelBp::Update() {
-    ImGui::Begin(PanelName().c_str());
+    auto graph = bp::Bp::Instance().CurEditGraph();
 
+    ImGui::Begin(PanelName().c_str());
     ed::SetCurrentEditor(_node_editor);
+    // double click node
+    ed::NodeId n_id = ed::GetDoubleClickedNode();
+	std::shared_ptr<bp::BpObj> dc_node = nullptr;
+	if (graph != nullptr && (dc_node = graph->GetNode((int)n_id.Get())) != nullptr) {
+		// 显示节点属性
+        _is_doubleclick_node = true;
+		_doubleclick_node = dc_node;
+	}
+    // begin node editor
     ed::Begin("Node editor");
     auto cursorTopLeft = ImGui::GetCursorScreenPos();
     util::BlueprintNodeBuilder builder(reinterpret_cast<ImTextureID>(_bg_texture.TextureID), _bg_texture.Width, _bg_texture.Height);
-    auto graph = bp::Bp::Instance().CurEditGraph();
     if (graph != nullptr) {
         // ev nodes
         for (auto& p : graph->GetEvNodes()) {
@@ -183,12 +193,46 @@ void SFEPanelBp::Update() {
         ed::EndDelete();
     }
 	ed::End();
+    if (_is_doubleclick_node) {
+        _is_doubleclick_node = false;
+        if (_doubleclick_node != nullptr && _doubleclick_node->GetObjType() == bp::BpObjType::BP_NODE_VAR) {
+            auto& pins = _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT);
+            if (pins.size() > 0){
+                bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
+                strcpy(_doubleclick_node_edit_attr, _doubleclick_node_attr.c_str());
+                ImGui::OpenPopup("node attr");
+            }
+        }
+    }
+    ShowVarNodeAttr();
     ImGui::End();
 }
 
 void SFEPanelBp::Exit() {
     ed::DestroyEditor(_node_editor);
     _node_editor = nullptr;
+}
+
+void SFEPanelBp::ShowVarNodeAttr() {
+    if (ImGui::BeginPopupModal("node attr", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        // Show node attr
+        ImGui::TextUnformatted("variable attr:");
+        ImGui::InputTextMultiline("", _doubleclick_node_edit_attr, sizeof(_doubleclick_node_edit_attr));
+        ImGui::Separator();
+
+        if (ImGui::Button("OK", ImVec2(120, 0))) {
+            _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT)[0].SetValue(std::string(_doubleclick_node_edit_attr));
+            _doubleclick_node = nullptr;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) { 
+            _doubleclick_node = nullptr;
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::EndPopup();
+    }
 }
 
 void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpObj>& node) {
