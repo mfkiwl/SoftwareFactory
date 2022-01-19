@@ -1,4 +1,5 @@
 #include "SFEPanelMainMenu.hpp"
+#include "nfd.h"
 
 namespace sfe {
 
@@ -16,13 +17,16 @@ void SFEPanelMainMenu::Update() {
                 create_new = true;
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Import...", "")) {}
+            if (ImGui::MenuItem("Import...", "")) {
+                ImportGraph();
+            }
             if (ImGui::MenuItem("Export...", "")) {}
             ImGui::Separator();
             if (ImGui::MenuItem("Save...", "CTRL+S")) {
                 LOG(INFO) << "Save...";
             }
-            if (ImGui::MenuItem("Save as...", "CTRL+SHIFT+S")) {}
+            if (ImGui::MenuItem("Save as...", "CTRL+SHIFT+S")) {
+            }
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "CTRL+Q")) {}
             ImGui::EndMenu();
@@ -106,6 +110,23 @@ void SFEPanelMainMenu::CreateNewGraph() {
         ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
         ImGui::EndPopup();
+    }
+}
+
+void SFEPanelMainMenu::ImportGraph() {
+    nfdchar_t *out_path = NULL;
+    nfdresult_t result = NFD_OpenDialog("json", NULL, &out_path);
+    if (result == NFD_OKAY) {
+        LOG(INFO) << "Import " << out_path;
+        Json::Value v;
+        v["command"] = "import_graph";
+        v["path"] = out_path;
+        SendMessage({PanelName(), "editor", "", v});
+        free(out_path);
+    } else if (result == NFD_CANCEL) {
+        LOG(INFO) << "Import cancel";
+    } else {
+        LOG(ERROR) << "Import error " << NFD_GetError();
     }
 }
 

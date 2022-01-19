@@ -6,6 +6,8 @@ if (POLICY CMP0072)
   # set(OpenGL_GL_PREFERENCE GLVND)
 endif()
 add_subdirectory(imgui-node-editor)
+add_subdirectory(nativefiledialog)
+include_directories(nativefiledialog/src/include)
 
 find_package(OpenGL REQUIRED)
 include_directories(${OpenGL_INCLUDE_DIRS})
@@ -37,6 +39,7 @@ target_link_libraries(SoftwareFactoryEditor
     OpenGL
     GL
     
+    nativefiledialog
     imgui 
     imgui_canvas
     imgui_node_editor

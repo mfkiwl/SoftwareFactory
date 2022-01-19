@@ -158,6 +158,16 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             v["y"] = msg.json_msg["y"];
             auto panel = GetPanel("bp editor");
             panel->RecvMessage({"editor", "bp editor", "", v});
+        } else if (cmd == "import_graph") {
+            auto path = msg.json_msg["path"].asString();
+            auto g = std::make_shared<bp::BpGraph>();
+            bp::LoadState state = bp::LoadState::OK;
+            if (bp::LoadState::OK == (state = bp::Bp::Instance().LoadGraph(path, g))) {
+                bp::Bp::Instance().AddEditGraph(g->GetName(), g);
+                bp::Bp::Instance().SetCurEditGraph(g);
+            } else {
+                LOG(ERROR) << "load graph " << path << " failed, " << (int)state;
+            }
         }
     }
 }

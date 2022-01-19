@@ -13,6 +13,7 @@ public:
 
 private:
     void CreateNewGraph();
+    void ImportGraph();
 
     bool _runing = false;
 };
