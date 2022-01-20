@@ -4,6 +4,7 @@
 #include "BpModLib.hpp"
 #include "BpNodeLib.hpp"
 #include "BpModLibLinux.hpp"
+#include "BpBaseNodeVar.hpp"
 #include "BpGraph.hpp"
 
 namespace bp {
@@ -20,7 +21,7 @@ Bp::Bp() {
 	_base_mods->Init("../conf/");
 	_nodes_lib = std::make_shared<BpNodeLib>();
 
-	_contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, "");
+	_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
 	// 事件节点
 	auto& node_contents = _nodes_lib->GetContents()->GetChildren();
 	for (int i = 0; i < node_contents.size(); ++i) {
@@ -55,29 +56,29 @@ BpVariable Bp::CreateVariable(const std::string& type, const std::string& name, 
 	return var;
 }
 
-LoadState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g) {
 	std::ifstream ifs(bp_json_path);
 	if (!ifs.is_open()) {
 		LOG(ERROR) << "Open \"" << bp_json_path << "\" failed";
-		return LoadState::ERR_OPEN_FILE;
+		return LoadSaveState::ERR_OPEN_FILE;
 	}
 	Json::Value value;
     Json::Reader reader(Json::Features::strictMode());
     if (!reader.parse(ifs, value)) {
 		LOG(ERROR) << "Parse \"" << bp_json_path << "\" failed";
-        return LoadState::ERR_PARSE;
+        return LoadSaveState::ERR_PARSE;
     }
 	LOG(INFO) << "Load \"" << bp_json_path << "\"...";
 	return LoadGraph(value, g);
 }
 
-LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 	// 检查配置文件版本是否小于当前程序版本
 	auto bin_ver = bp::Bp::Instance().Version();
 	if (bin_ver != root["version"].asString()) {
 		LOG(ERROR) << "Version error: bin " << bin_ver << ", conf \""
 			<< root["version"].asString();
-		return LoadState::ERR_VERSION;
+		return LoadSaveState::ERR_VERSION;
 	}
 
 	g->Clear();
@@ -90,7 +91,7 @@ LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 		auto value_desc = vars[i]["value"].asString();
 		auto var = CreateVariable(type, name, value_desc);
 		if (var.IsNone()) {
-			return LoadState::ERR_VAR;
+			return LoadSaveState::ERR_VAR;
 		}
 		g->AddVariable(name, var);
 	}
@@ -108,8 +109,8 @@ LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 			节点位置
 		*/
 		int id = nodes[i]["id"].asInt();
-		BpObjType t = (BpObjType)nodes[i]["type"].asInt();
-		if (t == BpObjType::BP_NODE_NORMAL) {
+		BpNodeType t = (BpNodeType)nodes[i]["type"].asInt();
+		if (t == BpNodeType::BP_NODE_NORMAL) {
 			auto node_name = nodes[i]["name"].asString();
 			auto func_name = nodes[i]["func"].asString();
 			auto node = SpawnNode(func_name);
@@ -119,15 +120,15 @@ LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 			}
 			g->AddNode(node);
 		}
-		if (t == BpObjType::BP_NODE_EV) {
+		if (t == BpNodeType::BP_NODE_EV) {
 			// 从BpNodeLib中创建事件Node
 			// TODO
 		}
-		if (t == BpObjType::BP_NODE_VAR) {
+		if (t == BpNodeType::BP_NODE_VAR) {
 			// 从BpNodeLib中创建变量Node
 			// TODO
 		}
-		if (t == BpObjType::BP_GRAPH || t == BpObjType::BP_GRAPH_EXEC) {
+		if (t == BpNodeType::BP_GRAPH || t == BpNodeType::BP_GRAPH_EXEC) {
 			// TODO
 			LOG(ERROR) << "Unimp";
 		}
@@ -146,7 +147,7 @@ LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 		auto ep = g->SearchPin(end_id);
 		if (sp == nullptr || ep == nullptr) {
 			LOG(ERROR) << "Search pin " << start_id << " or " << end_id << " failed";
-			return LoadState::ERR_SEARCH_PIN;
+			return LoadSaveState::ERR_SEARCH_PIN;
 		}
 		g->AddLink(*sp, *ep);
 		// link color
@@ -160,91 +161,83 @@ LoadState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g) {
 	}
 
 	g->SetNextID(root["max_id"].asInt());
-	return LoadState::OK;
+	return LoadSaveState::OK;
 }
 
-bool Bp::SaveGraph(const std::shared_ptr<BpGraph>& g, const std::string& file) {
-	// TODO
-	// pt::ptree tree;
-	// tree.add("version", Version());
-	// /*
+LoadSaveState Bp::SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g) {
+	std::ofstream ofs(bp_json_path);
+	if (!ofs.is_open()) {
+		LOG(ERROR) << "Open \"" << bp_json_path << "\" failed";
+		return LoadSaveState::ERR_OPEN_FILE;
+	}
+	Json::Value root;
+	auto res = SaveGraph(root, g);
+	Json::StyledWriter sw;
+	ofs << sw.write(root);
+	ofs.close();
+	return res;
+}
+
+LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g) {
+	root["version"] = Version();
+	// ev_nodes
+	auto& ev_nodes = g->GetEvNodes();
+	for (auto ev : ev_nodes) {
+		Json::Value json_evnode;
+		json_evnode["name"] = ev.first;
+		json_evnode["type"] = (int)ev.second->GetNodeType();
+		json_evnode["style"] = (int)ev.second->GetNodeStyle();
+		json_evnode["id"] = ev.second->GetID();
+		root["ev_nodes"].append(json_evnode);
+	}
+	// var/base/nor nodes
+	auto& nor_nodes = g->GetNodes();
+	for (auto nor : nor_nodes) {
+		Json::Value json_nornode;
+		json_nornode["name"] = nor->GetName();
+		json_nornode["type"] = (int)nor->GetNodeType();
+		json_nornode["style"] = (int)nor->GetNodeStyle();
+		json_nornode["id"] = nor->GetID();
+		if (nor->GetNodeType() == BpNodeType::BP_NODE_VAR) {
+			auto var_node = std::dynamic_pointer_cast<BpBaseNodeVar>(nor);
+			json_nornode["get"] = var_node->IsGet();
+		}
+		root["nor_nodes"].append(json_nornode);
+	}
 	// links
-	// nodes:
-	// 	ev_nodes
-	// 	nor_nodes
-	// variables
-	// next_id
-	// */
-	// BpGraph* g = m_graph;
-
-	// pt::ptree nodes;
-	// auto& ev_nodes = m_graph->GetEvNodes();
-	// for (auto p : ev_nodes) {
-	// 	pt::ptree node;
-	// 	node.add("node_kind", (int)p.second->GetComponentType());
-	// 	node.add("id", p.second->GetID());
-	// 	node.add("name", p.first);
-	// 	node.add("class_name", p.second->GetComeFrom().first);
-	// 	node.add("model_name", p.second->GetComeFrom().second);
-	// 	// pin
-	// 	// 目前不用保存pin的属性,node中都已经知道如何创建pin了。
-	// 	nodes.push_back(std::make_pair("", node));
-	// }
-	// auto& nor_nodes = m_graph->GetNodes();
-	// for (auto n : nor_nodes) {
-	// 	pt::ptree node;
-	// 	node.add("node_kind", (int)n->GetComponentType());
-	// 	node.add("id", n->GetID());
-	// 	node.add("name", n->GetName());
-		
-	// 	if (n->GetComponentType() == BpComponentType::BP_NODE_VAR || n->GetComponentType() == BpComponentType::BP_NODE_REF_VAR) {
-	// 		BpVariableNode* var_node = static_cast<BpVariableNode*>(n);
-	// 		node.add("getset", (int)var_node->m_getset_type);
-	// 	}
-	// 	else {
-	// 		node.add("class_name", n->GetComeFrom().first);
-	// 		node.add("model_name", n->GetComeFrom().second);
-	// 	}
-	// 	nodes.push_back(std::make_pair("", node));
-	// }
-	// tree.add_child("nodes", nodes);
-
-	// pt::ptree links;
-	// for (auto& l : m_graph->GetLinks()) {
-	// 	pt::ptree link;
-	// 	link.add("id", l.ID);
-	// 	link.add("start_id", l.StartPinID);
-	// 	link.add("end_id", l.EndPinID);
-	// 	pt::ptree color;
-	// 	color.push_back(std::make_pair("", pt::ptree().put("", l.Color[0])));
-	// 	color.push_back(std::make_pair("", pt::ptree().put("", l.Color[1])));
-	// 	color.push_back(std::make_pair("", pt::ptree().put("", l.Color[2])));
-	// 	color.push_back(std::make_pair("", pt::ptree().put("", l.Color[3])));
-	// 	link.push_back(std::make_pair("color", color));
-	// 	links.push_back(std::make_pair("", link));
-	// }
-	// tree.add_child("links", links);
-
-	// pt::ptree variables;
-	// for (auto& x : m_graph->GetValues()) {
-	// 	if(x.second.IsRef()) continue;
-	// 	pt::ptree var;
-	// 	var.add("name", x.first);
-	// 	var.add("value", x.second.ToStr());
-	// 	variables.push_back(std::make_pair("", var));
-	// }
-	// tree.add_child("variables", variables);
-	// tree.add("max_id", g->GetNextID());
-	// return tree;
-	return false;
+	auto& links = g->GetLinks();
+	for (auto& l : links) {
+		Json::Value json_link;
+		json_link["id"] = l.ID;
+		json_link["start_id"] = l.StartPinID;
+		json_link["end_id"] = l.EndPinID;
+		Json::Value json_link_color;
+		json_link_color.append(l.Color[0]);
+		json_link_color.append(l.Color[1]);
+		json_link_color.append(l.Color[2]);
+		json_link_color.append(l.Color[3]);
+		json_link["color"] = json_link_color;
+		root["links"].append(json_link);
+	}
+	// vars
+	auto& vars = g->GetVariables();
+	for (auto& x : vars) {
+		Json::Value json_var;
+		json_var["name"] = x.first;
+		json_var["type"] = x.second.GetType();
+		json_var["value"] = x.second.ToJson();
+		root["vars"].append(json_var);
+	}
+	root["max_id"] = g->GetNextID();
+	return LoadSaveState::OK;
 }
 
-std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpObjType t) {
+std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNodeType t) {
 	// 从BpModLib中获得函数指针和描述
 	// 从BpNodeLib中获得节点对象
 	// 组合成Node添加到graph
 	// _base_mods->GetMods()[0]->GetContents();
-	if (t == BpObjType::BP_NODE_NORMAL) {
+	if (t == BpNodeType::BP_NODE_NORMAL) {
 		auto func_info = _base_mods->GetFunc(node_name);
 		if (func_info.type == BpModuleFuncType::UNKNOWN) {
 			LOG(ERROR) << "get func " << node_name << " failed";
@@ -272,9 +265,9 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpObjT
 			res.emplace_back(var);
 		}
 		return _nodes_lib->CreateFuncNode(func_info, args, res);
-	} else if (t == BpObjType::BP_NODE_EV) {
+	} else if (t == BpNodeType::BP_NODE_EV) {
 		return _nodes_lib->CreateEvNode(node_name);
-	} else if (t == BpObjType::BP_NODE_BASE) {
+	} else if (t == BpNodeType::BP_NODE_BASE) {
 		return _nodes_lib->CreateBaseNode(node_name);
 	}
 	return nullptr;

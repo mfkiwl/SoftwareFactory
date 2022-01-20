@@ -7,7 +7,7 @@ class BpBaseNodePrint : public BpNode
 {
 public:
 	BpBaseNodePrint(std::shared_ptr<BpGraph> parent)
-        : BpNode("Print", parent, bp::BpObjType::BP_NODE_BASE) {}
+        : BpNode("Print", parent, bp::BpNodeType::BP_NODE_BASE) {}
 
 	virtual void Logic() {
         for (int i = 0; i < _inputs.size(); ++i) {

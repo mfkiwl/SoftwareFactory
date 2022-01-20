@@ -11,7 +11,7 @@
 
 namespace bp {
 
-enum class LoadState : int {
+enum class LoadSaveState : int {
 	OK = 0,
 	ERR_OPEN_FILE,
 	ERR_PARSE,
@@ -30,15 +30,16 @@ public:
 
 	std::string Version() { return "0.1"; }
 
-	LoadState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
-	LoadState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g);
+	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
+	LoadSaveState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g);
 
-	bool SaveGraph(const std::shared_ptr<BpGraph>&, const std::string&);
+	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g);
+	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);
 
 	BpVariable CreateVariable(const std::string& type, const std::string& name);
 	BpVariable CreateVariable(const std::string& type, const std::string& name, const std::string& value_desc);
 
-	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpObjType t = BpObjType::BP_NODE_NORMAL);
+	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpNodeType t = BpNodeType::BP_NODE_NORMAL);
 	/* 生成一个新的变量节点并加入graph */
 	std::shared_ptr<BpNode> SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_type, const std::string& var_name, bool is_get = true);
 	/* 根据已有的变量生成节点 */

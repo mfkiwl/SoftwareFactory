@@ -7,7 +7,7 @@
 namespace bp {
 
 // 用于控制显示节点样式
-enum class BpNodeType : int
+enum class BpNodeStyle : int
 {
     BP_NONE, // 未知
 	BP_BLUPRINT, // 标准类型的节点
@@ -15,7 +15,7 @@ enum class BpNodeType : int
 };
 
 // 节点类型
-enum class BpObjType : int
+enum class BpNodeType : int
 {
 	BP_NONE = 0, // 未知
 	BP_NODE_EV, // 事件节点
@@ -39,8 +39,8 @@ public:
 	std::shared_ptr<BpGraph> GetParentGraph() { return _parent_graph.lock(); }
 	void SetParentGraph(std::shared_ptr<BpGraph> graph);
 
-	BpNodeType GetNodeType() { return _type; }
-    BpObjType GetObjType() { return _obj_type; }
+	BpNodeStyle GetNodeStyle() { return _type; }
+    BpNodeType GetNodeType() { return _node_type; }
 	int GetID() { return _id; }
 	std::string& GetName() { return _name; }
 
@@ -53,8 +53,8 @@ public:
 
 protected:
 	std::weak_ptr<BpGraph>      _parent_graph;
-	BpObjType                   _obj_type;
-	BpNodeType                  _type;
+	BpNodeType                   _node_type;
+	BpNodeStyle                  _type;
 	std::string                 _name;
     int                         _id;
 	int                         _tmp_next_id;

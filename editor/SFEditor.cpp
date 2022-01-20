@@ -97,7 +97,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
         auto cmd = msg.json_msg["command"];
         if (cmd == "create_new") {
             auto graph_name = msg.json_msg["graph_name"].asString();
-            auto graph_type = msg.json_msg["graph_type"].asString() == "mod graph" ? bp::BpObjType::BP_GRAPH : bp::BpObjType::BP_GRAPH_EXEC;
+            auto graph_type = msg.json_msg["graph_type"].asString() == "mod graph" ? bp::BpNodeType::BP_GRAPH : bp::BpNodeType::BP_GRAPH_EXEC;
             auto g = std::make_shared<bp::BpGraph>(graph_name, graph_type);
             bp::Bp::Instance().AddEditGraph(graph_name, g);
             bp::Bp::Instance().SetCurEditGraph(g);
@@ -113,19 +113,19 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 LOG(WARNING) << "cur edit graph is nullptr";
                 return;
             }
-            auto obj_type = bp::BpObjType::BP_NONE;
+            auto obj_type = bp::BpNodeType::BP_NONE;
             int contents_type = msg.json_msg["type"].asInt();
-            if (contents_type == (int)BpContents::Type::EV) {
-                obj_type = bp::BpObjType::BP_NODE_EV;
-            } else if (contents_type == (int)BpContents::Type::FUNC) {
-                obj_type = bp::BpObjType::BP_NODE_NORMAL;
-            } else if (contents_type == (int)BpContents::Type::VAL) {
-                obj_type = bp::BpObjType::BP_NODE_VAR;
-            } else if (contents_type == (int)BpContents::Type::BASE) {
-                obj_type = bp::BpObjType::BP_NODE_BASE;
+            if (contents_type == (int)BpContents::LeafType::EV) {
+                obj_type = bp::BpNodeType::BP_NODE_EV;
+            } else if (contents_type == (int)BpContents::LeafType::FUNC) {
+                obj_type = bp::BpNodeType::BP_NODE_NORMAL;
+            } else if (contents_type == (int)BpContents::LeafType::VAL) {
+                obj_type = bp::BpNodeType::BP_NODE_VAR;
+            } else if (contents_type == (int)BpContents::LeafType::BASE) {
+                obj_type = bp::BpNodeType::BP_NODE_BASE;
             }
             std::shared_ptr<bp::BpNode> node = nullptr;
-            if (obj_type == bp::BpObjType::BP_NODE_VAR) {
+            if (obj_type == bp::BpNodeType::BP_NODE_VAR) {
                 if (msg.json_msg["node_name"].asString().empty()) {
                     node = bp::Bp::Instance().SpawnVarNode(g, 
                                 msg.json_msg["var_name"].asString(),
@@ -143,7 +143,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 LOG(WARNING) << "SpawnNode failed";
                 return;
             }
-            if (node->GetObjType() == bp::BpObjType::BP_NODE_EV) {
+            if (node->GetNodeType() == bp::BpNodeType::BP_NODE_EV) {
                 LOG(INFO) << "Create ev node " << node->GetName();
                 g->AddEventNode(node);
             } else {
@@ -161,12 +161,23 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
         } else if (cmd == "import_graph") {
             auto path = msg.json_msg["path"].asString();
             auto g = std::make_shared<bp::BpGraph>();
-            bp::LoadState state = bp::LoadState::OK;
-            if (bp::LoadState::OK == (state = bp::Bp::Instance().LoadGraph(path, g))) {
+            bp::LoadSaveState state = bp::LoadSaveState::OK;
+            if (bp::LoadSaveState::OK == (state = bp::Bp::Instance().LoadGraph(path, g))) {
                 bp::Bp::Instance().AddEditGraph(g->GetName(), g);
                 bp::Bp::Instance().SetCurEditGraph(g);
             } else {
-                LOG(ERROR) << "load graph " << path << " failed, " << (int)state;
+                LOG(ERROR) << "Load graph " << path << " failed, " << (int)state;
+            }
+        } else if (cmd == "save_graph") {
+            auto path = msg.json_msg["path"].asString();
+            auto g = bp::Bp::Instance().CurEditGraph();
+            if (g == nullptr) {
+                LOG(WARNING) << "cur edit graph is nullptr";
+                return;
+            }
+            bp::LoadSaveState state = bp::LoadSaveState::OK;
+            if (bp::LoadSaveState::OK != (state = bp::Bp::Instance().SaveGraph(path, g))) {
+                LOG(ERROR) << "Save graph " << path << " failed, " << (int)state;
             }
         }
     }

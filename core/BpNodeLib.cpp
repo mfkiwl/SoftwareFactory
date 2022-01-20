@@ -23,14 +23,14 @@ BpNodeLib::BpNodeLib()
         }
     }
 {
-    _root_contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, "");
+    _root_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
     // 创建事件目录
-    _ev_contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, "event node");
-    _ev_contents->AddChild(std::make_shared<BpContents>(nullptr, BpContents::Type::EV, "Tick"));
+    _ev_contents = std::make_shared<BpContents>(nullptr, "event node", BpContents::Type::CONTENTS);
+    _ev_contents->AddChild(std::make_shared<BpContents>(nullptr, "Tick", BpContents::Type::LEAF, BpContents::LeafType::EV));
     _root_contents->AddChild(_ev_contents);
     // 创建基础节点目录
-    _base_contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, "base node");
-    _base_contents->AddChild(std::make_shared<BpContents>(nullptr, BpContents::Type::BASE, "Print"));
+    _base_contents = std::make_shared<BpContents>(nullptr, "base node", BpContents::Type::CONTENTS);
+    _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Print", BpContents::Type::LEAF, BpContents::LeafType::BASE));
     _root_contents->AddChild(_base_contents);
 }
 

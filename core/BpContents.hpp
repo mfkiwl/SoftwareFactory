@@ -6,18 +6,24 @@
 
 class BpContents : public std::enable_shared_from_this<BpContents> {
 public:
-    enum class Type {
+    enum class Type : int {
         CONTENTS,
+        LEAF,
+        
+    };
+    enum class LeafType : int {
+        NONE,
         FUNC,
         VAL,
         EV,
         BASE,
     };
 
-    BpContents(std::shared_ptr<BpContents> parent, Type t, std::string name)
+    BpContents(std::shared_ptr<BpContents> parent, std::string name, Type t, LeafType lt = LeafType::NONE)
         : std::enable_shared_from_this<BpContents>()
         , _parent(parent)
         , _type(t)
+        , _leaf_type(lt)
         , _name(name)
     {}
     
@@ -42,7 +48,7 @@ public:
         return true;
     }
 
-    std::string GetName() { 
+    const std::string& GetName() { 
         return _name;
     }
 
@@ -63,6 +69,9 @@ public:
 
     Type GetType() {
         return _type;
+    }
+    LeafType GetLeafType() {
+        return _leaf_type;
     }
 
     std::string PrintContents() {
@@ -93,6 +102,7 @@ private:
     }
 
     Type _type;
+    LeafType _leaf_type;
     std::string _name;
     std::weak_ptr<BpContents> _parent;
     std::vector<std::shared_ptr<BpContents>> _next_contents;

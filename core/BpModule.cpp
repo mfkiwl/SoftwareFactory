@@ -38,7 +38,7 @@ bool BpModule::LoadModule(const std::string& json_file) {
     // 提取模块名称
     _mod_name = root["_lib"].asString();
     _mod_name = _mod_name.substr(3, _mod_name.size() - 6);
-    _contents = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, _mod_name);
+    _contents = std::make_shared<BpContents>(nullptr, _mod_name, BpContents::Type::CONTENTS);
     // 初始化dll
     std::filesystem::path p(json_file);
     std::string dll_path = p.parent_path().string() + "/../lib/" + root["_lib"].asString();
@@ -68,7 +68,7 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
 	            Json::Value::Members::iterator func_it;
                 for (func_it = func_mem.begin(); func_it != func_mem.end(); func_it++) {
                     auto func = v[*it][*func_it];
-                    auto leaf_func = std::make_shared<BpContents>(contents, BpContents::Type::FUNC, (*func_it));
+                    auto leaf_func = std::make_shared<BpContents>(contents, (*func_it), BpContents::Type::LEAF, BpContents::LeafType::FUNC);
                     // 加载函数符号
                     auto f = GetFunc(*func_it);
                     if (f == nullptr) {
@@ -86,13 +86,13 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                     continue;
                 }
                 for (int i = 0; i < v[*it].size(); ++i) {
-                    auto leaf_val = std::make_shared<BpContents>(contents, BpContents::Type::VAL, v[*it][i].asString());
+                    auto leaf_val = std::make_shared<BpContents>(contents, v[*it][i].asString(), BpContents::Type::LEAF, BpContents::LeafType::VAL);
                     contents->AddChild(leaf_val);
                     _var_names.insert(v[*it][i].asString());
                 }
             }
         } else {
-            auto child = std::make_shared<BpContents>(contents, BpContents::Type::CONTENTS, *it);
+            auto child = std::make_shared<BpContents>(contents, *it, BpContents::Type::CONTENTS);
             BuildContents(v[*it], child);
         }
     }

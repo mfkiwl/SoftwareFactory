@@ -14,7 +14,7 @@
 #include "../BpVariable.hpp"
 
 TEST(bpcore, BpContents) {
-    auto bpcontents = std::make_shared<BpContents>(nullptr, BpContents::Type::VAL, "pb_int_a");
+    auto bpcontents = std::make_shared<BpContents>(nullptr, "pb_int_a", BpContents::Type::LEAF, BpContents::LeafType::VAL);
     EXPECT_FALSE(bpcontents->SetParent(nullptr));
     EXPECT_FALSE(bpcontents->AddChild(nullptr));
     EXPECT_EQ(bpcontents->GetFullPath(), "pb_int_a");
@@ -25,10 +25,10 @@ TEST(bpcore, BpContents) {
         |--bp3
         |  |--bp4
     */
-    auto bp1 = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, "bp");
-    auto bp2 = std::make_shared<BpContents>(nullptr, BpContents::Type::FUNC, "global_add");
-    auto bp3 = std::make_shared<BpContents>(nullptr, BpContents::Type::CONTENTS, "math");
-    auto bp4 = std::make_shared<BpContents>(nullptr, BpContents::Type::VAL, "pb_int_a");
+    auto bp1 = std::make_shared<BpContents>(nullptr, "bp", BpContents::Type::CONTENTS);
+    auto bp2 = std::make_shared<BpContents>(nullptr, "global_add", BpContents::Type::LEAF, BpContents::LeafType::FUNC);
+    auto bp3 = std::make_shared<BpContents>(nullptr, "math", BpContents::Type::CONTENTS);
+    auto bp4 = std::make_shared<BpContents>(nullptr, "pb_int_a", BpContents::Type::LEAF, BpContents::LeafType::VAL);
     bp1->AddChild(bp2);
     EXPECT_EQ(bp2->GetFullPath(), "bp.global_add");
     bp3->SetParent(bp1);
@@ -116,6 +116,6 @@ TEST(bpcore, Bp) {
     auto& b = bp::Bp::Instance();
     LOG(INFO) << "bp version: " << bp::Bp::Instance().Version();
     auto g = std::make_shared<bp::BpGraph>();
-    EXPECT_EQ(bp::LoadState::ERR_OPEN_FILE, b.LoadGraph(std::string(""), g));
-    EXPECT_NE(bp::LoadState::OK, b.LoadGraph(std::string("../conf/com_random.json"), g));
+    EXPECT_EQ(bp::LoadSaveState::ERR_OPEN_FILE, b.LoadGraph(std::string(""), g));
+    EXPECT_NE(bp::LoadSaveState::OK, b.LoadGraph(std::string("../conf/com_random.json"), g));
 }

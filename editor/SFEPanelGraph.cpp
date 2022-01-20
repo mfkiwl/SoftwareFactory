@@ -150,7 +150,7 @@ void SFEPanelGraph::ShowVarSetting() {
             Json::Value v2;
             v2["command"] = "spawn_node";
             v2["node_name"] = "";
-            v2["type"] = (int)bp::BpObjType::BP_NODE_VAR;
+            v2["type"] = (int)bp::BpNodeType::BP_NODE_VAR;
             v2["is_get"] = is_get;
             v2["var_name"] = buf;
             ImVec2 xy = ImGui::GetMousePos();

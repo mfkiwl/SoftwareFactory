@@ -195,7 +195,7 @@ void SFEPanelBp::Update() {
 	ed::End();
     if (_is_doubleclick_node) {
         _is_doubleclick_node = false;
-        if (_doubleclick_node != nullptr && _doubleclick_node->GetObjType() == bp::BpObjType::BP_NODE_VAR) {
+        if (_doubleclick_node != nullptr && _doubleclick_node->GetNodeType() == bp::BpNodeType::BP_NODE_VAR) {
             auto& pins = _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT);
             if (pins.size() > 0){
                 bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
@@ -236,14 +236,14 @@ void SFEPanelBp::ShowVarNodeAttr() {
 }
 
 void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpObj>& node) {
-	if (node->GetNodeType() != bp::BpNodeType::BP_BLUPRINT
-		&& node->GetNodeType() != bp::BpNodeType::BP_SIMPLE)
+	if (node->GetNodeStyle() != bp::BpNodeStyle::BP_BLUPRINT
+		&& node->GetNodeStyle() != bp::BpNodeStyle::BP_SIMPLE)
 		return;
 
-	bool is_simple = (node->GetNodeType() == bp::BpNodeType::BP_SIMPLE);
+	bool is_simple = (node->GetNodeStyle() == bp::BpNodeStyle::BP_SIMPLE);
 	builder.Begin(node->GetID());
 	if (!is_simple) {
-		builder.Header(GetNodeKindColor(node->GetObjType()));
+		builder.Header(GetNodeKindColor(node->GetNodeType()));
 		ImGui::Spring(0);
 		ImGui::TextUnformatted(node->GetName().c_str());
 		ImGui::Spring(1);
@@ -328,12 +328,12 @@ ImColor SFEPanelBp::GetIconColor(bp::BpPin& pin) {
 	return ImColor(51, 150, 215); // object
 }
 
-ImColor SFEPanelBp::GetNodeKindColor(bp::BpObjType kind) {
+ImColor SFEPanelBp::GetNodeKindColor(bp::BpNodeType kind) {
 	switch (kind) {
 	default:
-	case bp::BpObjType::BP_NODE_EV:     return ImColor(255, 128, 128);
-	case bp::BpObjType::BP_NODE_VAR:	return ImColor(51, 150, 215);
-	case bp::BpObjType::BP_NODE_NORMAL:	return ImColor(255, 255, 255);
+	case bp::BpNodeType::BP_NODE_EV:     return ImColor(255, 128, 128);
+	case bp::BpNodeType::BP_NODE_VAR:	return ImColor(51, 150, 215);
+	case bp::BpNodeType::BP_NODE_NORMAL:	return ImColor(255, 255, 255);
 	}
 }
 

@@ -28,6 +28,9 @@ public:
 
 	const std::string& GetType() const { return _var_type; }
 
+	// TODO
+	const std::string ToJson() const { return ""; }
+
 	bool IsSameType(const BpVariable& v) { return ((_var_type == "any") || (_var_type == v._var_type)); }
 
 	// 值传递

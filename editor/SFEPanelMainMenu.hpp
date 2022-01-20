@@ -14,6 +14,7 @@ public:
 private:
     void CreateNewGraph();
     void ImportGraph();
+    void SaveGraph();
 
     bool _runing = false;
 };

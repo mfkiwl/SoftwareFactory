@@ -18,7 +18,7 @@ public:
 	friend class Bp;
 public:
 	BpGraph(std::shared_ptr<BpGraph> parent = nullptr);
-	BpGraph(std::string name, BpObjType t, std::shared_ptr<BpGraph> parent = nullptr);
+	BpGraph(std::string name, BpNodeType t, std::shared_ptr<BpGraph> parent = nullptr);
 
 	virtual void Run() override;
 	virtual void Logic() {

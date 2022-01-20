@@ -7,7 +7,7 @@ class BpEvNode : public BpNode
 {
 public:
 	BpEvNode(const std::string& name, std::shared_ptr<BpGraph> parent, int lv, int loop)
-        : BpNode(name, parent, bp::BpObjType::BP_NODE_EV)
+        : BpNode(name, parent, bp::BpNodeType::BP_NODE_EV)
         , _lv(lv)
         , _loop_cnt(loop) {}
 

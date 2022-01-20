@@ -44,7 +44,7 @@ private:
     void ShowVarNodeAttr();
     void ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpObj>& node);
     void DrawPinIcon(bp::BpPin& pin, int alpha);
-    ImColor GetNodeKindColor(bp::BpObjType kind);
+    ImColor GetNodeKindColor(bp::BpNodeType kind);
     ImColor GetIconColor(bp::BpPin& pin);
     bool CanCreateLink(bp::BpPin* a, bp::BpPin* b);
     ImTextureID LoadTexture(const char* path);

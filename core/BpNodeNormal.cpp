@@ -5,7 +5,7 @@
 namespace bp {
 
 BpNodeNormal::BpNodeNormal(const std::string& func_full_path, std::shared_ptr<BpGraph> parent)
-	: BpNode(func_full_path, parent, BpObjType::BP_NODE_NORMAL)
+	: BpNode(func_full_path, parent, BpNodeType::BP_NODE_NORMAL)
 {}
 
 void BpNodeNormal::Logic() {

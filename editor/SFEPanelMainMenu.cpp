@@ -26,6 +26,7 @@ void SFEPanelMainMenu::Update() {
                 LOG(INFO) << "Save...";
             }
             if (ImGui::MenuItem("Save as...", "CTRL+SHIFT+S")) {
+                SaveGraph();
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Exit", "CTRL+Q")) {}
@@ -127,6 +128,23 @@ void SFEPanelMainMenu::ImportGraph() {
         LOG(INFO) << "Import cancel";
     } else {
         LOG(ERROR) << "Import error " << NFD_GetError();
+    }
+}
+
+void SFEPanelMainMenu::SaveGraph() {
+    nfdchar_t *out_path = NULL;
+    nfdresult_t result = NFD_OpenDialog("", NULL, &out_path);
+    if (result == NFD_OKAY) {
+        LOG(INFO) << "Save as " << out_path;
+        Json::Value v;
+        v["command"] = "save_graph";
+        v["path"] = out_path;
+        SendMessage({PanelName(), "editor", "", v});
+        free(out_path);
+    } else if (result == NFD_CANCEL) {
+        LOG(INFO) << "Save cancel";
+    } else {
+        LOG(ERROR) << "Save error " << NFD_GetError();
     }
 }
 

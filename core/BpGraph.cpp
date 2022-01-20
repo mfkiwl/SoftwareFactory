@@ -11,11 +11,11 @@ BpGraph::BpGraph(std::shared_ptr<BpGraph> parent)
 	: BpObj("", parent)
 	, _next_id(0) {}
 
-BpGraph::BpGraph(std::string name, BpObjType t, std::shared_ptr<BpGraph> parent)
+BpGraph::BpGraph(std::string name, BpNodeType t, std::shared_ptr<BpGraph> parent)
 	: BpObj(name, parent)
 	, _next_id(0) {
-	_obj_type = t;
-	if (t == BpObjType::BP_GRAPH) {
+	_node_type = t;
+	if (t == BpNodeType::BP_GRAPH) {
 		// TODO 添加输入输出节点, 并对_input_node赋值
 	}
 }
@@ -145,11 +145,11 @@ std::shared_ptr<BpObj> BpGraph::GetNode(int id) {
 }
 
 bool BpGraph::AddEventNode(std::shared_ptr<BpObj> node) {
-	if (_obj_type == BpObjType::BP_GRAPH) {
+	if (_node_type == BpNodeType::BP_GRAPH) {
 		LOG(ERROR) << _name << " not exec graph";
 		return false;
 	}
-	if (node->GetObjType() != BpObjType::BP_NODE_EV) {
+	if (node->GetNodeType() != BpNodeType::BP_NODE_EV) {
 		LOG(ERROR) << node->GetName() << " not ev node";
 		return false;
 	}
@@ -186,7 +186,7 @@ void BpGraph::RunEvent(std::string ev) {
 }
 
 void BpGraph::Run() {
-	if (_obj_type == BpObjType::BP_GRAPH) {
+	if (_node_type == BpNodeType::BP_GRAPH) {
 		BpObj::Run();
 	} else {
 		// TODO 应该按事件优先级依次执行

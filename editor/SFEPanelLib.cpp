@@ -57,14 +57,14 @@ void SFEPanelLib::ShowLib(std::shared_ptr<BpContents> c) {
             SendMessage({PanelName(), "drag tip", "", v});
             // 给 bp editor发送创建Node消息
             // 变量节点, 需要使用界面设置get/set和变量名称
-            if (_drag_item.lock()->GetType() == BpContents::Type::VAL) {
+            if (_drag_item.lock()->GetLeafType() == BpContents::LeafType::VAL) {
                 // show setting
                 _show_var_setting = true;
             } else {
                 Json::Value v2;
                 v2["command"] = "spawn_node";
-                v2["node_name"] = (_drag_item.lock()->GetType() == BpContents::Type::FUNC) ? _drag_item.lock()->GetFullPath() : _drag_item.lock()->GetName();
-                v2["type"] = (int)_drag_item.lock()->GetType();
+                v2["node_name"] = (_drag_item.lock()->GetLeafType() == BpContents::LeafType::FUNC) ? _drag_item.lock()->GetFullPath() : _drag_item.lock()->GetName();
+                v2["type"] = (int)_drag_item.lock()->GetLeafType();
                 ImVec2 xy = ImGui::GetMousePos();
                 v2["x"] = xy.x;
                 v2["y"] = xy.y;
@@ -101,7 +101,7 @@ void SFEPanelLib::ShowVarSetting() {
             Json::Value v2;
             v2["command"] = "spawn_node";
             v2["node_name"] = _drag_item.lock()->GetName();
-            v2["type"] = (int)_drag_item.lock()->GetType();
+            v2["type"] = (int)_drag_item.lock()->GetLeafType();
             v2["is_get"] = is_get;
             v2["var_name"] = buf;
             ImVec2 xy = ImGui::GetMousePos();
