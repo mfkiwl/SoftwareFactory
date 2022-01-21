@@ -66,4 +66,14 @@ void BpVariable::SetValueByRef(const pb_msg_ptr_t& v) {
 	_var = v;
 }
 
+const std::string BpVariable::ToJson() const { 
+	if (_var == nullptr) {
+		LOG(ERROR) << "var " << _var_name << " is empty";
+		return "";
+	}
+	std::string json;
+	JsonPbConvert::PbMsg2JsonStr(*_var, json);
+	return json; 
+}
+
 } // namespace bp

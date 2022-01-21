@@ -12,14 +12,13 @@ void SFEPanelMainMenu::Update() {
     static bool create_new = false;
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Create New", "")) {
-                LOG(INFO) << "Create New";
+            if (ImGui::MenuItem("New", "")) {
                 create_new = true;
             }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Import...", "")) {
-                ImportGraph();
+            if (ImGui::MenuItem("Open...", "")) {
+                OpenGraph();
             }
+            ImGui::Separator();
             if (ImGui::MenuItem("Export...", "")) {}
             ImGui::Separator();
             if (ImGui::MenuItem("Save...", "CTRL+S")) {
@@ -49,7 +48,7 @@ void SFEPanelMainMenu::Update() {
                 v["run"] = _runing;
                 SendMessage({PanelName(), "all", "", v});
             }
-            if (ImGui::MenuItem("Pause", "CTRL+F5")) {}
+            // if (ImGui::MenuItem("Pause", "CTRL+F5")) {}
             if (ImGui::MenuItem("Stop", "SHIFT+F5", false, _runing)) {
                 _runing = false;
                 Json::Value v;
@@ -57,18 +56,11 @@ void SFEPanelMainMenu::Update() {
                 v["run"] = _runing;
                 SendMessage({PanelName(), "all", "", v});
             }
-            if (ImGui::MenuItem("Restart", "CTRL+SHIFT+F5")) {}
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View")) {
             if (ImGui::MenuItem("ShowDemo")) {
                 SendMessage({"", "editor", "show_demo"});
-            }
-            if (ImGui::MenuItem("ErrorCommand")) {
-                SendMessage({"", "xxx", "show_demo"});
-            }
-            if (ImGui::MenuItem("Spawn node")) {
-                SendMessage({"", "bp editor", "spawn_node"});
             }
             ImGui::EndMenu();
         }
@@ -77,7 +69,7 @@ void SFEPanelMainMenu::Update() {
 
     if (create_new) {
         create_new = false;
-        ImGui::OpenPopup("create graph...");
+        ImGui::OpenPopup("Create graph...");
     }
     CreateNewGraph();
 }
@@ -87,7 +79,7 @@ void SFEPanelMainMenu::Exit() {
 }
 
 void SFEPanelMainMenu::CreateNewGraph() {
-    if (ImGui::BeginPopupModal("create graph...", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Create graph...", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
         static std::string graph_type = "exec graph";
         static int style_idx = 0;
         if (ImGui::Combo("graph type", &style_idx, "exec graph\0mod graph\0")) {
@@ -114,18 +106,17 @@ void SFEPanelMainMenu::CreateNewGraph() {
     }
 }
 
-void SFEPanelMainMenu::ImportGraph() {
+void SFEPanelMainMenu::OpenGraph() {
     nfdchar_t *out_path = NULL;
     nfdresult_t result = NFD_OpenDialog("json", NULL, &out_path);
     if (result == NFD_OKAY) {
-        LOG(INFO) << "Import " << out_path;
         Json::Value v;
-        v["command"] = "import_graph";
+        v["command"] = "open_graph";
         v["path"] = out_path;
         SendMessage({PanelName(), "editor", "", v});
         free(out_path);
     } else if (result == NFD_CANCEL) {
-        LOG(INFO) << "Import cancel";
+        LOG(INFO) << "Open cancel";
     } else {
         LOG(ERROR) << "Import error " << NFD_GetError();
     }
@@ -133,7 +124,7 @@ void SFEPanelMainMenu::ImportGraph() {
 
 void SFEPanelMainMenu::SaveGraph() {
     nfdchar_t *out_path = NULL;
-    nfdresult_t result = NFD_OpenDialog("", NULL, &out_path);
+    nfdresult_t result = NFD_SaveDialog("", NULL, &out_path);
     if (result == NFD_OKAY) {
         LOG(INFO) << "Save as " << out_path;
         Json::Value v;

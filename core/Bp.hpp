@@ -17,6 +17,7 @@ enum class LoadSaveState : int {
 	ERR_PARSE,
 	ERR_VERSION,
 	ERR_VAR,
+	ERR_CREATE_NODE,
 	ERR_SEARCH_PIN,
 };
 
@@ -28,7 +29,7 @@ class Bp
 public:
 	static Bp& Instance();
 
-	std::string Version() { return "0.1"; }
+	std::vector<int> Version(const std::string& path);
 
 	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
 	LoadSaveState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g);
@@ -68,6 +69,7 @@ private:
 	std::shared_ptr<BpNodeLib> _nodes_lib;
 	// 库目录
 	std::shared_ptr<BpContents> _contents;
+	std::vector<int> _version;
 };
 
 } // nemespace bp
