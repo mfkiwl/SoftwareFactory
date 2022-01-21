@@ -20,14 +20,15 @@ enum class BpNodeType : int
 	BP_NONE = 0, // 未知
 	BP_NODE_EV, // 事件节点
 	BP_NODE_VAR, //变量节点
-	BP_NODE_NORMAL,  // 函数节点
+	BP_NODE_FUNC,  // 函数节点
 	BP_NODE_BASE,  // 基础节点
+	BP_NODE_USER, // 用户自定义节点
 	BP_GRAPH, // 图节点
     BP_GRAPH_EXEC, // 可以执行的图节点
 };
 
 class BpGraph;
-class BpObj  : public std::enable_shared_from_this<BpObj>
+class BpObj : public std::enable_shared_from_this<BpObj>
 {
 public:
 	BpObj(const std::string& name, std::shared_ptr<BpGraph> parent = nullptr);

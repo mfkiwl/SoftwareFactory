@@ -8,10 +8,10 @@
 namespace bp {
 
 /* 常规的函数节点 */
-class BpNodeNormal : public BpNode
+class BpNodeFunc : public BpNode
 {
 public:
-	BpNodeNormal(const std::string& func_full_path, std::shared_ptr<BpGraph> parent);
+	BpNodeFunc(const std::string& func_full_path, std::shared_ptr<BpGraph> parent);
 
 	virtual void Logic() override;
 

@@ -29,6 +29,8 @@ set(editor_srcs
     SFEPanelLib.cpp
     SFEPanelDragTip.cpp
     SFEPanelGraph.cpp
+    SFEPanelLog.cpp
+    SFEPanelUINodes.cpp
 )
 add_executable(SoftwareFactoryEditor ${editor_srcs})
 target_compile_definitions(SoftwareFactoryEditor PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)

@@ -6,6 +6,7 @@ static std::unordered_map<std::string, std::function<std::shared_ptr<::google::p
     {"bpbase.BpInt", [](){ return std::make_shared<bp_pb::BpInt>(); }},
     {"bpbase.BpFloat", [](){ return std::make_shared<bp_pb::BpFloat>(); }},
     {"bpbase.BpString", [](){ return std::make_shared<bp_pb::BpString>(); }},
+    {"bpbase.BpIntPair", [](){ return std::make_shared<bp_pb::BpIntPair>(); }},
 };
 
 std::shared_ptr<::google::protobuf::Message> create_msg(const std::string& msg_name) {

@@ -1,3 +1,5 @@
+#include <sstream>
+#include <chrono>
 #include "bpcommon.hpp"
 
 namespace bp {
@@ -375,6 +377,25 @@ bool set_attr(std::shared_ptr<::google::protobuf::Message> msg, const std::strin
 bool get_attr(const std::shared_ptr<::google::protobuf::Message> msg, std::string& json_str) {
     JsonPbConvert::PbMsg2JsonStr(*msg, json_str);
     return true;
+}
+
+std::string BpCommon::GetModName(const std::string& full_path) {
+    std::stringstream ss(full_path);
+    std::string mod_name;
+    std::getline(ss, mod_name, '.');
+    return mod_name;
+}
+
+std::string BpCommon::GetCurTime() {
+    auto now = std::chrono::system_clock::now();
+    uint64_t dis_millseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()
+        - std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count() * 1000;
+    time_t tt = std::chrono::system_clock::to_time_t(now);
+    auto time_tm = localtime(&tt);
+    char str_time[25] = { 0 };
+    sprintf(str_time, "%02d:%02d:%02d.%03d", time_tm->tm_hour,
+        time_tm->tm_min, time_tm->tm_sec, (int)dis_millseconds);
+    return std::string(str_time);
 }
 
 } // namespace bp

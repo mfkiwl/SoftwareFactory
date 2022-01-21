@@ -24,8 +24,8 @@ SET(BP_CORE_SRC
     BpObj.cpp
     BpNode.hpp
     BpNode.cpp
-    BpNodeNormal.hpp
-    BpNodeNormal.cpp
+    BpNodeFunc.hpp
+    BpNodeFunc.cpp
     BpGraph.hpp
     BpGraph.cpp
     Bp.hpp

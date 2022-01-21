@@ -9,7 +9,7 @@ namespace bp {
 BpObj::BpObj(const std::string& name, std::shared_ptr<BpGraph> parent)
 	: std::enable_shared_from_this<BpObj>()
     , _parent_graph(parent)
-	, _node_type(BpNodeType::BP_NODE_NORMAL)
+	, _node_type(BpNodeType::BP_NODE_FUNC)
 	, _type(BpNodeStyle::BP_BLUPRINT)
 	, _name(name)
 	, _tmp_next_id(0)

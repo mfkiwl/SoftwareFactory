@@ -1,14 +1,14 @@
-#include "BpNodeNormal.hpp"
+#include "BpNodeFunc.hpp"
 #include "BpGraph.hpp"
 #include "Bp.hpp"
 
 namespace bp {
 
-BpNodeNormal::BpNodeNormal(const std::string& func_full_path, std::shared_ptr<BpGraph> parent)
-	: BpNode(func_full_path, parent, BpNodeType::BP_NODE_NORMAL)
+BpNodeFunc::BpNodeFunc(const std::string& func_full_path, std::shared_ptr<BpGraph> parent)
+	: BpNode(func_full_path, parent, BpNodeType::BP_NODE_FUNC)
 {}
 
-void BpNodeNormal::Logic() {
+void BpNodeFunc::Logic() {
     // 根据输入参数,输出参数数量,转换指针并调用
     // 获得返回值并设置到输出pin保存的值里
     int in_n = _info.type_args.size();

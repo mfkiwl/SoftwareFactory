@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <functional>
 
 #include <jsoncpp/json/json.h>
 
@@ -29,7 +30,8 @@ class Bp
 public:
 	static Bp& Instance();
 
-	std::vector<int> Version(const std::string& path);
+	bool RegisterUserMod(std::shared_ptr<BpContents>, 
+			std::function<std::shared_ptr<BpNode>(const std::string&)>);
 
 	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
 	LoadSaveState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g);
@@ -40,7 +42,7 @@ public:
 	BpVariable CreateVariable(const std::string& type, const std::string& name);
 	BpVariable CreateVariable(const std::string& type, const std::string& name, const std::string& value_desc);
 
-	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpNodeType t = BpNodeType::BP_NODE_NORMAL);
+	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpNodeType t = BpNodeType::BP_NODE_FUNC);
 	/* 生成一个新的变量节点并加入graph */
 	std::shared_ptr<BpNode> SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_type, const std::string& var_name, bool is_get = true);
 	/* 根据已有的变量生成节点 */
@@ -58,6 +60,8 @@ private:
     Bp(const Bp &signal);
     const Bp &operator=(const Bp &);
 
+	std::vector<int> Version(const std::string& path);
+
 	// 当前被编辑的图
 	std::weak_ptr<BpGraph> _cur_edit_graph;
 	std::unordered_map<std::string, std::shared_ptr<BpGraph>> _edit_graphs;
@@ -70,6 +74,8 @@ private:
 	// 库目录
 	std::shared_ptr<BpContents> _contents;
 	std::vector<int> _version;
+	// 用户注册的模块库
+	std::unordered_map<std::string, std::function<std::shared_ptr<BpNode>(const std::string&)>> _user_spawn_nodes;
 };
 
 } // nemespace bp

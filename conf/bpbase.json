@@ -3,6 +3,7 @@
     "_val":[
         "bpbase.BpInt",
         "bpbase.BpFloat",
-        "bpbase.BpString"
+        "bpbase.BpString",
+        "bpbase.BpIntPair"
     ]
 }

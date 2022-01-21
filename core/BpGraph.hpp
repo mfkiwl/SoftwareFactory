@@ -25,9 +25,6 @@ public:
 		// run "input node"
 		_input_node.lock()->Run();
 	}
-	
-	int GetNextID();
-	void SetNextID(int id);
 
 	event_node_map_t& GetEvNodes() { return _event_nodes; }
 	bool AddEventNode(std::shared_ptr<BpObj>);
@@ -63,7 +60,10 @@ public:
 	/* 清空图 */
 	void Clear();
 
+	int GetNextID();
+	
 private:
+	void SetNextID(int id);
 
 	void RunEvent(std::string ev);
 

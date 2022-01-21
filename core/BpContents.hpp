@@ -17,6 +17,7 @@ public:
         VAL,
         EV,
         BASE,
+        USER,
     };
 
     BpContents(std::shared_ptr<BpContents> parent, std::string name, Type t, LeafType lt = LeafType::NONE)

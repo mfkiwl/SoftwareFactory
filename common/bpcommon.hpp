@@ -39,6 +39,11 @@ namespace bp {
 
     bool get_attr(const std::shared_ptr<::google::protobuf::Message> msg, std::string& json_str);
 
+    class BpCommon {
+    public:
+        static std::string GetModName(const std::string& full_path);
+        static std::string GetCurTime();
+    };
 }; // namespace bp
 
 #endif

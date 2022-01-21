@@ -12,3 +12,8 @@ message BpFloat {
 message BpString {
     string var = 1;
 }
+
+message BpIntPair {
+    int32 a = 1;
+    int32 b = 2;
+}

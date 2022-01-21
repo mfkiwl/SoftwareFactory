@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -10,6 +11,12 @@
 #include "imgui.h"
 
 namespace sfe {
+
+enum UILogLv : int {
+    INFO,
+    WARNING,
+    ERROR,
+};
 
 struct SFEMessage {
     std::string src;
@@ -40,8 +47,8 @@ struct SFEMessage {
 
     面板公共设置
 */
-class SFEPanel {
-
+class SFEPanel : public std::enable_shared_from_this<SFEPanel> 
+{
 public:
     const std::string& PanelName() { return _name; }
     void SetPanelName(const std::string& name) { _name = name; }
@@ -54,6 +61,8 @@ public:
 
     virtual void Exit() = 0;
 
+    void UILog(const std::string& msg, UILogLv lv = UILogLv::INFO);
+
     /* Call by SFEditor */
     void ProcMessage();
     void RecvMessage(const SFEMessage& msg) {
@@ -61,14 +70,18 @@ public:
     }
     const std::vector<SFEMessage>& GetDispatchMessage() { return _send_que; }
     void ClearDispathMessage() { _send_que.clear(); }
+    /* Call by child */
+    void SendMessage(const SFEMessage& msg) {
+        if (msg.src == "uinodes") {
+            LOG_EVERY_N(INFO, 30) << "per 30 msg: " << msg.Print();
+        } else {
+            LOG(INFO) << msg.Print();
+        }
+        _send_que.emplace_back(msg);
+    }
 protected:
     /* Call by this */
     virtual void OnMessage(const SFEMessage& msg) {}
-    /* Call by child */
-    void SendMessage(const SFEMessage& msg) {
-        LOG(INFO) << msg.Print();
-        _send_que.emplace_back(msg);
-    }
 
 private:
     std::string _name;

@@ -4,16 +4,20 @@
 #include "SFEPanelLib.hpp"
 #include "SFEPanelDragTip.hpp"
 #include "SFEPanelGraph.hpp"
+#include "SFEPanelLog.hpp"
+#include "SFEPanelUINodes.hpp"
 #include "Bp.hpp"
 
 namespace sfe {
 
 bool SFEditor::Init() {
+    _panels.emplace_back(std::make_shared<SFEPanelUINodes>());
     _panels.emplace_back(std::make_shared<SFEPanelMainMenu>());
     _panels.emplace_back(std::make_shared<SFEPanelBp>());
     _panels.emplace_back(std::make_shared<SFEPanelLib>());
     _panels.emplace_back(std::make_shared<SFEPanelDragTip>());
     _panels.emplace_back(std::make_shared<SFEPanelGraph>());
+    _panels.emplace_back(std::make_shared<SFEPanelLog>());
 
     for (auto it = _panels.begin(); it != _panels.end(); ++it) {
         (*it)->Init();
@@ -118,11 +122,13 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             if (contents_type == (int)BpContents::LeafType::EV) {
                 obj_type = bp::BpNodeType::BP_NODE_EV;
             } else if (contents_type == (int)BpContents::LeafType::FUNC) {
-                obj_type = bp::BpNodeType::BP_NODE_NORMAL;
+                obj_type = bp::BpNodeType::BP_NODE_FUNC;
             } else if (contents_type == (int)BpContents::LeafType::VAL) {
                 obj_type = bp::BpNodeType::BP_NODE_VAR;
             } else if (contents_type == (int)BpContents::LeafType::BASE) {
                 obj_type = bp::BpNodeType::BP_NODE_BASE;
+            } else if (contents_type == (int)BpContents::LeafType::USER) {
+                obj_type = bp::BpNodeType::BP_NODE_USER;
             }
             std::shared_ptr<bp::BpNode> node = nullptr;
             if (obj_type == bp::BpNodeType::BP_NODE_VAR) {

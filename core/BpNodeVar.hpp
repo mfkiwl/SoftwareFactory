@@ -3,10 +3,10 @@
 
 namespace bp {
 
-class BpBaseNodeVar : public BpNode
+class BpNodeVar : public BpNode
 {
 public:
-	BpBaseNodeVar(bool is_get, BpVariable& var, std::shared_ptr<BpGraph> parent)
+	BpNodeVar(bool is_get, BpVariable& var, std::shared_ptr<BpGraph> parent)
         : BpNode(var.GetName(), parent, bp::BpNodeType::BP_NODE_VAR)
         , _is_get(is_get)
         , _var(var)

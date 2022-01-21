@@ -63,7 +63,8 @@ void SFEPanelLib::ShowLib(std::shared_ptr<BpContents> c) {
             } else {
                 Json::Value v2;
                 v2["command"] = "spawn_node";
-                v2["node_name"] = (_drag_item.lock()->GetLeafType() == BpContents::LeafType::FUNC) ? _drag_item.lock()->GetFullPath() : _drag_item.lock()->GetName();
+                auto leaf_type = _drag_item.lock()->GetLeafType();
+                v2["node_name"] = (leaf_type == BpContents::LeafType::FUNC || leaf_type == BpContents::LeafType::USER) ? _drag_item.lock()->GetFullPath() : _drag_item.lock()->GetName();
                 v2["type"] = (int)_drag_item.lock()->GetLeafType();
                 ImVec2 xy = ImGui::GetMousePos();
                 v2["x"] = xy.x;

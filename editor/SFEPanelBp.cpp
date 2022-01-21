@@ -333,7 +333,7 @@ ImColor SFEPanelBp::GetNodeKindColor(bp::BpNodeType kind) {
 	default:
 	case bp::BpNodeType::BP_NODE_EV:     return ImColor(255, 128, 128);
 	case bp::BpNodeType::BP_NODE_VAR:	return ImColor(51, 150, 215);
-	case bp::BpNodeType::BP_NODE_NORMAL:	return ImColor(255, 255, 255);
+	case bp::BpNodeType::BP_NODE_FUNC:	return ImColor(255, 255, 255);
 	}
 }
 

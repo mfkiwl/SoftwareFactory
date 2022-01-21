@@ -1,10 +1,11 @@
 ﻿#include <fstream>
 
+#include "bpcommon.hpp"
 #include "Bp.hpp"
 #include "BpModLib.hpp"
 #include "BpNodeLib.hpp"
 #include "BpModLibLinux.hpp"
-#include "BpBaseNodeVar.hpp"
+#include "BpNodeVar.hpp"
 #include "BpGraph.hpp"
 
 namespace bp {
@@ -60,6 +61,17 @@ std::vector<int> Bp::Version(const std::string& path) {
         }
     }
     return res;
+}
+
+bool Bp::RegisterUserMod(std::shared_ptr<BpContents> contents, std::function<std::shared_ptr<BpNode>(const std::string&)> func) {
+	auto user_mode_name = contents->GetName();
+	if (_user_spawn_nodes.find(user_mode_name) != _user_spawn_nodes.end()) {
+		LOG(ERROR) << "Register user node " << user_mode_name;
+		return false;
+	}
+	_user_spawn_nodes[user_mode_name] = func;
+	_contents->AddChild(contents);
+	return true;
 }
 
 BpVariable Bp::CreateVariable(const std::string& type, const std::string& name) {
@@ -211,12 +223,13 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 	auto& nor_nodes = g->GetNodes();
 	for (auto nor : nor_nodes) {
 		Json::Value json_nornode;
+		auto node_type = nor->GetNodeType();
 		json_nornode["name"] = nor->GetName();
-		json_nornode["type"] = (int)nor->GetNodeType();
+		json_nornode["type"] = (int)node_type;
 		json_nornode["style"] = (int)nor->GetNodeStyle();
 		json_nornode["id"] = nor->GetID();
 		if (nor->GetNodeType() == BpNodeType::BP_NODE_VAR) {
-			auto var_node = std::dynamic_pointer_cast<BpBaseNodeVar>(nor);
+			auto var_node = std::dynamic_pointer_cast<BpNodeVar>(nor);
 			json_nornode["get"] = var_node->IsGet();
 		}
 		root["nodes"].append(json_nornode);
@@ -254,7 +267,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 	// 从BpNodeLib中获得节点对象
 	// 组合成Node添加到graph
 	// _base_mods->GetMods()[0]->GetContents();
-	if (t == BpNodeType::BP_NODE_NORMAL) {
+	if (t == BpNodeType::BP_NODE_FUNC) {
 		auto func_info = _base_mods->GetFunc(node_name);
 		if (func_info.type == BpModuleFuncType::UNKNOWN) {
 			LOG(ERROR) << "get func " << node_name << " failed";
@@ -286,6 +299,12 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 		return _nodes_lib->CreateEvNode(node_name);
 	} else if (t == BpNodeType::BP_NODE_BASE) {
 		return _nodes_lib->CreateBaseNode(node_name);
+	} else if (t == BpNodeType::BP_NODE_USER) {
+		auto user_mod_name = BpCommon::GetModName(node_name);
+		if (_user_spawn_nodes.find(user_mod_name) == _user_spawn_nodes.end()) {
+			return nullptr;
+		}
+		return _user_spawn_nodes[user_mod_name](node_name);
 	}
 	return nullptr;
 }

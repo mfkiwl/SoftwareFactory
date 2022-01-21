@@ -3,7 +3,7 @@
     "_func":{
         "add_int":{
             "_input":[
-                "bpmath.BpIntPair"
+                "bpbase.BpIntPair"
             ],
             "_output":[
                 "bpbase.BpInt"
@@ -17,8 +17,5 @@
                 "bpbase.BpInt"
             ]
         }
-    },
-    "_val":[
-        "bpmath.BpIntPair"
-    ]
+    }
 }

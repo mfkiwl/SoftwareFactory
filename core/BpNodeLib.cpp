@@ -1,9 +1,8 @@
 #include "BpNodeLib.hpp"
 #include "BpNode.hpp"
-#include "BpNodeNormal.hpp"
+#include "BpNodeFunc.hpp"
 #include "BpEvNodeTick.hpp"
-#include "BpBaseNodeVar.hpp"
-#include "BpBaseNodePrint.hpp"
+#include "BpNodeVar.hpp"
 
 namespace bp {
 BpNodeLib::BpNodeLib() 
@@ -14,14 +13,7 @@ BpNodeLib::BpNodeLib()
             return node; }
         }
     },
-    _base_nodes {
-        {"Print", [](){ 
-            auto node = std::make_shared<BpBaseNodePrint>(nullptr); 
-            node->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable()); 
-            node->AddPin("any", BpPinKind::BP_INPUT, BpPinType::BP_VALUE, BpVariable("any", "any", nullptr)).SetAssignByRef(true); 
-            return node; }
-        }
-    }
+    _base_nodes {}
 {
     _root_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
     // 创建事件目录
@@ -29,9 +21,9 @@ BpNodeLib::BpNodeLib()
     _ev_contents->AddChild(std::make_shared<BpContents>(nullptr, "Tick", BpContents::Type::LEAF, BpContents::LeafType::EV));
     _root_contents->AddChild(_ev_contents);
     // 创建基础节点目录
-    _base_contents = std::make_shared<BpContents>(nullptr, "base node", BpContents::Type::CONTENTS);
-    _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Print", BpContents::Type::LEAF, BpContents::LeafType::BASE));
-    _root_contents->AddChild(_base_contents);
+    // _base_contents = std::make_shared<BpContents>(nullptr, "base node", BpContents::Type::CONTENTS);
+    // _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Print", BpContents::Type::LEAF, BpContents::LeafType::BASE));
+    // _root_contents->AddChild(_base_contents);
 }
 
 BpNodeLib::~BpNodeLib() {
@@ -42,7 +34,7 @@ std::shared_ptr<BpNode> BpNodeLib::CreateFuncNode(BpModuleFunc func_info,
             std::vector<BpVariable>& args,
             std::vector<BpVariable>& res) {
     LOG(INFO) << "create func node " << func_info.name;
-    auto node = std::make_shared<BpNodeNormal>(func_info.name, nullptr);
+    auto node = std::make_shared<BpNodeFunc>(func_info.name, nullptr);
     node->SetFuncInfo(func_info);
     // // 创建一个输入输出flow
     node->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
@@ -62,7 +54,7 @@ std::shared_ptr<BpNode> BpNodeLib::CreateFuncNode(BpModuleFunc func_info,
 /* 创建变量Node */
 std::shared_ptr<BpNode> BpNodeLib::CreateVarNode(BpVariable var, bool is_get) {
     LOG(INFO) << "create var node " << var.GetName() << "(" << var.GetType() << ")";
-    auto node = std::make_shared<BpBaseNodeVar>(is_get, var, nullptr);
+    auto node = std::make_shared<BpNodeVar>(is_get, var, nullptr);
     if (is_get) {
         node->AddPin(var.GetType(), BpPinKind::BP_OUTPUT, BpPinType::BP_VALUE, var);
     } else {

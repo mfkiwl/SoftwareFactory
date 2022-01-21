@@ -1,7 +1,2 @@
 syntax = "proto3";
 package bp_pb;
-
-message BpIntPair {
-    int32 a = 1;
-    int32 b = 2;
-}
