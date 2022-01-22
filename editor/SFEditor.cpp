@@ -104,7 +104,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
         if (cmd == "create_new") {
             auto graph_name = msg.json_msg["graph_name"].asString();
             auto graph_type = msg.json_msg["graph_type"].asString() == "mod graph" ? bp::BpNodeType::BP_GRAPH : bp::BpNodeType::BP_GRAPH_EXEC;
-            auto g = std::make_shared<bp::BpGraph>(graph_name, graph_type);
+            auto g = bp::Bp::Instance().SpawnGraph(graph_name, graph_type);
             bp::Bp::Instance().AddEditGraph(graph_name, g);
             bp::Bp::Instance().SetCurEditGraph(g);
             // send to graph

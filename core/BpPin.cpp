@@ -9,7 +9,7 @@ BpPin::BpPin()
 	, ID(-1)
 {}
 
-BpPin::BpPin(std::shared_ptr<BpObj> n, 
+BpPin::BpPin(std::shared_ptr<BpNode> n, 
 		BpPinKind k, BpPinType t, int id, 
 		const std::string& name, const BpVariable& v)
 	: _v(v)

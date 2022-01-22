@@ -8,16 +8,13 @@
 namespace bp {
 
 BpGraph::BpGraph(std::shared_ptr<BpGraph> parent) 
-	: BpObj("", parent)
+	: BpNode("", parent)
 	, _next_id(0) {}
 
 BpGraph::BpGraph(std::string name, BpNodeType t, std::shared_ptr<BpGraph> parent)
-	: BpObj(name, parent)
+	: BpNode(name, parent)
 	, _next_id(0) {
 	_node_type = t;
-	if (t == BpNodeType::BP_GRAPH) {
-		// TODO 添加输入输出节点, 并对_input_node赋值
-	}
 }
 
 void BpGraph::Clear() {
@@ -65,7 +62,13 @@ void BpGraph::RemoveVariable(const std::string& name) {
 	_vars.erase(name);
 }
 
-void BpGraph::AddNode(std::shared_ptr<BpObj> node) {
+void BpGraph::AddNode(std::shared_ptr<BpNode> node) {
+	if (node->GetNodeType() == BpNodeType::BP_GRAPH_INPUT) {
+		_input_node = node;
+	}
+	if (node->GetNodeType() == BpNodeType::BP_GRAPH_OUTPUT) {
+		_output_node = node;
+	}
 	node->SetParentGraph(std::dynamic_pointer_cast<BpGraph>(shared_from_this()));
 	_nodes.push_back(node);
 }
@@ -89,7 +92,7 @@ void BpGraph::DelLink(int id) {
 		}
 	}
 }
-void BpGraph::DelNode(std::shared_ptr<BpObj> node) {
+void BpGraph::DelNode(std::shared_ptr<BpNode> node) {
 	for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
 		if (*it == node) {
 			_nodes.erase(it);
@@ -137,14 +140,14 @@ BpPin* BpGraph::SearchPin(int id) {
 	return nullptr;
 }
 
-std::shared_ptr<BpObj> BpGraph::GetNode(int id) {
+std::shared_ptr<BpNode> BpGraph::GetNode(int id) {
 	for (auto com : _nodes) {
 		if (com->GetID() == id) return com;
 	}
 	return nullptr;
 }
 
-bool BpGraph::AddEventNode(std::shared_ptr<BpObj> node) {
+bool BpGraph::AddEventNode(std::shared_ptr<BpNode> node) {
 	if (_node_type == BpNodeType::BP_GRAPH) {
 		LOG(ERROR) << _name << " not exec graph";
 		return false;
@@ -187,7 +190,7 @@ void BpGraph::RunEvent(std::string ev) {
 
 void BpGraph::Run() {
 	if (_node_type == BpNodeType::BP_GRAPH) {
-		BpObj::Run();
+		BpNode::Run();
 	} else {
 		// TODO 应该按事件优先级依次执行
 		RunEvent("Tick");

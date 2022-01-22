@@ -1,6 +1,6 @@
 #pragma once
 #include "BpNode.hpp"
-#include "../SFEPanel.hpp"
+#include "SFEPanel.hpp"
 #include "bpbase.pb.h"
 
 namespace sfe {
@@ -8,9 +8,11 @@ namespace sfe {
 class SFEUINodePlot : public bp::BpNode {
 public:
     SFEUINodePlot(const std::string& name, std::shared_ptr<bp::BpGraph> parent, std::shared_ptr<SFEPanel> panel)
-        : BpNode(name, parent, bp::BpNodeType::BP_NODE_USER)
+        : BpNode(name, parent)
         , _panel(panel)
-    {}
+    {
+        _node_type = bp::BpNodeType::BP_NODE_USER;
+    }
 
 	virtual void Logic() {
         if (_panel.expired()) {
@@ -18,9 +20,6 @@ public:
             return;
         }
         auto p = _panel.lock();
-        // p->UILog(_inputs[1].GetValue()->DebugString()); 
-        // p->UILog(_inputs[2].GetValue()->DebugString()); 
-        // p->UILog(_inputs[3].GetValue()->DebugString()); 
         Json::Value v;
         v["command"] = std::dynamic_pointer_cast<::bp_pb::BpString>(_inputs[1].GetValue())->var();
         v["x"] = std::dynamic_pointer_cast<::bp_pb::BpFloat>(_inputs[2].GetValue())->var();

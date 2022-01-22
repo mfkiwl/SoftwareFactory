@@ -1,14 +1,13 @@
 #include "BpNodeLib.hpp"
-#include "BpNode.hpp"
-#include "BpNodeFunc.hpp"
-#include "BpEvNodeTick.hpp"
 #include "BpNodeVar.hpp"
+#include "BpNodeFunc.hpp"
+#include "BpNodeEvTick.hpp"
 
 namespace bp {
 BpNodeLib::BpNodeLib() 
     : _ev_nodes {
         {"Tick", [](){ 
-            auto node = std::make_shared<BpEvNodeTick>(nullptr); 
+            auto node = std::make_shared<BpNodeEvTick>(nullptr); 
             node->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable()); 
             return node; }
         }
@@ -81,10 +80,6 @@ std::shared_ptr<BpNode> BpNodeLib::CreateBaseNode(const std::string& name) {
         return nullptr;
     }
     return _base_nodes[name]();
-}
-
-std::shared_ptr<BpNode> BpNodeLib::CreateGraphIONode(const std::shared_ptr<BpGraph>& g) {
-    return nullptr;
 }
 
 std::shared_ptr<BpContents> BpNodeLib::GetContents() {

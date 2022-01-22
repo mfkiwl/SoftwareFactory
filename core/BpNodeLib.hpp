@@ -6,24 +6,22 @@
 
 namespace bp {
 class BpNode;
-class BpEvNode;
+class BpNodeEv;
 class BpGraph;
 class BpNodeLib
 {
-    typedef std::shared_ptr<BpEvNode> create_ev_node_t();
+    typedef std::shared_ptr<BpNodeEv> create_ev_node_t();
     typedef std::shared_ptr<BpNode> create_base_node_t();
-    typedef std::shared_ptr<BpNode> create_func_node_t(BpModuleFunc func_info);
-    typedef std::shared_ptr<BpNode> create_var_node_t(pb_msg_ptr_t msg, bool is_get, bool is_ref);
 public:
     BpNodeLib();
     virtual ~BpNodeLib();
 
-    /* 创建函数node */
+    /* 创建函数Node */
     std::shared_ptr<BpNode> CreateFuncNode(BpModuleFunc func_info, 
             std::vector<BpVariable>& args,
             std::vector<BpVariable>& res);
 
-    /* 创建变量node */
+    /* 创建变量Node */
     std::shared_ptr<BpNode> CreateVarNode(BpVariable var, bool is_get);
     
     /* 创建事件Node */
@@ -31,9 +29,6 @@ public:
 
     /* 创建分支结构Node */
     std::shared_ptr<BpNode> CreateBaseNode(const std::string& name);
-
-    /* 创建BpGraph的IO Node */
-    std::shared_ptr<BpNode> CreateGraphIONode(const std::shared_ptr<BpGraph>& g);
 
     /* 获得节点(分支结构)目录 */
     std::shared_ptr<BpContents> GetContents();

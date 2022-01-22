@@ -18,6 +18,7 @@ include_directories(${SDL2_INCLUDE_DIRS})
 find_package(imgui REQUIRED)
 include_directories(${imgui_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/3rd/glew-cmake-2.2.0/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(editor_srcs
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_opengl3.cpp
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_sdl.cpp

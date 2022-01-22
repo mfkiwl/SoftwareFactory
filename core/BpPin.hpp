@@ -22,12 +22,12 @@ enum class BpPinType : int {
 	BP_VALUE,
 };
 
-class BpObj;
+class BpNode;
 class BpPin final
 {
 public:
 	BpPin();
-	BpPin(std::shared_ptr<BpObj> n, 
+	BpPin(std::shared_ptr<BpNode> n, 
 			BpPinKind k, BpPinType t, int id,
 			const std::string& name, const BpVariable& v);
 
@@ -85,7 +85,7 @@ public:
 	BpPinType GetPinType() const { return _type; }
 	const std::string& GetVarType() { return _v.GetType(); }
 	void SetPinType(BpPinType t) { _type = t; }
-	const std::shared_ptr<BpObj> GetObj() { return _node.lock(); }
+	const std::shared_ptr<BpNode> GetObj() { return _node.lock(); }
 
     int           ID;
 
@@ -98,7 +98,7 @@ private:
 	std::string           _name;
     BpPinType             _type;
     BpPinKind             _kind;
-	std::weak_ptr<BpObj>  _node;
+	std::weak_ptr<BpNode>  _node;
 
 	BpVariable            _v;
 };

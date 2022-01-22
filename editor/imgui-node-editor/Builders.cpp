@@ -180,7 +180,7 @@ bool util::BlueprintNodeBuilder::SetStage(Stage stage)
             HeaderRect = ImGui_GetItemRect();
 
             // spacing between header and content
-            ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.y * 2.0f);
+            ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.y * 1.0f); // 2.0
 
             break;
 

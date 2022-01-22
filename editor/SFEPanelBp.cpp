@@ -17,7 +17,7 @@ bool SFEPanelBp::Init() {
     ed::Config config;
     _node_editor = ed::CreateEditor(&config);
     ed::SetCurrentEditor(_node_editor);
-    ed::GetStyle().NodeRounding = 6;
+    ed::GetStyle().NodeRounding = 4;
     ed::NavigateToContent();
     return true;
 }
@@ -59,7 +59,7 @@ void SFEPanelBp::Update() {
     ed::SetCurrentEditor(_node_editor);
     // double click node
     ed::NodeId n_id = ed::GetDoubleClickedNode();
-	std::shared_ptr<bp::BpObj> dc_node = nullptr;
+	std::shared_ptr<bp::BpNode> dc_node = nullptr;
 	if (graph != nullptr && (dc_node = graph->GetNode((int)n_id.Get())) != nullptr) {
 		// 显示节点属性
         _is_doubleclick_node = true;
@@ -87,112 +87,12 @@ void SFEPanelBp::Update() {
             ed::Link((*it).ID, (*it).StartPinID, (*it).EndPinID, ImColor((*it).Color[0], (*it).Color[1], (*it).Color[2], (*it).Color[3]), 2.0f);
     
         // create/delete
-        if (ed::BeginCreate(ImColor(255, 255, 255), 2.0f)) {
-            auto showLabel = [](const char* label, ImColor color)
-            {
-                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
-                auto size = ImGui::CalcTextSize(label);
-
-                auto padding = ImGui::GetStyle().FramePadding;
-                auto spacing = ImGui::GetStyle().ItemSpacing;
-
-                ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
-
-                auto rectMin = ImGui::GetCursorScreenPos() - padding;
-                auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
-
-                auto drawList = ImGui::GetWindowDrawList();
-                drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
-                ImGui::TextUnformatted(label);
-            };
-
-            ed::PinId startPinId = 0, endPinId = 0;
-            bp::BpPin* new_link_pin = nullptr;
-            if (ed::QueryNewLink(&startPinId, &endPinId)) {
-                auto startPin = graph->SearchPin((int)startPinId.Get());
-                auto endPin = graph->SearchPin((int)endPinId.Get());
-
-                new_link_pin = startPin ? startPin : endPin;
-
-                if (startPin->GetPinKind() == bp::BpPinKind::BP_INPUT) {
-                    std::swap(startPin, endPin);
-                    std::swap(startPinId, endPinId);
-                }
-
-                if (startPin && endPin) {
-                    if (endPin == startPin) {
-                        ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-                    } else if (endPin->GetPinKind() == startPin->GetPinKind()) {
-                        showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
-                        ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
-                    } else if (endPin->GetObj() == startPin->GetObj()) {
-                        showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
-                        ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
-                    } else if (!startPin->IsSameType(endPin)) {
-                        showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
-                        ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
-                    } else if (!CanCreateLink(startPin, endPin)) {
-                        showLabel("x linked", ImColor(45, 32, 32, 180));
-                        ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
-                    } else {
-                        showLabel("+ Create Link", ImColor(32, 45, 32, 180));
-                        if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f)) {
-                            graph->AddLink(*startPin, *endPin);
-                            ImColor c = GetIconColor(*startPin);
-                            graph->GetLinks().back().SetColor(c.Value.x, c.Value.y, c.Value.z, c.Value.w);
-                        }
-                    }
-                }
-            }
-
-            ed::PinId pinId = 0;
-            if (ed::QueryNewNode(&pinId)) {
-                new_link_pin = graph->SearchPin((int)pinId.Get());
-                if (new_link_pin)
-                    showLabel("+ Create Node", ImColor(32, 45, 32, 180));
-
-                if (ed::AcceptNewItem()) {
-                    // m_create_new_node = true;
-                    // m_new_node_link_pin = graph->SearchPin((int)pinId.Get());
-                    ed::Suspend();
-                    ImGui::OpenPopup("Create New Node");
-                    ed::Resume();
-                }
-            }
-        }
-        ed::EndCreate();
-
-        if (ed::BeginDelete()) {
-            ed::LinkId linkId = 0;
-            while (ed::QueryDeletedLink(&linkId)) {
-                if (ed::AcceptDeletedItem()) {
-                    auto id = std::find_if(graph->GetLinks().begin(), graph->GetLinks().end(), [linkId](auto& link) { return link.ID == (int)linkId.Get(); });
-                    if (id != graph->GetLinks().end()) {
-                        graph->DelLink(id->ID);
-                    }
-                }
-            }
-
-            ed::NodeId nodeId = 0;
-            while (ed::QueryDeletedNode(&nodeId)) {
-                if (ed::AcceptDeletedItem()) {
-                    auto& nodes = graph->GetNodes();
-                    auto id = std::find_if(nodes.begin(), nodes.end(), [nodeId](auto node) { return node->GetID() == (int)nodeId.Get(); });
-                    if (id != nodes.end()) {
-                        graph->DelNode(*id);
-                    }
-
-                    auto& ev_nodes = graph->GetEvNodes();
-                    auto p = std::find_if(ev_nodes.begin(), ev_nodes.end(), [nodeId](auto node) { return node.second->GetID() == (int)nodeId.Get(); });
-                    if (p != ev_nodes.end()) {
-                        graph->DelEventNode((*p).first);
-                    }
-                }
-            }
-        }
-        ed::EndDelete();
+        NodeLinkCreate(graph);
+        NodeLinkDelete(graph);
     }
 	ed::End();
+
+    // node attr
     if (_is_doubleclick_node) {
         _is_doubleclick_node = false;
         if (_doubleclick_node != nullptr && _doubleclick_node->GetNodeType() == bp::BpNodeType::BP_NODE_VAR) {
@@ -206,6 +106,115 @@ void SFEPanelBp::Update() {
     }
     ShowVarNodeAttr();
     ImGui::End();
+}
+
+void SFEPanelBp::NodeLinkCreate(std::shared_ptr<bp::BpGraph>& graph) {
+    if (ed::BeginCreate(ImColor(255, 255, 255), 2.0f)) {
+        auto showLabel = [](const char* label, ImColor color)
+        {
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetTextLineHeight());
+            auto size = ImGui::CalcTextSize(label);
+
+            auto padding = ImGui::GetStyle().FramePadding;
+            auto spacing = ImGui::GetStyle().ItemSpacing;
+
+            ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(spacing.x, -spacing.y));
+
+            auto rectMin = ImGui::GetCursorScreenPos() - padding;
+            auto rectMax = ImGui::GetCursorScreenPos() + size + padding;
+
+            auto drawList = ImGui::GetWindowDrawList();
+            drawList->AddRectFilled(rectMin, rectMax, color, size.y * 0.15f);
+            ImGui::TextUnformatted(label);
+        };
+
+        ed::PinId startPinId = 0, endPinId = 0;
+        bp::BpPin* new_link_pin = nullptr;
+        if (ed::QueryNewLink(&startPinId, &endPinId)) {
+            auto startPin = graph->SearchPin((int)startPinId.Get());
+            auto endPin = graph->SearchPin((int)endPinId.Get());
+
+            new_link_pin = startPin ? startPin : endPin;
+
+            if (startPin->GetPinKind() == bp::BpPinKind::BP_INPUT) {
+                std::swap(startPin, endPin);
+                std::swap(startPinId, endPinId);
+            }
+
+            if (startPin && endPin) {
+                if (endPin == startPin) {
+                    ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                } else if (endPin->GetPinKind() == startPin->GetPinKind()) {
+                    showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
+                    ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
+                } else if (endPin->GetObj() == startPin->GetObj()) {
+                    showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
+                    ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
+                } else if (!startPin->IsSameType(endPin)) {
+                    showLabel("x Incompatible Pin Type", ImColor(45, 32, 32, 180));
+                    ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
+                } else if (!CanCreateLink(startPin, endPin)) {
+                    showLabel("x linked", ImColor(45, 32, 32, 180));
+                    ed::RejectNewItem(ImColor(255, 128, 128), 1.0f);
+                } else {
+                    showLabel("+ Create Link", ImColor(32, 45, 32, 180));
+                    if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f)) {
+                        graph->AddLink(*startPin, *endPin);
+                        ImColor c = GetIconColor(*startPin);
+                        graph->GetLinks().back().SetColor(c.Value.x, c.Value.y, c.Value.z, c.Value.w);
+                    }
+                }
+            }
+        }
+
+        ed::PinId pinId = 0;
+        if (ed::QueryNewNode(&pinId)) {
+            new_link_pin = graph->SearchPin((int)pinId.Get());
+            if (new_link_pin)
+                showLabel("+ Create Node", ImColor(32, 45, 32, 180));
+
+            if (ed::AcceptNewItem()) {
+                // m_create_new_node = true;
+                // m_new_node_link_pin = graph->SearchPin((int)pinId.Get());
+                ed::Suspend();
+                ImGui::OpenPopup("Create New Node");
+                ed::Resume();
+            }
+        }
+    }
+    ed::EndCreate();
+}
+
+void SFEPanelBp::NodeLinkDelete(std::shared_ptr<bp::BpGraph>& graph) {
+    if (ed::BeginDelete()) {
+        ed::LinkId linkId = 0;
+        while (ed::QueryDeletedLink(&linkId)) {
+            if (ed::AcceptDeletedItem()) {
+                auto id = std::find_if(graph->GetLinks().begin(), graph->GetLinks().end(), [linkId](auto& link) { return link.ID == (int)linkId.Get(); });
+                if (id != graph->GetLinks().end()) {
+                    graph->DelLink(id->ID);
+                }
+            }
+        }
+
+        ed::NodeId nodeId = 0;
+        while (ed::QueryDeletedNode(&nodeId)) {
+            if (ed::AcceptDeletedItem()) {
+                auto& nodes = graph->GetNodes();
+                auto id = std::find_if(nodes.begin(), nodes.end(), [nodeId](auto node) { return node->GetID() == (int)nodeId.Get(); });
+                if (id != nodes.end()) {
+                    graph->DelNode(*id);
+                }
+
+                auto& ev_nodes = graph->GetEvNodes();
+                auto p = std::find_if(ev_nodes.begin(), ev_nodes.end(), [nodeId](auto node) { return node.second->GetID() == (int)nodeId.Get(); });
+                if (p != ev_nodes.end()) {
+                    graph->DelEventNode((*p).first);
+                }
+            }
+        }
+    }
+    ed::EndDelete();
 }
 
 void SFEPanelBp::Exit() {
@@ -235,7 +244,7 @@ void SFEPanelBp::ShowVarNodeAttr() {
     }
 }
 
-void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpObj>& node) {
+void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpNode>& node) {
 	if (node->GetNodeStyle() != bp::BpNodeStyle::BP_BLUPRINT
 		&& node->GetNodeStyle() != bp::BpNodeStyle::BP_SIMPLE)
 		return;
@@ -247,7 +256,7 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 		ImGui::Spring(0);
 		ImGui::TextUnformatted(node->GetName().c_str());
 		ImGui::Spring(1);
-		ImGui::Dummy(ImVec2(0, 28));
+		ImGui::Dummy(ImVec2(0, 20));
 		ImGui::Spring(0);
 		builder.EndHeader();
 	}
@@ -268,6 +277,9 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 		ImGui::PopStyleVar();
 		builder.EndInput();
 	}
+    // add pin icon
+    // TODO
+    //ImGui::Button(" + ");
 
 	if (is_simple) {
 		builder.Middle();
@@ -292,6 +304,10 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 		ImGui::PopStyleVar();
 		builder.EndOutput();
 	}
+    // add pin icon
+    // TODO
+    // ImGui::Button(" + ");
+
 	builder.End();
 }
 
@@ -303,7 +319,7 @@ void SFEPanelBp::DrawPinIcon(bp::BpPin& pin, int alpha) {
 	case bp::BpPinType::BP_FLOW:     iconType = IconType::Flow;   break;
 	case bp::BpPinType::BP_VALUE:    iconType = IconType::Circle; break;
 	}
-	ax::Widgets::Icon(ImVec2(24, 24), iconType, pin.IsLinked(), color, ImColor(32, 32, 32, alpha));
+	ax::Widgets::Icon(ImVec2(20, 20), iconType, pin.IsLinked(), color, ImColor(32, 32, 32, alpha));
 }
 
 bool SFEPanelBp::CanCreateLink(bp::BpPin* a, bp::BpPin* b) {

@@ -89,7 +89,11 @@ void SFEPanelMainMenu::CreateNewGraph() {
             }
         }
         static char buf[64] = "";
-        ImGui::InputText("graph name", buf, 64, ImGuiInputTextFlags_CharsNoBlank);
+        if (graph_type == "mod graph") {
+            ImGui::InputText("graph name", buf, 64, ImGuiInputTextFlags_CharsNoBlank);
+        } else {
+            strcpy(buf, "__main__");
+        }
 
         if (ImGui::Button("OK", ImVec2(120, 0))) { 
             Json::Value v;

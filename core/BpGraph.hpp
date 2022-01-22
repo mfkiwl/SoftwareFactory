@@ -5,14 +5,14 @@
 
 #include "BpLink.hpp"
 #include "BpVariable.hpp"
-#include "BpObj.hpp"
+#include "BpNode.hpp"
 
 namespace bp {
 
-class BpGraph : public BpObj
+class BpGraph : public BpNode
 {
-	typedef std::unordered_map<std::string, std::shared_ptr<BpObj>> event_node_map_t;
-	typedef std::vector<std::shared_ptr<BpObj>>                     node_vec_t;
+	typedef std::unordered_map<std::string, std::shared_ptr<BpNode>> event_node_map_t;
+	typedef std::vector<std::shared_ptr<BpNode>>                     node_vec_t;
 	typedef std::unordered_map<std::string, BpVariable>             variable_map_t;
 public:
 	friend class Bp;
@@ -22,18 +22,19 @@ public:
 
 	virtual void Run() override;
 	virtual void Logic() {
-		// run "input node"
-		_input_node.lock()->Run();
+		if (_node_type == BpNodeType::BP_GRAPH && !_input_node.expired()){
+			_input_node.lock()->Run();
+		}
 	}
 
 	event_node_map_t& GetEvNodes() { return _event_nodes; }
-	bool AddEventNode(std::shared_ptr<BpObj>);
+	bool AddEventNode(std::shared_ptr<BpNode>);
 	void DelEventNode(std::string name);
 
 	node_vec_t& GetNodes() { return _nodes; }
-	std::shared_ptr<BpObj> GetNode(int id);
-	void AddNode(std::shared_ptr<BpObj>);
-	void DelNode(std::shared_ptr<BpObj>);
+	std::shared_ptr<BpNode> GetNode(int id);
+	void AddNode(std::shared_ptr<BpNode>);
+	void DelNode(std::shared_ptr<BpNode>);
 
 	std::vector<BpLink> SearchLinks(int id);
 	std::vector<BpLink>& GetLinks() { return _links; }
@@ -80,7 +81,8 @@ private:
 	variable_map_t              _vars;
 	BpVariable                  _null_val;
 
-	std::weak_ptr<BpObj>        _input_node;
+	std::weak_ptr<BpNode>       _input_node;
+	std::weak_ptr<BpNode>       _output_node;
 };
 
 } // namespace bp

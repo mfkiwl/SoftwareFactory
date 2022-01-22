@@ -34,18 +34,18 @@ public:
 			std::function<std::shared_ptr<BpNode>(const std::string&)>);
 
 	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
-	LoadSaveState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g);
-
 	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g);
-	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);
 
 	BpVariable CreateVariable(const std::string& type, const std::string& name);
 	BpVariable CreateVariable(const std::string& type, const std::string& name, const std::string& value_desc);
 
+	/* 生成图 */
+	std::shared_ptr<BpGraph> SpawnGraph(const std::string& name, BpNodeType t = BpNodeType::BP_GRAPH_EXEC);
+	/* 生成非变量节点 */
 	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpNodeType t = BpNodeType::BP_NODE_FUNC);
-	/* 生成一个新的变量节点并加入graph */
+	/* 创建新变量,创建新变量节点,加入graph */
 	std::shared_ptr<BpNode> SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_type, const std::string& var_name, bool is_get = true);
-	/* 根据已有的变量生成节点 */
+	/* 已有变量,创建新变量节点,加入graph */
 	std::shared_ptr<BpNode> SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_name, bool is_get = true);
 
 	const std::shared_ptr<BpContents>& GetContents() const;
@@ -61,6 +61,9 @@ private:
     const Bp &operator=(const Bp &);
 
 	std::vector<int> Version(const std::string& path);
+
+	LoadSaveState LoadGraph(const Json::Value& root, const Json::Value& json_graph, std::shared_ptr<BpGraph>& g);
+	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);
 
 	// 当前被编辑的图
 	std::weak_ptr<BpGraph> _cur_edit_graph;

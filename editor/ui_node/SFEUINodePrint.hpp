@@ -1,15 +1,17 @@
 #pragma once
 #include "BpNode.hpp"
-#include "../SFEPanel.hpp"
+#include "SFEPanel.hpp"
 
 namespace sfe {
 
 class SFEUINodePrint : public bp::BpNode {
 public:
     SFEUINodePrint(const std::string& name, std::shared_ptr<bp::BpGraph> parent, std::shared_ptr<SFEPanel> panel)
-        : BpNode(name, parent, bp::BpNodeType::BP_NODE_USER)
+        : BpNode(name, parent)
         , _panel(panel)
-    {}
+    {
+        _node_type = bp::BpNodeType::BP_NODE_USER;
+    }
 
 	virtual void Logic() {
         if (_panel.expired()) {

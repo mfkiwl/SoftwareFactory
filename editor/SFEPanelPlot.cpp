@@ -38,7 +38,7 @@ void SFEPanelPlot::Update() {
     conf.selection.show = true;
     conf.selection.start = &selection_start;
     conf.selection.length = &selection_length;
-    float height = selection_length > 1 ? (cur_win->Size.y - 20) / 2 : (cur_win->Size.y - 20);
+    float height = selection_length > 1 ? (cur_win->Size.y - 30) / 2 : (cur_win->Size.y - 30);
     conf.frame_size = ImVec2(cur_win->Size.x, height);
     ImGui::Plot("plot1", conf);
 

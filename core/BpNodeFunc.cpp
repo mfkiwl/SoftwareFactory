@@ -5,8 +5,10 @@
 namespace bp {
 
 BpNodeFunc::BpNodeFunc(const std::string& func_full_path, std::shared_ptr<BpGraph> parent)
-	: BpNode(func_full_path, parent, BpNodeType::BP_NODE_FUNC)
-{}
+	: BpNode(func_full_path, parent)
+{
+    _node_type = BpNodeType::BP_NODE_FUNC;
+}
 
 void BpNodeFunc::Logic() {
     // 根据输入参数,输出参数数量,转换指针并调用
