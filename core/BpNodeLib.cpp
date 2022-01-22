@@ -58,6 +58,8 @@ std::shared_ptr<BpNode> BpNodeLib::CreateVarNode(BpVariable var, bool is_get) {
     if (is_get) {
         node->AddPin(var.GetType(), BpPinKind::BP_OUTPUT, BpPinType::BP_VALUE, var);
     } else {
+        node->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
+        node->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
         node->AddPin(var.GetType(), BpPinKind::BP_INPUT, BpPinType::BP_VALUE, var);
     }
     return node;

@@ -289,7 +289,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 		for (int i = 0; i < func_info.type_res.size(); ++i) {
 			auto var = CreateVariable(func_info.type_res[i], func_info.type_res[i]);
 			if (var.IsNone()) {
-				LOG(ERROR) << "create var " << func_info.type_args[i] << " failed";
+				LOG(ERROR) << "create var " << func_info.type_res[i] << " failed";
 				return nullptr;
 			}
 			res.emplace_back(var);

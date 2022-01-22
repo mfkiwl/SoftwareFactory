@@ -4,6 +4,7 @@
         "bpbase.BpInt",
         "bpbase.BpFloat",
         "bpbase.BpString",
-        "bpbase.BpIntPair"
+        "bpbase.BpIntPair",
+        "bpbase.BpFloatPair"
     ]
 }

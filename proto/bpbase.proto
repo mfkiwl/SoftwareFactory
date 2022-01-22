@@ -17,3 +17,8 @@ message BpIntPair {
     int32 a = 1;
     int32 b = 2;
 }
+
+message BpFloatPair {
+    float a = 1;
+    float b = 2;
+}

@@ -11,10 +11,27 @@
         },
         "sub_int":{
             "_input":[
-                "bpmath.BpIntPair"
+                "bpbase.BpIntPair"
             ],
             "_output":[
                 "bpbase.BpInt"
+            ]
+        },
+        "sin_float":{
+            "_input":[
+                "bpbase.BpFloat"
+            ],
+            "_output":[
+                "bpbase.BpFloat"
+            ]
+        },
+        "add_float":{
+            "_input":[
+                "bpbase.BpFloat",
+                "bpbase.BpFloat"
+            ],
+            "_output":[
+                "bpbase.BpFloat"
             ]
         }
     }

@@ -61,6 +61,9 @@ void SFEPanelGraph::Update() {
     ImGui::End();
 
     if (_runing) {
+        if (bp::Bp::Instance().CurEditGraph() == nullptr) {
+            return;
+        }
         bp::Bp::Instance().CurEditGraph()->Run();
     }
 }

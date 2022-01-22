@@ -6,6 +6,7 @@
 #include "SFEPanelGraph.hpp"
 #include "SFEPanelLog.hpp"
 #include "SFEPanelUINodes.hpp"
+#include "SFEPanelPlot.hpp"
 #include "Bp.hpp"
 
 namespace sfe {
@@ -18,6 +19,7 @@ bool SFEditor::Init() {
     _panels.emplace_back(std::make_shared<SFEPanelDragTip>());
     _panels.emplace_back(std::make_shared<SFEPanelGraph>());
     _panels.emplace_back(std::make_shared<SFEPanelLog>());
+    _panels.emplace_back(std::make_shared<SFEPanelPlot>());
 
     for (auto it = _panels.begin(); it != _panels.end(); ++it) {
         (*it)->Init();

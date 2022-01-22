@@ -105,7 +105,7 @@ void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
     for (int i = 0; i < in_n; ++i) {
         f.type_args.emplace_back(v["_input"][i].asString());
     }
-    for (int i = 0; i < in_n; ++i) {
+    for (int i = 0; i < out_n; ++i) {
         f.type_res.emplace_back(v["_output"][i].asString());
     }
     if (in_n == 0 && out_n == 1) {

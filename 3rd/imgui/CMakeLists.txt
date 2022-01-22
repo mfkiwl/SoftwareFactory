@@ -3,6 +3,8 @@ set(_imgui_Sources
     imgui_demo.cpp
     imgui_draw.cpp
     imgui_widgets.cpp
+    # 3rd
+    imgui_plot.cpp
 )
 source_group("" FILES ${_imgui_Sources})
 add_library(imgui STATIC ${_imgui_Sources})
