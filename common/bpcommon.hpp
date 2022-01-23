@@ -43,6 +43,7 @@ namespace bp {
     public:
         static std::string GetModName(const std::string& full_path);
         static std::string GetCurTime();
+        static std::vector<std::string> GetDirFiles(const std::string& conf_path);
     };
 }; // namespace bp
 

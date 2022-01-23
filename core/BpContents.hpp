@@ -18,6 +18,7 @@ public:
         EV,
         BASE,
         USER,
+        GRAPH,
     };
 
     BpContents(std::shared_ptr<BpContents> parent, std::string name, Type t, LeafType lt = LeafType::NONE)

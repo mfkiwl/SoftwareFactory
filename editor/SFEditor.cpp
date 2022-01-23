@@ -104,7 +104,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
         if (cmd == "create_new") {
             auto graph_name = msg.json_msg["graph_name"].asString();
             auto graph_type = msg.json_msg["graph_type"].asString() == "mod graph" ? bp::BpNodeType::BP_GRAPH : bp::BpNodeType::BP_GRAPH_EXEC;
-            auto g = bp::Bp::Instance().SpawnGraph(graph_name, graph_type);
+            auto g = std::dynamic_pointer_cast<bp::BpGraph>(bp::Bp::Instance().SpawnNode(graph_name, graph_type));
             bp::Bp::Instance().AddEditGraph(graph_name, g);
             bp::Bp::Instance().SetCurEditGraph(g);
             // send to graph
@@ -131,6 +131,12 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 obj_type = bp::BpNodeType::BP_NODE_BASE;
             } else if (contents_type == (int)BpContents::LeafType::USER) {
                 obj_type = bp::BpNodeType::BP_NODE_USER;
+            } else if (contents_type == (int)BpContents::LeafType::GRAPH) {
+                obj_type = bp::BpNodeType::BP_GRAPH;
+            }
+            if (obj_type == bp::BpNodeType::BP_NONE) {
+                LOG(ERROR) << "obj_type is none, return";
+                return;
             }
             std::shared_ptr<bp::BpNode> node = nullptr;
             if (obj_type == bp::BpNodeType::BP_NODE_VAR) {
@@ -168,7 +174,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             panel->RecvMessage({"editor", "bp editor", "", v});
         } else if (cmd == "open_graph") {
             auto path = msg.json_msg["path"].asString();
-            auto g = std::make_shared<bp::BpGraph>();
+            std::shared_ptr<bp::BpGraph> g = std::make_shared<bp::BpGraph>();
             bp::LoadSaveState state = bp::LoadSaveState::OK;
             if (bp::LoadSaveState::OK == (state = bp::Bp::Instance().LoadGraph(path, g))) {
                 bp::Bp::Instance().AddEditGraph(g->GetName(), g);

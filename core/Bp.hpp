@@ -25,6 +25,7 @@ enum class LoadSaveState : int {
 class BpModLib;
 class BpGraph;
 class BpNodeLib;
+class BpGraphModLib;
 class Bp
 {
 public:
@@ -33,14 +34,14 @@ public:
 	bool RegisterUserMod(std::shared_ptr<BpContents>, 
 			std::function<std::shared_ptr<BpNode>(const std::string&)>);
 
-	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
+	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g, const std::string& graph_name = "__main__");
+	LoadSaveState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g, const std::string& graph_name = "__main__");
 	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g);
+	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);
 
 	BpVariable CreateVariable(const std::string& type, const std::string& name);
 	BpVariable CreateVariable(const std::string& type, const std::string& name, const std::string& value_desc);
 
-	/* 生成图 */
-	std::shared_ptr<BpGraph> SpawnGraph(const std::string& name, BpNodeType t = BpNodeType::BP_GRAPH_EXEC);
 	/* 生成非变量节点 */
 	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpNodeType t = BpNodeType::BP_NODE_FUNC);
 	/* 创建新变量,创建新变量节点,加入graph */
@@ -63,13 +64,12 @@ private:
 	std::vector<int> Version(const std::string& path);
 
 	LoadSaveState LoadGraph(const Json::Value& root, const Json::Value& json_graph, std::shared_ptr<BpGraph>& g);
-	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);
 
 	// 当前被编辑的图
 	std::weak_ptr<BpGraph> _cur_edit_graph;
 	std::unordered_map<std::string, std::shared_ptr<BpGraph>> _edit_graphs;
 	// 组织模块库
-	std::unordered_map<std::string, std::shared_ptr<BpGraph>> _graphs;
+	std::shared_ptr<BpGraphModLib> _graph_mods;
 	// 基础模块库
 	std::shared_ptr<BpModLib> _base_mods;
 	// 节点库

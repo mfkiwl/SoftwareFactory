@@ -5,6 +5,7 @@
 #include "BpModLib.hpp"
 #include "BpNodeLib.hpp"
 #include "BpModLibLinux.hpp"
+#include "BpGraphModLib.hpp"
 #include "BpNodeVar.hpp"
 #include "BpGraph.hpp"
 
@@ -22,6 +23,8 @@ Bp::Bp()
 
 	_base_mods = std::make_shared<BpModLibLinux>();
 	_base_mods->Init("../conf/");
+	_graph_mods = std::make_shared<BpGraphModLib>();
+	_graph_mods->Init("../mod/");
 	_nodes_lib = std::make_shared<BpNodeLib>();
 
 	_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
@@ -30,16 +33,17 @@ Bp::Bp()
 	for (int i = 0; i < node_contents.size(); ++i) {
 		_contents->AddChild(node_contents[i]);
 	}
-	// 函数变量节点
+	// 函数/变量节点
 	auto& mods = _base_mods->GetMods();
 	for (int i = 0; i < mods.size(); ++i) {
 		_contents->AddChild(mods[i]->GetContents());
 	}
+	// 组织模块节点
+	_contents->AddChild(_graph_mods->GetContents());
 }
 
 Bp::~Bp() {
 	_edit_graphs.clear();
-	_graphs.clear();
 }
 
 std::vector<int> Bp::Version(const std::string& path) {
@@ -91,7 +95,7 @@ BpVariable Bp::CreateVariable(const std::string& type, const std::string& name, 
 	return var;
 }
 
-LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g, const std::string& graph_name) {
 	std::ifstream ifs(bp_json_path);
 	if (!ifs.is_open()) {
 		LOG(ERROR) << "Open \"" << bp_json_path << "\" failed";
@@ -104,12 +108,21 @@ LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpG
         return LoadSaveState::ERR_PARSE;
     }
 	LOG(INFO) << "Load \"" << bp_json_path << "\"...";
-	Json::Value main_graph = root["__main__"];
-	return LoadGraph(root, main_graph, g);
+	if (g == nullptr) {
+		// 根据图名创建图
+	}
+	if (graph_name.empty()) {
+		// 从json文件中获得图名称
+	}
+	return LoadGraph(root, g, graph_name);
+}
+
+LoadSaveState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g, const std::string& graph_name) {
+	Json::Value graph = root[graph_name];
+	return LoadGraph(root, graph, g);
 }
 
 LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_graph, std::shared_ptr<BpGraph>& g) {
-	g->Clear();
 	g->_name = json_graph["name"].asString();
 	// variables
 	auto vars = json_graph["vars"];
@@ -136,9 +149,6 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 		if (t == BpNodeType::BP_NODE_VAR) {
 			bool get = nodes[i]["get"].asBool();
 			node = SpawnVarNode(g, node_name, get);
-		} else if (t == BpNodeType::BP_GRAPH) {
-			// TODO
-			LOG(ERROR) << "Unimp";
 		} else if (t == BpNodeType::BP_GRAPH_EXEC) {
 			LOG(WARNING) << "Can't load BP_GRAPH_EXEC graph, continue";
 			continue;
@@ -254,24 +264,6 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 	return LoadSaveState::OK;
 }
 
-std::shared_ptr<BpGraph> Bp::SpawnGraph(const std::string& name, BpNodeType t) {
-	auto g = std::make_shared<BpGraph>(((t == BpNodeType::BP_GRAPH) ? name : "__main__"), t, nullptr);
-	if (t == BpNodeType::BP_GRAPH) {
-		g->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
-		g->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
-		
-		auto input = std::make_shared<BpNode>("input", nullptr);
-		input->SetNodeType(BpNodeType::BP_GRAPH_INPUT);
-		input->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
-		g->AddNode(input);
-
-		auto output = std::make_shared<BpNode>("output", nullptr);
-		output->SetNodeType(BpNodeType::BP_GRAPH_OUTPUT);
-		g->AddNode(output);
-	}
-	return g;
-}
-
 std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNodeType t) {
 	// 从BpModLib中获得函数指针和描述
 	// 从BpNodeLib中获得节点对象
@@ -315,6 +307,33 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 			return nullptr;
 		}
 		return _user_spawn_nodes[user_mod_name](node_name);
+	} else if (t == BpNodeType::BP_GRAPH) {
+		auto graph_desc = _graph_mods->GetGraphDesc(node_name);
+		auto graph = std::make_shared<BpGraph>(node_name, t, nullptr);;
+		graph->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
+		graph->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
+		if (!graph_desc.isNull()) {
+			LoadSaveState state = LoadSaveState::OK;
+			if (LoadSaveState::OK != (state = LoadGraph(Json::Value(), graph_desc, graph))) {
+				LOG(ERROR) << "load mod graph failed, " << (int)state;
+				return nullptr;
+			}
+		} else {
+			graph->AddNode(SpawnNode("input", BpNodeType::BP_GRAPH_INPUT));
+			graph->AddNode(SpawnNode("input", BpNodeType::BP_GRAPH_OUTPUT));
+		}
+		return graph;
+	} else if (t == BpNodeType::BP_GRAPH_EXEC) {
+		return std::make_shared<BpGraph>("__main__", t, nullptr);
+	} else if (t == BpNodeType::BP_GRAPH_INPUT) {
+		auto input = std::make_shared<BpNode>("input", nullptr);
+		input->SetNodeType(BpNodeType::BP_GRAPH_INPUT);
+		input->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
+		return input;
+	}else if (t == BpNodeType::BP_GRAPH_OUTPUT) {
+		auto output = std::make_shared<BpNode>("output", nullptr);
+		output->SetNodeType(BpNodeType::BP_GRAPH_OUTPUT);
+		return output;
 	}
 	return nullptr;
 }

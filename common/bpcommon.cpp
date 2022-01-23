@@ -1,3 +1,5 @@
+#include <sys/types.h>
+#include <dirent.h>
 #include <sstream>
 #include <chrono>
 #include "bpcommon.hpp"
@@ -396,6 +398,22 @@ std::string BpCommon::GetCurTime() {
     sprintf(str_time, "%02d:%02d:%02d.%03d", time_tm->tm_hour,
         time_tm->tm_min, time_tm->tm_sec, (int)dis_millseconds);
     return std::string(str_time);
+}
+
+std::vector<std::string> BpCommon::GetDirFiles(const std::string& conf_path) {
+    std::vector<std::string> res;
+    DIR* dir = opendir(conf_path.c_str());
+    if (dir == nullptr) {
+        return res;
+    }
+    struct dirent* entry = nullptr;
+    while (nullptr != (entry = readdir(dir))) {
+        if (entry->d_type == DT_REG) {
+            res.emplace_back(conf_path + entry->d_name);
+        }
+    }
+    closedir(dir);
+    return res;
 }
 
 } // namespace bp

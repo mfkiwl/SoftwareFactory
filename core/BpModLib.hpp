@@ -20,7 +20,7 @@ public:
         _mods.clear();
     }
     bool Init(const std::string& conf_path) {
-        auto confs = GetDirFiles(conf_path);
+        auto confs = BpCommon::GetDirFiles(conf_path);
         if (confs.empty()) {
             LOG(ERROR) << "search conf file " << conf_path << " failed";
             return false;
@@ -67,7 +67,6 @@ public:
     }
 
 protected:
-    virtual std::vector<std::string> GetDirFiles(const std::string& conf_path) = 0;
     virtual std::shared_ptr<BpModule> CreateModule(const std::string& mod_name) = 0;
 
     std::vector<std::shared_ptr<BpModule>> _mods;

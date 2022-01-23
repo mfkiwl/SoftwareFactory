@@ -2,6 +2,14 @@
 ## Bp
 * 全局初始化所有配置
 * 全局清理
+* LoadGraph
+    * 从配置文件加载graph
+        * 未知graph name
+        * 未知图类型
+    * 从已知配置图类型中加载
+    * 一个json文件代表一个mod graph或者 exec graph
+    * json文件中添加图类型
+    * json文件文件中标识图入口
 
 ## BpLib
 主要管理所有基础模块
