@@ -20,6 +20,7 @@ enum class LoadSaveState : int {
 	ERR_VAR,
 	ERR_CREATE_NODE,
 	ERR_SEARCH_PIN,
+	ERR_JSON_FMT,
 };
 
 class BpModLib;
@@ -34,7 +35,7 @@ public:
 	bool RegisterUserMod(std::shared_ptr<BpContents>, 
 			std::function<std::shared_ptr<BpNode>(const std::string&)>);
 
-	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g, const std::string& graph_name = "__main__");
+	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
 	LoadSaveState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g, const std::string& graph_name = "__main__");
 	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g);
 	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);

@@ -95,7 +95,7 @@ BpVariable Bp::CreateVariable(const std::string& type, const std::string& name, 
 	return var;
 }
 
-LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g, const std::string& graph_name) {
+LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g) {
 	std::ifstream ifs(bp_json_path);
 	if (!ifs.is_open()) {
 		LOG(ERROR) << "Open \"" << bp_json_path << "\" failed";
@@ -108,11 +108,23 @@ LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpG
         return LoadSaveState::ERR_PARSE;
     }
 	LOG(INFO) << "Load \"" << bp_json_path << "\"...";
-	if (g == nullptr) {
-		// 根据图名创建图
+	std::string graph_name = "";
+	Json::Value graph_json;
+	Json::Value::Members mem = root.getMemberNames();
+	for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
+		graph_name = *iter;
+		break;
 	}
 	if (graph_name.empty()) {
-		// 从json文件中获得图名称
+		LOG(ERROR) << "can't find graph name";
+		return LoadSaveState::ERR_JSON_FMT;
+	}
+	if (graph_name == "__main__") {
+		g = std::make_shared<BpGraph>("__main__", BpNodeType::BP_GRAPH_EXEC, nullptr);
+	} else {
+		g = std::make_shared<BpGraph>(graph_name, BpNodeType::BP_GRAPH, nullptr);;
+		g->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
+		g->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
 	}
 	return LoadGraph(root, g, graph_name);
 }
@@ -321,6 +333,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 		} else {
 			graph->AddNode(SpawnNode("input", BpNodeType::BP_GRAPH_INPUT));
 			graph->AddNode(SpawnNode("input", BpNodeType::BP_GRAPH_OUTPUT));
+			LOG(WARNING) << "mod graph lib has no graph: " << node_name;
 		}
 		return graph;
 	} else if (t == BpNodeType::BP_GRAPH_EXEC) {

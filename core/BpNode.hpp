@@ -1,6 +1,7 @@
 #ifndef __BP_OBJ_HPP__
 #define __BP_OBJ_HPP__
 #include <memory>
+#include <sstream>
 
 #include "BpPin.hpp"
 
@@ -54,10 +55,32 @@ public:
 	/* 设置Pin都是未赋值状态 */
 	void ClearFlag();
 	void SetNodeType(BpNodeType t) { _node_type = t; }
+
+	std::string Print() {
+		std::stringstream ss;
+		ss << PrintNodeType(_node_type) << " (" << _name << "#" << _id << ")";
+		return ss.str();
+	}
+	std::string PrintNodeType(BpNodeType t) {
+		static std::vector<std::string> type_str = 
+		{
+			"BP_NONE",
+			"BP_NODE_EV",
+			"BP_NODE_VAR",
+			"BP_NODE_FUNC",
+			"BP_NODE_BASE",
+			"BP_NODE_USER",
+			"BP_GRAPH",
+			"BP_GRAPH_EXEC",
+			"BP_GRAPH_INPUT",
+			"BP_GRAPH_OUTPUT",
+		};
+		return type_str[(int)t];
+	}
 protected:
 	std::weak_ptr<BpGraph>      _parent_graph;
-	BpNodeType                   _node_type;
-	BpNodeStyle                  _node_style;
+	BpNodeType                  _node_type;
+	BpNodeStyle                 _node_style;
 	std::string                 _name;
     int                         _id;
 	int                         _tmp_next_id;
