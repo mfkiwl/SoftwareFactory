@@ -61,10 +61,16 @@ void SFEPanelGraph::Update() {
     ImGui::End();
 
     if (_runing) {
-        if (bp::Bp::Instance().CurEditGraph() == nullptr) {
+        auto g = bp::Bp::Instance().CurEditGraph();
+        if (g == nullptr) {
             return;
         }
-        bp::Bp::Instance().CurEditGraph()->Run();
+        if (g->GetNodeType() == bp::BpNodeType::BP_GRAPH) {
+            g->ClearFlag();
+            g->Logic();
+        } else {
+            g->Run();
+        }
     }
 }
 

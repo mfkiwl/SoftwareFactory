@@ -11,6 +11,7 @@ namespace bp {
 
 class BpVariable
 {
+	friend class BpGraph;
 public:
 	BpVariable();
 	// 引用传递

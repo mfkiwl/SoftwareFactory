@@ -26,6 +26,7 @@ public:
                 } else {
                     LOG(ERROR) << "value is nullptr";
                 }
+                _inputs[i].SetValueByRef(nullptr);
             }
         }
     }

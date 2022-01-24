@@ -174,7 +174,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             panel->RecvMessage({"editor", "bp editor", "", v});
         } else if (cmd == "open_graph") {
             auto path = msg.json_msg["path"].asString();
-            std::shared_ptr<bp::BpGraph> g = std::make_shared<bp::BpGraph>();
+            std::shared_ptr<bp::BpGraph> g = nullptr;
             bp::LoadSaveState state = bp::LoadSaveState::OK;
             if (bp::LoadSaveState::OK == (state = bp::Bp::Instance().LoadGraph(path, g))) {
                 bp::Bp::Instance().AddEditGraph(g->GetName(), g);

@@ -36,7 +36,10 @@ void BpGraph::SetNextID(int id) {
 }
 
 BpVariable& BpGraph::GetVariable(const std::string& name) {
-	if (_vars.find(name) == _vars.end()) return _null_val;
+	if (_vars.find(name) == _vars.end()) {
+		LOG(ERROR) << "can't find var " << name;
+		return _null_val;
+	}
 	return _vars[name];
 }
 
@@ -45,6 +48,7 @@ bool BpGraph::AddVariable(const std::string& name, const BpVariable& v) {
 		_vars[name] = v;
 		return true;
 	}
+	LOG(ERROR) << "create var " << name << "failed";
 	return false;
 }
 
@@ -95,6 +99,13 @@ void BpGraph::DelLink(int id) {
 void BpGraph::DelNode(std::shared_ptr<BpNode> node) {
 	for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
 		if (*it == node) {
+			if (node->GetNodeType() == BpNodeType::BP_NODE_VAR) {
+				LOG(INFO) << "cur var " << node->GetName() << "use count: " << _vars[node->GetName()]._var.use_count();
+				if (_vars[node->GetName()]._var.use_count() == 2) {
+					LOG(INFO) << "Erase var " << node->GetName();
+					_vars.erase(node->GetName());
+				}
+			}
 			_nodes.erase(it);
 			break;
 		}
@@ -190,6 +201,7 @@ void BpGraph::RunEvent(std::string ev) {
 
 void BpGraph::Run() {
 	if (_node_type == BpNodeType::BP_GRAPH) {
+		ClearFlag();
 		BpNode::Run();
 	} else {
 		// TODO 应该按事件优先级依次执行

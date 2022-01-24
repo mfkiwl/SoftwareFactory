@@ -63,12 +63,12 @@ public:
 
 	int GetNextID();
 	
+	void ClearFlag();
+
 private:
 	void SetNextID(int id);
 
 	void RunEvent(std::string ev);
-
-	void ClearFlag();
 
 	int                         _next_id;
 	/* 图的起点 */
