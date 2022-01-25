@@ -46,6 +46,8 @@ private:
     void NodeLinkCreate(std::shared_ptr<bp::BpGraph>&);
     void NodeLinkDelete(std::shared_ptr<bp::BpGraph>&);
     void DrawPinIcon(bp::BpPin& pin, int alpha);
+    void OnDoubleclickNode();
+    void SetNodesPos(const std::string& desc);
     ImColor GetNodeKindColor(bp::BpNodeType kind);
     ImColor GetIconColor(bp::BpPin& pin);
     bool CanCreateLink(bp::BpPin* a, bp::BpPin* b);

@@ -36,7 +36,7 @@ public:
 			std::function<std::shared_ptr<BpNode>(const std::string&)>);
 
 	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
-	LoadSaveState LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g, const std::string& graph_name = "__main__");
+	LoadSaveState LoadGraph(const Json::Value& root, const std::string& graph_name, std::shared_ptr<BpGraph>& g);
 	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g);
 	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);
 
@@ -54,6 +54,13 @@ public:
 
 	std::shared_ptr<BpGraph> CurEditGraph() { return _cur_edit_graph.lock(); }
 	void SetCurEditGraph(std::shared_ptr<BpGraph> g) { _cur_edit_graph = g; }
+	void SetCurEditGraph(const std::string& name) { 
+		if (_edit_graphs.find(name) != _edit_graphs.end()) {
+			_cur_edit_graph = _edit_graphs[name];
+			return;
+		}
+		LOG(ERROR) << "can't find current graph " << name;
+	}
 	bool AddEditGraph(const std::string& name, std::shared_ptr<BpGraph> g);
 	const std::unordered_map<std::string, std::shared_ptr<BpGraph>>& GetEditGraphs() { return _edit_graphs; }
 private:

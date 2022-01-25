@@ -114,11 +114,6 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             auto panel = GetPanel("graph");
             panel->RecvMessage({"editor", "graph", "", v});
         } else if (cmd == "spawn_node") {
-            auto g = bp::Bp::Instance().CurEditGraph();
-            if (g == nullptr) {
-                LOG(WARNING) << "cur edit graph is nullptr";
-                return;
-            }
             auto obj_type = bp::BpNodeType::BP_NONE;
             int contents_type = msg.json_msg["type"].asInt();
             if (contents_type == (int)BpContents::LeafType::EV) {
@@ -139,6 +134,17 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 return;
             }
             std::shared_ptr<bp::BpNode> node = nullptr;
+            auto g = bp::Bp::Instance().CurEditGraph();
+            if (obj_type == bp::BpNodeType::BP_GRAPH && g == nullptr) {
+                node = bp::Bp::Instance().SpawnNode(msg.json_msg["node_name"].asString(), obj_type);
+                auto new_graph = std::dynamic_pointer_cast<bp::BpGraph>(node);
+                bp::Bp::Instance().AddEditGraph(msg.json_msg["node_name"].asString(), new_graph);
+                bp::Bp::Instance().SetCurEditGraph(new_graph);
+                return;
+            } else if (g == nullptr) {
+                LOG(WARNING) << "cur edit graph is nullptr";
+                return;
+            }
             if (obj_type == bp::BpNodeType::BP_NODE_VAR) {
                 if (msg.json_msg["node_name"].asString().empty()) {
                     node = bp::Bp::Instance().SpawnVarNode(g, 
@@ -193,6 +199,8 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             if (bp::LoadSaveState::OK != (state = bp::Bp::Instance().SaveGraph(path, g))) {
                 LOG(ERROR) << "Save graph " << path << " failed, " << (int)state;
             }
+        } else if (cmd == "switch_graph") {
+            bp::Bp::Instance().SetCurEditGraph(msg.json_msg["name"].asString());
         }
     }
 }

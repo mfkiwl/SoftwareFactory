@@ -42,12 +42,15 @@ void SFEPanelBp::OnMessage(const SFEMessage& msg) {
         }
     }
     if (msg.msg.empty()) {
-        if (msg.json_msg["command"].asString() == "set_node_pos") {
+        auto cmd = msg.json_msg["command"].asString();
+        if (cmd == "set_node_pos") {
             auto mouse_pos = ImVec2(msg.json_msg["x"].asInt(), msg.json_msg["y"].asInt());
 	        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
             ed::SetNodePosition((ed::NodeId)msg.json_msg["node_id"].asInt(), 
                 canvas_pos
                 );
+        } else if (cmd == "set_nodes_pos") {
+            SetNodesPos(msg.json_msg["desc"].asString());
         }
     }
 }
@@ -95,14 +98,7 @@ void SFEPanelBp::Update() {
     // node attr
     if (_is_doubleclick_node) {
         _is_doubleclick_node = false;
-        if (_doubleclick_node != nullptr && _doubleclick_node->GetNodeType() == bp::BpNodeType::BP_NODE_VAR) {
-            auto& pins = _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT);
-            if (pins.size() > 0){
-                bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
-                strcpy(_doubleclick_node_edit_attr, _doubleclick_node_attr.c_str());
-                ImGui::OpenPopup("node attr");
-            }
-        }
+        OnDoubleclickNode();
     }
     ShowVarNodeAttr();
     ImGui::End();
@@ -222,6 +218,26 @@ void SFEPanelBp::Exit() {
     _node_editor = nullptr;
 }
 
+void SFEPanelBp::OnDoubleclickNode() {
+    switch (_doubleclick_node->GetNodeType()) {
+    case bp::BpNodeType::BP_NODE_VAR: {
+        auto& pins = _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT);
+        if (pins.size() > 0){
+            // FIXME, only show one variable
+            bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
+            strcpy(_doubleclick_node_edit_attr, _doubleclick_node_attr.c_str());
+            ImGui::OpenPopup("node attr");
+        }
+    }
+    break;
+    case bp::BpNodeType::BP_GRAPH: {
+        auto g = std::dynamic_pointer_cast<bp::BpGraph>(_doubleclick_node);
+        bp::Bp::Instance().SetCurEditGraph(g);
+    }
+    break;
+    }
+}
+
 void SFEPanelBp::ShowVarNodeAttr() {
     if (ImGui::BeginPopupModal("node attr", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
         // Show node attr
@@ -256,7 +272,7 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 		ImGui::Spring(0);
 		ImGui::TextUnformatted(node->GetName().c_str());
 		ImGui::Spring(1);
-		ImGui::Dummy(ImVec2(0, 20));
+		ImGui::Dummy(ImVec2(0, 24));
 		ImGui::Spring(0);
 		builder.EndHeader();
 	}
@@ -277,9 +293,15 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 		ImGui::PopStyleVar();
 		builder.EndInput();
 	}
-    // add pin icon
-    // TODO
-    //ImGui::Button(" + ");
+    if (node->GetNodeType() == bp::BpNodeType::BP_GRAPH_OUTPUT) {
+        if (ImGui::Button(" + ")) {
+            // TODO
+        } 
+        // ImGui::SameLine();
+        if (ImGui::Button(" - ")) {
+            // TODO
+        }
+    }
 
 	if (is_simple) {
 		builder.Middle();
@@ -305,10 +327,33 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 		builder.EndOutput();
 	}
     // add pin icon
-    // TODO
-    // ImGui::Button(" + ");
+    if (node->GetNodeType() == bp::BpNodeType::BP_GRAPH_INPUT) {
+        if (ImGui::Button(" + ")) {
+            // TODO
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(" - ")) {
+            // TODO
+        }
+    }
 
 	builder.End();
+}
+
+void SFEPanelBp::SetNodesPos(const std::string& desc) {
+    Json::Value v;
+    Json::Reader reader(Json::Features::strictMode());
+    if (!reader.parse(desc, v)) {
+        LOG(ERROR) << "Parse node desc failed, " << desc;
+        return;
+    }
+    Json::Value::Members mem = v.getMemberNames();
+	Json::Value::Members::iterator it;
+	for (it = mem.begin(); it != mem.end(); it++) {
+        auto id = v[(*it)]["id"].asInt();
+        auto pos = v[(*it)]["pos"];
+        ed::SetNodePosition((ed::NodeId)id, ImVec2(pos[0].asInt(), pos[1].asInt()));
+    }
 }
 
 void SFEPanelBp::DrawPinIcon(bp::BpPin& pin, int alpha) {
@@ -319,7 +364,7 @@ void SFEPanelBp::DrawPinIcon(bp::BpPin& pin, int alpha) {
 	case bp::BpPinType::BP_FLOW:     iconType = IconType::Flow;   break;
 	case bp::BpPinType::BP_VALUE:    iconType = IconType::Circle; break;
 	}
-	ax::Widgets::Icon(ImVec2(20, 20), iconType, pin.IsLinked(), color, ImColor(32, 32, 32, alpha));
+	ax::Widgets::Icon(ImVec2(24, 24), iconType, pin.IsLinked(), color, ImColor(32, 32, 32, alpha));
 }
 
 bool SFEPanelBp::CanCreateLink(bp::BpPin* a, bp::BpPin* b) {

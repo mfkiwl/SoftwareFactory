@@ -32,8 +32,10 @@ void SFEPanelGraph::Update() {
             int j = 0;
             for(auto& g : edit_graphs) {
                 if (item_current == j) {
-                    LOG(INFO) << "graph change: " << g.first;
-                    bp::Bp::Instance().SetCurEditGraph(g.second);
+                    Json::Value v;
+                    v["command"] = "switch_graph";
+                    v["name"] = g.first;
+                    SendMessage({PanelName(), "editor", "", v});
                     break;
                 }
                 j++;

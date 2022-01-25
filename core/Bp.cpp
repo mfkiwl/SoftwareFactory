@@ -24,7 +24,7 @@ Bp::Bp()
 	_base_mods = std::make_shared<BpModLibLinux>();
 	_base_mods->Init("../conf/");
 	_graph_mods = std::make_shared<BpGraphModLib>();
-	_graph_mods->Init("../mod/");
+	_graph_mods->Init("/home/caros/mod/");
 	_nodes_lib = std::make_shared<BpNodeLib>();
 
 	_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
@@ -126,10 +126,10 @@ LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpG
 		g->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
 		g->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
 	}
-	return LoadGraph(root, g, graph_name);
+	return LoadGraph(root, graph_name, g);
 }
 
-LoadSaveState Bp::LoadGraph(const Json::Value& root, std::shared_ptr<BpGraph>& g, const std::string& graph_name) {
+LoadSaveState Bp::LoadGraph(const Json::Value& root, const std::string& graph_name, std::shared_ptr<BpGraph>& g) {
 	Json::Value graph = root[graph_name];
 	return LoadGraph(root, graph, g);
 }
