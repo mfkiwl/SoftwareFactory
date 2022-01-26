@@ -25,4 +25,19 @@ TEST(bpcommon, PbJsonConvert) {
         EXPECT_TRUE(bp::JsonPbConvert::Json2PbMsg(v, msg));
         std::cout << "pb: \n{" << msg.DebugString() << "}" << std::endl;
     }
+
+    {
+        Json::Value v;
+        Json::Value v2;
+        v2["1"] = "hello";
+        v["a"] = v2;
+        Json::FastWriter writer;
+        auto dst = writer.write(v);
+        std::cout << "fast write: " << dst << std::endl;
+        Json::Value::Members mem = v.getMemberNames();
+        for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
+            std::cout << *iter << std::endl;
+            std::cout << v[*iter] << std::endl;
+        }
+    }
 }

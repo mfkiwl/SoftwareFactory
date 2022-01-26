@@ -115,6 +115,7 @@ TEST(bpcore, BpModLib) {
 TEST(bpcore, Bp) {
     auto& b = bp::Bp::Instance();
     auto g = std::make_shared<bp::BpGraph>();
-    EXPECT_EQ(bp::LoadSaveState::ERR_OPEN_FILE, b.LoadGraph(std::string(""), g));
-    EXPECT_NE(bp::LoadSaveState::OK, b.LoadGraph(std::string("../conf/com_random.json"), g));
+    Json::Value nodes_pos;
+    EXPECT_EQ(bp::LoadSaveState::ERR_OPEN_FILE, b.LoadGraph(std::string(""), g, nodes_pos));
+    EXPECT_NE(bp::LoadSaveState::OK, b.LoadGraph(std::string("../conf/com_random.json"), g, nodes_pos));
 }

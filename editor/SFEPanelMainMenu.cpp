@@ -132,9 +132,9 @@ void SFEPanelMainMenu::SaveGraph() {
     if (result == NFD_OKAY) {
         LOG(INFO) << "Save as " << out_path;
         Json::Value v;
-        v["command"] = "save_graph";
+        v["command"] = "save_graph_step1";
         v["path"] = out_path;
-        SendMessage({PanelName(), "editor", "", v});
+        SendMessage({PanelName(), "bp editor", "", v});
         free(out_path);
     } else if (result == NFD_CANCEL) {
         LOG(INFO) << "Save cancel";

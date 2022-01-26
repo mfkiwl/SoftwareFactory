@@ -95,7 +95,7 @@ BpVariable Bp::CreateVariable(const std::string& type, const std::string& name, 
 	return var;
 }
 
-LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g, Json::Value& desc) {
 	std::ifstream ifs(bp_json_path);
 	if (!ifs.is_open()) {
 		LOG(ERROR) << "Open \"" << bp_json_path << "\" failed";
@@ -110,6 +110,7 @@ LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpG
 	LOG(INFO) << "Load \"" << bp_json_path << "\"...";
 	std::string graph_name = "";
 	Json::Value graph_json;
+	// FIXME: if has __main__ do or other
 	Json::Value::Members mem = root.getMemberNames();
 	for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
 		graph_name = *iter;
@@ -126,15 +127,15 @@ LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpG
 		g->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
 		g->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
 	}
-	return LoadGraph(root, graph_name, g);
+	return LoadGraph(root, graph_name, g, desc);
 }
 
-LoadSaveState Bp::LoadGraph(const Json::Value& root, const std::string& graph_name, std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::LoadGraph(const Json::Value& root, const std::string& graph_name, std::shared_ptr<BpGraph>& g, Json::Value& desc) {
 	Json::Value graph = root[graph_name];
-	return LoadGraph(root, graph, g);
+	return LoadGraph(root, graph, g, desc);
 }
 
-LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_graph, std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_graph, std::shared_ptr<BpGraph>& g, Json::Value& desc) {
 	g->_name = json_graph["name"].asString();
 	// variables
 	auto vars = json_graph["vars"];
@@ -152,14 +153,16 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 	}
 	// nodes
 	auto nodes = json_graph["nodes"];
-	for (int i = 0; i < nodes.size(); ++i) {
-		int id = nodes[i]["id"].asInt();
-		BpNodeType t = (BpNodeType)nodes[i]["type"].asInt();
-		auto node_name = nodes[i]["name"].asString();
-		auto style_name = nodes[i]["style"].asString();
+	Json::Value::Members mem = nodes.getMemberNames();
+	for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
+		int id = std::stoi(*iter);
+		auto json_node = nodes[*iter];
+		BpNodeType t = (BpNodeType)json_node["type"].asInt();
+		auto node_name = json_node["name"].asString();
+		auto style_name = json_node["style"].asString();
 		std::shared_ptr<BpNode> node = nullptr;
 		if (t == BpNodeType::BP_NODE_VAR) {
-			bool get = nodes[i]["get"].asBool();
+			bool get = json_node["get"].asBool();
 			node = SpawnVarNode(g, node_name, get);
 		} else if (t == BpNodeType::BP_GRAPH_EXEC) {
 			LOG(WARNING) << "Can't load BP_GRAPH_EXEC graph, continue";
@@ -204,21 +207,21 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 	return LoadSaveState::OK;
 }
 
-LoadSaveState Bp::SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g, const Json::Value& desc) {
 	std::ofstream ofs(bp_json_path);
 	if (!ofs.is_open()) {
 		LOG(ERROR) << "Open \"" << bp_json_path << "\" failed";
 		return LoadSaveState::ERR_OPEN_FILE;
 	}
 	Json::Value root;
-	auto res = SaveGraph(root, g);
+	auto res = SaveGraph(root, g, desc);
 	Json::StyledWriter sw;
 	ofs << sw.write(root);
 	ofs.close();
 	return res;
 }
 
-LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g) {
+LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g, const Json::Value& desc) {
 	Json::Value json_graph;
 	json_graph["name"] = g->GetName();
 	// ev_nodes
@@ -244,7 +247,7 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 			auto var_node = std::dynamic_pointer_cast<BpNodeVar>(nor);
 			json_nornode["get"] = var_node->IsGet();
 		}
-		json_graph["nodes"].append(json_nornode);
+		json_graph["nodes"][std::to_string(nor->GetID())] = json_nornode;
 	}
 	// links
 	auto& links = g->GetLinks();
@@ -326,7 +329,8 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 		graph->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
 		if (!graph_desc.isNull()) {
 			LoadSaveState state = LoadSaveState::OK;
-			if (LoadSaveState::OK != (state = LoadGraph(Json::Value(), graph_desc, graph))) {
+			Json::Value nodes_pos;
+			if (LoadSaveState::OK != (state = LoadGraph(Json::Value(), graph_desc, graph, nodes_pos))) {
 				LOG(ERROR) << "load mod graph failed, " << (int)state;
 				return nullptr;
 			}

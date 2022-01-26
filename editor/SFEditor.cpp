@@ -182,13 +182,14 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             auto path = msg.json_msg["path"].asString();
             std::shared_ptr<bp::BpGraph> g = nullptr;
             bp::LoadSaveState state = bp::LoadSaveState::OK;
-            if (bp::LoadSaveState::OK == (state = bp::Bp::Instance().LoadGraph(path, g))) {
+            Json::Value nodes_pos;
+            if (bp::LoadSaveState::OK == (state = bp::Bp::Instance().LoadGraph(path, g, nodes_pos))) {
                 bp::Bp::Instance().AddEditGraph(g->GetName(), g);
                 bp::Bp::Instance().SetCurEditGraph(g);
             } else {
                 LOG(ERROR) << "Load graph " << path << " failed, " << (int)state;
             }
-        } else if (cmd == "save_graph") {
+        } else if (cmd == "save_graph_step2") {
             auto path = msg.json_msg["path"].asString();
             auto g = bp::Bp::Instance().CurEditGraph();
             if (g == nullptr) {
@@ -196,7 +197,8 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 return;
             }
             bp::LoadSaveState state = bp::LoadSaveState::OK;
-            if (bp::LoadSaveState::OK != (state = bp::Bp::Instance().SaveGraph(path, g))) {
+            Json::Value nodes_desc;
+            if (bp::LoadSaveState::OK != (state = bp::Bp::Instance().SaveGraph(path, g, nodes_desc))) {
                 LOG(ERROR) << "Save graph " << path << " failed, " << (int)state;
             }
         } else if (cmd == "switch_graph") {

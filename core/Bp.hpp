@@ -35,10 +35,10 @@ public:
 	bool RegisterUserMod(std::shared_ptr<BpContents>, 
 			std::function<std::shared_ptr<BpNode>(const std::string&)>);
 
-	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g);
-	LoadSaveState LoadGraph(const Json::Value& root, const std::string& graph_name, std::shared_ptr<BpGraph>& g);
-	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g);
-	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g);
+	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g, Json::Value& desc);
+	LoadSaveState LoadGraph(const Json::Value& root, const std::string& graph_name, std::shared_ptr<BpGraph>& g, Json::Value& desc);
+	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g, const Json::Value& desc);
+	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g, const Json::Value& desc);
 
 	BpVariable CreateVariable(const std::string& type, const std::string& name);
 	BpVariable CreateVariable(const std::string& type, const std::string& name, const std::string& value_desc);
@@ -71,7 +71,7 @@ private:
 
 	std::vector<int> Version(const std::string& path);
 
-	LoadSaveState LoadGraph(const Json::Value& root, const Json::Value& json_graph, std::shared_ptr<BpGraph>& g);
+	LoadSaveState LoadGraph(const Json::Value& root, const Json::Value& json_graph, std::shared_ptr<BpGraph>& g, Json::Value& desc);
 
 	// 当前被编辑的图
 	std::weak_ptr<BpGraph> _cur_edit_graph;
