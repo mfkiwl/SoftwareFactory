@@ -378,7 +378,7 @@ void SFEPanelBp::SetNodesPos(const std::string& desc) {
     Json::Value::Members mem = v.getMemberNames();
 	Json::Value::Members::iterator it;
 	for (it = mem.begin(); it != mem.end(); it++) {
-        auto id = v[(*it)]["id"].asInt();
+        auto id = std::stoi(*it);
         auto pos = v[(*it)]["pos"];
         ed::SetNodePosition((ed::NodeId)id, ImVec2(pos[0].asInt(), pos[1].asInt()));
     }

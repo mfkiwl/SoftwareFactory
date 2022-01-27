@@ -157,6 +157,11 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 	for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
 		int id = std::stoi(*iter);
 		auto json_node = nodes[*iter];
+		// node pos
+		if (json_node.isMember("pos")){
+			desc[*iter]["pos"] = json_node["pos"];
+        }
+		// node attr
 		BpNodeType t = (BpNodeType)json_node["type"].asInt();
 		auto node_name = json_node["name"].asString();
 		auto style_name = json_node["style"].asString();
@@ -249,6 +254,12 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 		}
 		json_graph["nodes"][std::to_string(nor->GetID())] = json_nornode;
 	}
+	// nodes pos
+	Json::Value::Members mem = desc.getMemberNames();
+	for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
+		json_graph["nodes"][*iter]["pos"] = desc[*iter]["pos"];
+	}
+
 	// links
 	auto& links = g->GetLinks();
 	for (auto& l : links) {

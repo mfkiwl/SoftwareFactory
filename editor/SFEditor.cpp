@@ -186,6 +186,12 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             if (bp::LoadSaveState::OK == (state = bp::Bp::Instance().LoadGraph(path, g, nodes_pos))) {
                 bp::Bp::Instance().AddEditGraph(g->GetName(), g);
                 bp::Bp::Instance().SetCurEditGraph(g);
+                // set nodes pos
+                Json::Value msg2;
+                msg2["command"] = "set_nodes_pos";
+                msg2["desc"] = Json::FastWriter().write(nodes_pos);
+                auto panel = GetPanel("bp editor");
+                panel->RecvMessage({"editor", "bp editor", "", msg2});
             } else {
                 LOG(ERROR) << "Load graph " << path << " failed, " << (int)state;
             }
@@ -198,6 +204,11 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             }
             bp::LoadSaveState state = bp::LoadSaveState::OK;
             Json::Value nodes_desc;
+            Json::Reader reader(Json::Features::strictMode());
+            if (!reader.parse(msg.json_msg["nodes_pos"].asString(), nodes_desc)) {
+                LOG(ERROR) << "parse nodes desc failed";
+                return;
+            }
             if (bp::LoadSaveState::OK != (state = bp::Bp::Instance().SaveGraph(path, g, nodes_desc))) {
                 LOG(ERROR) << "Save graph " << path << " failed, " << (int)state;
             }
