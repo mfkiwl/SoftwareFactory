@@ -40,4 +40,13 @@ TEST(bpcommon, PbJsonConvert) {
             std::cout << v[*iter] << std::endl;
         }
     }
+
+    {
+        // test repeate data
+        // TODO
+        ::bp_pb::BpIntAry msg;
+        std::string json;
+        bp::JsonPbConvert::PbMsg2JsonStr(msg, json);
+        std::cout << "repeat ary: " << json << std::endl;
+    }
 }

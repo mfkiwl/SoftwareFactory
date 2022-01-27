@@ -13,6 +13,10 @@ message BpString {
     string var = 1;
 }
 
+message BpBytes {
+    bytes var = 1;
+}
+
 message BpIntPair {
     int32 a = 1;
     int32 b = 2;
@@ -21,4 +25,12 @@ message BpIntPair {
 message BpFloatPair {
     float a = 1;
     float b = 2;
+}
+
+message BpIntAry {
+    repeated int32 ary = 1;
+}
+
+message BpFloatAry {
+    repeated float ary = 1;
 }

@@ -231,17 +231,17 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 	json_graph["name"] = g->GetName();
 	// ev_nodes
 	auto& ev_nodes = g->GetEvNodes();
-	for (auto ev : ev_nodes) {
+	for (auto& ev : ev_nodes) {
 		Json::Value json_evnode;
 		json_evnode["name"] = ev.first;
 		json_evnode["type"] = (int)ev.second->GetNodeType();
 		json_evnode["style"] = (int)ev.second->GetNodeStyle();
 		json_evnode["id"] = ev.second->GetID();
-		json_graph["nodes"].append(json_evnode);
+		json_graph["nodes"][std::to_string(ev.second->GetID())] = json_evnode;
 	}
 	// var/base/nor nodes
 	auto& nor_nodes = g->GetNodes();
-	for (auto nor : nor_nodes) {
+	for (auto& nor : nor_nodes) {
 		Json::Value json_nornode;
 		auto node_type = nor->GetNodeType();
 		json_nornode["name"] = nor->GetName();
@@ -259,7 +259,6 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 	for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
 		json_graph["nodes"][*iter]["pos"] = desc[*iter]["pos"];
 	}
-
 	// links
 	auto& links = g->GetLinks();
 	for (auto& l : links) {

@@ -252,7 +252,9 @@ void SFEPanelBp::OnDoubleclickNode() {
         auto& pins = _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT);
         if (pins.size() > 0){
             // FIXME, only show one variable
+            _doubleclick_node_attr.clear();
             bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
+            LOG(INFO) << "get var attr: " << _doubleclick_node_attr;
             strcpy(_doubleclick_node_edit_attr, _doubleclick_node_attr.c_str());
             ImGui::OpenPopup("node attr");
         }
@@ -274,6 +276,7 @@ void SFEPanelBp::ShowVarNodeAttr() {
         ImGui::Separator();
 
         if (ImGui::Button("OK", ImVec2(120, 0))) {
+            LOG(INFO) << "set var attr: " << std::string(_doubleclick_node_edit_attr);
             _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT)[0].SetValue(std::string(_doubleclick_node_edit_attr));
             _doubleclick_node = nullptr;
             ImGui::CloseCurrentPopup();

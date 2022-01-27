@@ -142,9 +142,9 @@ void JsonPbConvert::PbMsg2Json(const ProtobufMsg& src, Json::Value& dst, bool en
     for (int32_t i = 0; i < count; ++i) {
         const ProtobufFieldDescriptor* field = descriptor->field(i);
         if (field->is_repeated()) {
-            if (reflection->FieldSize(src, field) > 0) {
+            //if (reflection->FieldSize(src, field) > 0) {
                 RepeatedMessage2Json(src, field, reflection, dst[field->name()], enum2str);
-            }
+            // }
             continue;
         }
         // if (!reflection->HasField(src, field)) {
@@ -316,59 +316,56 @@ void JsonPbConvert::RepeatedMessage2Json(const ProtobufMsg& message,
     }
  
     for (int32_t i = 0; i < reflection->FieldSize(message, field); ++i) {
-        Json::Value tmp_json;
         switch (field->type()) {
             case ProtobufFieldDescriptor::TYPE_MESSAGE: {
                 const ProtobufMsg& tmp_message = reflection->GetRepeatedMessage(message, field, i);
                 if (0 != tmp_message.ByteSize()) {
+                    Json::Value tmp_json;
                     PbMsg2Json(tmp_message, tmp_json);
+                    json.append(tmp_json);
                 }
                 break;
             }
             case ProtobufFieldDescriptor::TYPE_BOOL:
-                tmp_json[field->name()] = reflection->GetRepeatedBool(message, field, i) ? true : false;
+                json.append(reflection->GetRepeatedBool(message, field, i) ? true : false);
                 break;
             case ProtobufFieldDescriptor::TYPE_ENUM: {
                 const ::google::protobuf::EnumValueDescriptor* enum_value_desc = reflection->GetRepeatedEnum(message, field, i);
-                if (enum2str) 
-                {
-                    tmp_json = enum_value_desc->name();
-                } 
-                else 
-                {
-                    tmp_json = enum_value_desc->number();
+                if (enum2str) {
+                    json.append(enum_value_desc->name());
+                } else {
+                    json.append(enum_value_desc->number());
                 }
                 break;
             }
             case ProtobufFieldDescriptor::TYPE_INT32:
             case ProtobufFieldDescriptor::TYPE_SINT32:
             case ProtobufFieldDescriptor::TYPE_SFIXED32:
-                tmp_json[field->name()] = reflection->GetRepeatedInt32(message, field, i);
+                json.append(reflection->GetRepeatedInt32(message, field, i));
                 break;
             case ProtobufFieldDescriptor::TYPE_UINT32:
             case ProtobufFieldDescriptor::TYPE_FIXED32:
-                tmp_json[field->name()] = reflection->GetRepeatedUInt32(message, field, i);
+                json.append(reflection->GetRepeatedUInt32(message, field, i));
                 break;
             case ProtobufFieldDescriptor::TYPE_INT64:
             case ProtobufFieldDescriptor::TYPE_SINT64:
             case ProtobufFieldDescriptor::TYPE_SFIXED64:
-                tmp_json[field->name()] = (Json::Int64)reflection->GetRepeatedInt64(message, field, i);
+                json.append((Json::Int64)reflection->GetRepeatedInt64(message, field, i));
                 break;
             case ProtobufFieldDescriptor::TYPE_UINT64:
             case ProtobufFieldDescriptor::TYPE_FIXED64:
-                tmp_json[field->name()] = Json::UInt64(reflection->GetRepeatedUInt64(message, field, i));
+                json.append(Json::UInt64(reflection->GetRepeatedUInt64(message, field, i)));
                 break;
             case ProtobufFieldDescriptor::TYPE_FLOAT:
-                tmp_json[field->name()] = reflection->GetRepeatedFloat(message, field, i);
+                json.append(reflection->GetRepeatedFloat(message, field, i));
                 break;
             case ProtobufFieldDescriptor::TYPE_STRING:
             case ProtobufFieldDescriptor::TYPE_BYTES:
-                tmp_json[field->name()] = reflection->GetRepeatedString(message, field, i);
+                json.append(reflection->GetRepeatedString(message, field, i));
                 break;
             default:
                 break;
         }
-        json.append(tmp_json);
     }
 }
 

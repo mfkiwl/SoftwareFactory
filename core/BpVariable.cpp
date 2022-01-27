@@ -58,6 +58,7 @@ bool BpVariable::SetValue(const Json::Value& v) {
 		LOG(ERROR) << "json_value is empty";
 		return false;
 	}
+	_var->Clear();
 	JsonPbConvert::Json2PbMsg(v, *_var);
 	return true;
 }

@@ -4,7 +4,10 @@
         "bpbase.BpInt",
         "bpbase.BpFloat",
         "bpbase.BpString",
+        "bpbase.BpBytes",
         "bpbase.BpIntPair",
-        "bpbase.BpFloatPair"
+        "bpbase.BpFloatPair",
+        "bpbase.BpIntAry",
+        "bpbase.BpFloatAry"
     ]
 }
