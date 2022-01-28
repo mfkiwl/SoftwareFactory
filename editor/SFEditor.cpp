@@ -140,6 +140,12 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 auto new_graph = std::dynamic_pointer_cast<bp::BpGraph>(node);
                 bp::Bp::Instance().AddEditGraph(msg.json_msg["node_name"].asString(), new_graph);
                 bp::Bp::Instance().SetCurEditGraph(new_graph);
+
+                Json::Value v;
+                v["command"] = "set_nodes_pos";
+                v["desc"] = Json::FastWriter().write(new_graph->GetNodesPos());
+                auto panel = GetPanel("bp editor");
+                panel->RecvMessage({"editor", "bp editor", "", v});
                 return;
             } else if (g == nullptr) {
                 LOG(WARNING) << "cur edit graph is nullptr";
@@ -214,6 +220,12 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             }
         } else if (cmd == "switch_graph") {
             bp::Bp::Instance().SetCurEditGraph(msg.json_msg["name"].asString());
+            auto g = bp::Bp::Instance().CurEditGraph();
+            Json::Value v;
+            v["command"] = "set_nodes_pos";
+            v["desc"] = Json::FastWriter().write(g->GetNodesPos());
+            auto panel = GetPanel("bp editor");
+            panel->RecvMessage({"editor", "bp editor", "", v});
         }
     }
 }

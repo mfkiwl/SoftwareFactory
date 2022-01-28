@@ -65,6 +65,9 @@ public:
 	
 	void ClearFlag();
 
+	void SetNodesPos(const Json::Value& desc) { _nodes_pos = desc; }
+	const Json::Value& GetNodesPos() { return _nodes_pos; }
+
 private:
 	void SetNextID(int id);
 
@@ -83,6 +86,8 @@ private:
 
 	std::weak_ptr<BpNode>       _input_node;
 	std::weak_ptr<BpNode>       _output_node;
+
+	Json::Value                 _nodes_pos;
 };
 
 } // namespace bp

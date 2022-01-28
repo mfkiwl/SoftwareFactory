@@ -262,7 +262,11 @@ void SFEPanelBp::OnDoubleclickNode() {
     break;
     case bp::BpNodeType::BP_GRAPH: {
         auto g = std::dynamic_pointer_cast<bp::BpGraph>(_doubleclick_node);
-        bp::Bp::Instance().SetCurEditGraph(g);
+        bp::Bp::Instance().AddEditGraph(g->GetName(), g);
+        Json::Value v;
+        v["command"] = "switch_graph";
+        v["name"] = g->GetName();
+        SendMessage({PanelName(), "editor", "", v});
     }
     break;
     }

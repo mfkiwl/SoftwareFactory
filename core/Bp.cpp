@@ -186,6 +186,7 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 			g->AddNode(node);
 		}
 	}
+	g->SetNodesPos(desc);
 	// 解析link并创建link
 	auto links = json_graph["links"];
 	for (int i = 0; i < links.size(); ++i) {
@@ -339,7 +340,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 		graph->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
 		if (!graph_desc.isNull()) {
 			LoadSaveState state = LoadSaveState::OK;
-			Json::Value nodes_pos;
+			Json::Value nodes_pos = _graph_mods->GetNodesPosFromDesc(graph_desc);
 			if (LoadSaveState::OK != (state = LoadGraph(Json::Value(), graph_desc, graph, nodes_pos))) {
 				LOG(ERROR) << "load mod graph failed, " << (int)state;
 				return nullptr;

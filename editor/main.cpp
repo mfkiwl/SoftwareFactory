@@ -116,7 +116,7 @@ int main(int, char**)
     // io.Fonts->AddFontDefault();
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
     LOG(INFO) <<  "dpi scale: " << platform_io.Monitors[0].DpiScale;
-    io.Fonts->AddFontFromFileTTF("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 11.0f * platform_io.Monitors[0].DpiScale);
+    io.Fonts->AddFontFromFileTTF("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 14.0f * platform_io.Monitors[0].DpiScale);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);

@@ -46,11 +46,21 @@ public:
 
     std::shared_ptr<BpContents> GetContents() { return _contents; }
 
-    Json::Value GetGraphDesc(const std::string& name) {
+    const Json::Value& GetGraphDesc(const std::string& name) {
         if (_mods.find(name) == _mods.end()) {
-            return Json::Value();
+            return Json::Value::null;
         }
         return _mods[name];
+    }
+
+    Json::Value GetNodesPosFromDesc(const Json::Value& desc) {
+        const auto& nodes = desc["nodes"];
+        Json::Value pos;
+        Json::Value::Members mem = nodes.getMemberNames();
+        for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
+            pos[*iter]["pos"] = nodes[*iter]["pos"];
+        }
+        return pos;
     }
 
 protected:
