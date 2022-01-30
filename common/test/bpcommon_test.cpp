@@ -31,8 +31,7 @@ TEST(bpcommon, PbJsonConvert) {
         Json::Value v2;
         v2["1"] = "hello";
         v["a"] = v2;
-        Json::FastWriter writer;
-        auto dst = writer.write(v);
+        auto dst = bp::BpCommon::Json2Str(v);
         std::cout << "fast write: " << dst << std::endl;
         Json::Value::Members mem = v.getMemberNames();
         for (auto iter = mem.begin(); iter != mem.end(); ++iter) {
@@ -48,5 +47,18 @@ TEST(bpcommon, PbJsonConvert) {
         std::string json;
         bp::JsonPbConvert::PbMsg2JsonStr(msg, json);
         std::cout << "repeat ary: " << json << std::endl;
+    }
+
+    {
+        std::string str = "9helll";
+        EXPECT_FALSE(bp::BpCommon::IsName(str));
+        str = "_helll";
+        EXPECT_TRUE(bp::BpCommon::IsName(str));
+        str = "9h elll";
+        EXPECT_FALSE(bp::BpCommon::IsName(str));
+        str = "hell_9helll_";
+        EXPECT_TRUE(bp::BpCommon::IsName(str));
+        str = "__maixxxx";
+        EXPECT_TRUE(bp::BpCommon::IsName(str));
     }
 }

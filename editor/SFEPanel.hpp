@@ -78,10 +78,13 @@ public:
             LOG(INFO) << msg.Print();
         }
         _send_que.emplace_back(msg);
+        OnPostSendMessage(msg);
     }
 protected:
     /* Call by this */
     virtual void OnMessage(const SFEMessage& msg) {}
+    /* 主要用于undo/redo操作 */
+    virtual void OnPostSendMessage(const SFEMessage& msg) {}
 
 private:
     std::string _name;

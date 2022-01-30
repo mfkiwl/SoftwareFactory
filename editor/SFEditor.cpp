@@ -7,6 +7,7 @@
 #include "SFEPanelLog.hpp"
 #include "SFEPanelUINodes.hpp"
 #include "SFEPanelPlot.hpp"
+#include "bpcommon.hpp"
 #include "Bp.hpp"
 
 namespace sfe {
@@ -34,7 +35,8 @@ void SFEditor::ProcEvent(const SDL_Event event) {
 }
 
 void SFEditor::Update() {
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! 
+    // You can browse its code to learn more about Dear ImGui!).
     if (_show_demo) {
         ImGui::ShowDemoWindow(&_show_demo);
     }
@@ -45,6 +47,28 @@ void SFEditor::Update() {
 }
 
 void SFEditor::DispatchMessage() {
+    // dispatch this message
+    for (int j = 0; j < _send_que.size(); ++j) {
+        // boardcast
+        if (_send_que[j].dst == "all") {
+            ProcEditorMessage(_send_que[j]);
+            for (int k = 0; k < _panels.size(); ++k) {
+                if (_panels[k]->PanelName() == _send_que[j].src) {
+                    continue;
+                }
+                _panels[k]->RecvMessage(_send_que[j]);
+            }
+            continue;
+        }
+        auto panel = GetPanel(_send_que[j].dst);
+        if (panel == nullptr) {
+            LOG(ERROR) << "Can't find panel, msg: " << _send_que[j].Print();
+            continue;
+        }
+        panel->RecvMessage(_send_que[j]);
+    }
+    _send_que.clear();
+    // dispatch panel message
     for (auto it = _panels.begin(); it != _panels.end(); ++it) {
         auto msgs = (*it)->GetDispatchMessage();
         for (int j = 0; j < msgs.size(); ++j) {
@@ -100,10 +124,15 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
         _show_demo = !_show_demo;
     }
     if (msg.msg.empty()) {
-        auto cmd = msg.json_msg["command"];
+        auto jmsg = msg.json_msg;
+        auto cmd = jmsg["command"];
         if (cmd == "create_new") {
-            auto graph_name = msg.json_msg["graph_name"].asString();
-            auto graph_type = msg.json_msg["graph_type"].asString() == "mod graph" ? bp::BpNodeType::BP_GRAPH : bp::BpNodeType::BP_GRAPH_EXEC;
+            auto graph_name = jmsg["graph_name"].asString();
+            auto graph_type = jmsg["graph_type"].asString() == "mod graph" ? bp::BpNodeType::BP_GRAPH : bp::BpNodeType::BP_GRAPH_EXEC;
+            if (bp::Bp::Instance().HasEditGraph(graph_name)) {
+                UILog(graph_name + " graph has exist", UILogLv::WARNING);
+                return;
+            }
             auto g = std::dynamic_pointer_cast<bp::BpGraph>(bp::Bp::Instance().SpawnNode(graph_name, graph_type));
             bp::Bp::Instance().AddEditGraph(graph_name, g);
             bp::Bp::Instance().SetCurEditGraph(g);
@@ -111,11 +140,10 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             Json::Value v;
             v["command"] = "set_cur_graph";
             v["graph_name"] = graph_name;
-            auto panel = GetPanel("graph");
-            panel->RecvMessage({"editor", "graph", "", v});
+            SendMessage({_name, "graph", "", v});
         } else if (cmd == "spawn_node") {
             auto obj_type = bp::BpNodeType::BP_NONE;
-            int contents_type = msg.json_msg["type"].asInt();
+            int contents_type = jmsg["type"].asInt();
             if (contents_type == (int)BpContents::LeafType::EV) {
                 obj_type = bp::BpNodeType::BP_NODE_EV;
             } else if (contents_type == (int)BpContents::LeafType::FUNC) {
@@ -136,34 +164,32 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             std::shared_ptr<bp::BpNode> node = nullptr;
             auto g = bp::Bp::Instance().CurEditGraph();
             if (obj_type == bp::BpNodeType::BP_GRAPH && g == nullptr) {
-                node = bp::Bp::Instance().SpawnNode(msg.json_msg["node_name"].asString(), obj_type);
+                node = bp::Bp::Instance().SpawnNode(jmsg["node_name"].asString(), obj_type);
                 auto new_graph = std::dynamic_pointer_cast<bp::BpGraph>(node);
-                bp::Bp::Instance().AddEditGraph(msg.json_msg["node_name"].asString(), new_graph);
+                bp::Bp::Instance().AddEditGraph(jmsg["node_name"].asString(), new_graph);
                 bp::Bp::Instance().SetCurEditGraph(new_graph);
-
                 Json::Value v;
                 v["command"] = "set_nodes_pos";
-                v["desc"] = Json::FastWriter().write(new_graph->GetNodesPos());
-                auto panel = GetPanel("bp editor");
-                panel->RecvMessage({"editor", "bp editor", "", v});
+                v["desc"] = bp::BpCommon::Json2Str(new_graph->GetNodesPos());
+                SendMessage({_name, "bp editor", "", v});
                 return;
             } else if (g == nullptr) {
                 LOG(WARNING) << "cur edit graph is nullptr";
                 return;
             }
             if (obj_type == bp::BpNodeType::BP_NODE_VAR) {
-                if (msg.json_msg["node_name"].asString().empty()) {
+                if (jmsg["node_name"].asString().empty()) {
                     node = bp::Bp::Instance().SpawnVarNode(g, 
-                                msg.json_msg["var_name"].asString(),
-                                msg.json_msg["is_get"].asBool());
+                                jmsg["var_name"].asString(),
+                                jmsg["is_get"].asBool());
                 } else {
                     node = bp::Bp::Instance().SpawnVarNode(g, 
-                                msg.json_msg["node_name"].asString(),
-                                msg.json_msg["var_name"].asString(),
-                                msg.json_msg["is_get"].asBool());
+                                jmsg["node_name"].asString(),
+                                jmsg["var_name"].asString(),
+                                jmsg["is_get"].asBool());
                 }
             } else {
-                node = bp::Bp::Instance().SpawnNode(msg.json_msg["node_name"].asString(), obj_type);
+                node = bp::Bp::Instance().SpawnNode(jmsg["node_name"].asString(), obj_type);
             }
             if (node == nullptr) {
                 LOG(WARNING) << "SpawnNode failed";
@@ -180,12 +206,11 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             Json::Value v;
             v["command"] = "set_node_pos";
             v["node_id"] = node->GetID();
-            v["x"] = msg.json_msg["x"];
-            v["y"] = msg.json_msg["y"];
-            auto panel = GetPanel("bp editor");
-            panel->RecvMessage({"editor", "bp editor", "", v});
+            v["x"] = jmsg["x"];
+            v["y"] = jmsg["y"];
+            SendMessage({_name, "bp editor", "", v});
         } else if (cmd == "open_graph") {
-            auto path = msg.json_msg["path"].asString();
+            auto path = jmsg["path"].asString();
             std::shared_ptr<bp::BpGraph> g = nullptr;
             bp::LoadSaveState state = bp::LoadSaveState::OK;
             Json::Value nodes_pos;
@@ -195,23 +220,22 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 // set nodes pos
                 Json::Value msg2;
                 msg2["command"] = "set_nodes_pos";
-                msg2["desc"] = Json::FastWriter().write(nodes_pos);
-                auto panel = GetPanel("bp editor");
-                panel->RecvMessage({"editor", "bp editor", "", msg2});
+                msg2["desc"] = bp::BpCommon::Json2Str(nodes_pos);;
+                SendMessage({_name, "bp editor", "", msg2});
             } else {
                 LOG(ERROR) << "Load graph " << path << " failed, " << (int)state;
             }
         } else if (cmd == "save_graph_step2") {
-            auto path = msg.json_msg["path"].asString();
+            auto path = jmsg["path"].asString();
             auto g = bp::Bp::Instance().CurEditGraph();
             if (g == nullptr) {
                 LOG(WARNING) << "cur edit graph is nullptr";
                 return;
             }
             bp::LoadSaveState state = bp::LoadSaveState::OK;
-            Json::Value nodes_desc;
-            Json::Reader reader(Json::Features::strictMode());
-            if (!reader.parse(msg.json_msg["nodes_pos"].asString(), nodes_desc)) {
+
+            auto nodes_desc = bp::BpCommon::Str2Json(jmsg["nodes_pos"].asString());
+            if (nodes_desc == Json::Value::null) {
                 LOG(ERROR) << "parse nodes desc failed";
                 return;
             }
@@ -219,13 +243,27 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 LOG(ERROR) << "Save graph " << path << " failed, " << (int)state;
             }
         } else if (cmd == "switch_graph") {
-            bp::Bp::Instance().SetCurEditGraph(msg.json_msg["name"].asString());
+            bp::Bp::Instance().SetCurEditGraph(jmsg["name"].asString());
             auto g = bp::Bp::Instance().CurEditGraph();
             Json::Value v;
             v["command"] = "set_nodes_pos";
-            v["desc"] = Json::FastWriter().write(g->GetNodesPos());
-            auto panel = GetPanel("bp editor");
-            panel->RecvMessage({"editor", "bp editor", "", v});
+            v["desc"] = bp::BpCommon::Json2Str(g->GetNodesPos());
+            SendMessage({_name, "bp editor", "", v});
+        } else if (cmd == "del_node") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            g->DelNode(jmsg["id"].asInt());
+        } else if (cmd == "del_evnode") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            g->DelEventNode(jmsg["name"].asString());
+        } else if (cmd == "del_link") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            g->DelLink(jmsg["id"].asInt());
+        } else if (cmd == "create_link") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            auto start_pin = g->SearchPin(jmsg["start_pin_id"].asInt());
+            auto end_pin = g->SearchPin(jmsg["end_pin_id"].asInt());
+            g->AddLink(*start_pin, *end_pin);
+            g->GetLinks().back().SetColor(jmsg["color"][0].asFloat(), jmsg["color"][1].asFloat(), jmsg["color"][2].asFloat(), jmsg["color"][3].asFloat());
         }
     }
 }

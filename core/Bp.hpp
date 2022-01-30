@@ -62,6 +62,7 @@ public:
 		LOG(ERROR) << "can't find current graph " << name;
 	}
 	bool AddEditGraph(const std::string& name, std::shared_ptr<BpGraph> g);
+	bool HasEditGraph(const std::string& name) { return _edit_graphs.find(name) != _edit_graphs.end(); }
 	const std::unordered_map<std::string, std::shared_ptr<BpGraph>>& GetEditGraphs() { return _edit_graphs; }
 private:
 	Bp();

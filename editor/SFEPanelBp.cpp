@@ -22,67 +22,6 @@ bool SFEPanelBp::Init() {
     return true;
 }
 
-void SFEPanelBp::OnMessage(const SFEMessage& msg) {
-    if (msg.msg == "spawnnode") {
-        auto g = bp::Bp::Instance().CurEditGraph();
-        if (g == nullptr) {
-            LOG(WARNING) << "cur edit graph is nullptr";
-            return;
-        }
-        auto node = bp::Bp::Instance().SpawnNode("bpmath.add_int");
-        if (node == nullptr) {
-            LOG(WARNING) << "SpawnNode failed";
-            return;
-        }
-        g->AddNode(node);
-        {
-            auto mouse_pos = ImGui::GetMousePos();
-	        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
-            ed::SetNodePosition((ed::NodeId)node->GetID(), canvas_pos);
-        }
-    }
-    if (msg.msg.empty()) {
-        auto cmd = msg.json_msg["command"].asString();
-        if (cmd == "set_node_pos") {
-            auto mouse_pos = ImVec2(msg.json_msg["x"].asInt(), msg.json_msg["y"].asInt());
-	        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
-            ed::SetNodePosition((ed::NodeId)msg.json_msg["node_id"].asInt(), 
-                canvas_pos
-                );
-        } else if (cmd == "set_nodes_pos") {
-            SetNodesPos(msg.json_msg["desc"].asString());
-        } else if (cmd == "save_graph_step1") {
-            auto g = bp::Bp::Instance().CurEditGraph();
-            if (g == nullptr) {
-                LOG(WARNING) << "cur edit graph is nullptr";
-                return;
-            }
-            auto& ev_nodes = g->GetEvNodes();
-            auto& nodes = g->GetNodes();
-            Json::Value root;
-            for (const auto& it : ev_nodes) {
-                Json::Value v;
-                auto pos = ed::GetNodePosition((ed::NodeId(it.second->GetID())));
-                v["pos"].append(pos.x);
-                v["pos"].append(pos.y);
-                root[std::to_string(it.second->GetID())] = v;
-            }
-            for (const auto& it : nodes) {
-                Json::Value v;
-                auto pos = ed::GetNodePosition((ed::NodeId(it->GetID())));
-                v["pos"].append(pos.x);
-                v["pos"].append(pos.y);
-                root[std::to_string(it->GetID())] = v;
-            }
-            Json::Value msg2;
-            msg2["command"] = "save_graph_step2";
-            msg2["path"] = msg.json_msg["path"].asString();
-            msg2["nodes_pos"] = Json::FastWriter().write(root);
-            SendMessage({PanelName(), "editor", "", msg2});
-        }
-    }
-}
-
 void SFEPanelBp::Update() {
     auto graph = bp::Bp::Instance().CurEditGraph();
 
@@ -92,7 +31,6 @@ void SFEPanelBp::Update() {
     ed::NodeId n_id = ed::GetDoubleClickedNode();
 	std::shared_ptr<bp::BpNode> dc_node = nullptr;
 	if (graph != nullptr && (dc_node = graph->GetNode((int)n_id.Get())) != nullptr) {
-		// 显示节点属性
         _is_doubleclick_node = true;
 		_doubleclick_node = dc_node;
 	}
@@ -183,9 +121,16 @@ void SFEPanelBp::NodeLinkCreate(std::shared_ptr<bp::BpGraph>& graph) {
                 } else {
                     showLabel("+ Create Link", ImColor(32, 45, 32, 180));
                     if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f)) {
-                        graph->AddLink(*startPin, *endPin);
+                        Json::Value v;
+                        v["command"] = "create_link";
+                        v["start_pin_id"] = startPin->ID;
+                        v["end_pin_id"] = endPin->ID;
                         ImColor c = GetIconColor(*startPin);
-                        graph->GetLinks().back().SetColor(c.Value.x, c.Value.y, c.Value.z, c.Value.w);
+                        v["color"].append(c.Value.x);
+                        v["color"].append(c.Value.y);
+                        v["color"].append(c.Value.z);
+                        v["color"].append(c.Value.w);
+                        SendMessage({PanelName(), "editor", "", v});
                     }
                 }
             }
@@ -216,7 +161,10 @@ void SFEPanelBp::NodeLinkDelete(std::shared_ptr<bp::BpGraph>& graph) {
             if (ed::AcceptDeletedItem()) {
                 auto id = std::find_if(graph->GetLinks().begin(), graph->GetLinks().end(), [linkId](auto& link) { return link.ID == (int)linkId.Get(); });
                 if (id != graph->GetLinks().end()) {
-                    graph->DelLink(id->ID);
+                    Json::Value v;
+                    v["command"] = "del_link";
+                    v["id"] = id->ID;
+                    SendMessage({PanelName(), "editor", "", v});
                 }
             }
         }
@@ -225,15 +173,21 @@ void SFEPanelBp::NodeLinkDelete(std::shared_ptr<bp::BpGraph>& graph) {
         while (ed::QueryDeletedNode(&nodeId)) {
             if (ed::AcceptDeletedItem()) {
                 auto& nodes = graph->GetNodes();
-                auto id = std::find_if(nodes.begin(), nodes.end(), [nodeId](auto node) { return node->GetID() == (int)nodeId.Get(); });
+                auto id = std::find_if(nodes.begin(), nodes.end(), [nodeId](auto& node) { return node->GetID() == (int)nodeId.Get(); });
                 if (id != nodes.end()) {
-                    graph->DelNode(*id);
+                    Json::Value v;
+                    v["command"] = "del_node";
+                    v["id"] = (*id)->GetID();
+                    SendMessage({PanelName(), "editor", "", v});
                 }
 
                 auto& ev_nodes = graph->GetEvNodes();
                 auto p = std::find_if(ev_nodes.begin(), ev_nodes.end(), [nodeId](auto node) { return node.second->GetID() == (int)nodeId.Get(); });
                 if (p != ev_nodes.end()) {
-                    graph->DelEventNode((*p).first);
+                    Json::Value v;
+                    v["command"] = "del_evnode";
+                    v["name"] = (*p).first;
+                    SendMessage({PanelName(), "editor", "", v});
                 }
             }
         }
@@ -244,32 +198,6 @@ void SFEPanelBp::NodeLinkDelete(std::shared_ptr<bp::BpGraph>& graph) {
 void SFEPanelBp::Exit() {
     ed::DestroyEditor(_node_editor);
     _node_editor = nullptr;
-}
-
-void SFEPanelBp::OnDoubleclickNode() {
-    switch (_doubleclick_node->GetNodeType()) {
-    case bp::BpNodeType::BP_NODE_VAR: {
-        auto& pins = _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT);
-        if (pins.size() > 0){
-            // FIXME, only show one variable
-            _doubleclick_node_attr.clear();
-            bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
-            LOG(INFO) << "get var attr: " << _doubleclick_node_attr;
-            strcpy(_doubleclick_node_edit_attr, _doubleclick_node_attr.c_str());
-            ImGui::OpenPopup("node attr");
-        }
-    }
-    break;
-    case bp::BpNodeType::BP_GRAPH: {
-        auto g = std::dynamic_pointer_cast<bp::BpGraph>(_doubleclick_node);
-        bp::Bp::Instance().AddEditGraph(g->GetName(), g);
-        Json::Value v;
-        v["command"] = "switch_graph";
-        v["name"] = g->GetName();
-        SendMessage({PanelName(), "editor", "", v});
-    }
-    break;
-    }
 }
 
 void SFEPanelBp::ShowVarNodeAttr() {
@@ -376,9 +304,8 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 }
 
 void SFEPanelBp::SetNodesPos(const std::string& desc) {
-    Json::Value v;
-    Json::Reader reader(Json::Features::strictMode());
-    if (!reader.parse(desc, v)) {
+    auto v = bp::BpCommon::Str2Json(desc);
+    if (v == Json::Value::null) {
         LOG(ERROR) << "Parse node desc failed, " << desc;
         return;
     }
@@ -461,6 +388,94 @@ ImTextureID SFEPanelBp::CreateTexture(const void* data, int width, int height) {
     texture.Height = height;
 
     return reinterpret_cast<ImTextureID>(texture.TextureID);
+}
+
+void SFEPanelBp::OnDoubleclickNode() {
+    switch (_doubleclick_node->GetNodeType()) {
+    case bp::BpNodeType::BP_NODE_VAR: {
+        auto& pins = _doubleclick_node->GetPins(bp::BpPinKind::BP_OUTPUT);
+        if (pins.size() > 0){
+            // FIXME, only show one variable
+            _doubleclick_node_attr.clear();
+            bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
+            LOG(INFO) << "get var attr: " << _doubleclick_node_attr;
+            strcpy(_doubleclick_node_edit_attr, _doubleclick_node_attr.c_str());
+            ImGui::OpenPopup("node attr");
+        }
+    }
+    break;
+    case bp::BpNodeType::BP_GRAPH: {
+        // FIXME: 添加编辑图未添加到命令模式
+        auto g = std::dynamic_pointer_cast<bp::BpGraph>(_doubleclick_node);
+        bp::Bp::Instance().AddEditGraph(g->GetName(), g);
+        Json::Value v;
+        v["command"] = "switch_graph";
+        v["name"] = g->GetName();
+        SendMessage({PanelName(), "editor", "", v});
+    }
+    break;
+    }
+}
+
+void SFEPanelBp::OnMessage(const SFEMessage& msg) {
+    if (msg.msg == "spawnnode") {
+        auto g = bp::Bp::Instance().CurEditGraph();
+        if (g == nullptr) {
+            LOG(WARNING) << "cur edit graph is nullptr";
+            return;
+        }
+        auto node = bp::Bp::Instance().SpawnNode("bpmath.add_int");
+        if (node == nullptr) {
+            LOG(WARNING) << "SpawnNode failed";
+            return;
+        }
+        g->AddNode(node);
+        {
+            auto mouse_pos = ImGui::GetMousePos();
+	        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
+            ed::SetNodePosition((ed::NodeId)node->GetID(), canvas_pos);
+        }
+    }
+    if (msg.msg.empty()) {
+        auto cmd = msg.json_msg["command"].asString();
+        if (cmd == "set_node_pos") {
+            auto mouse_pos = ImVec2(msg.json_msg["x"].asInt(), msg.json_msg["y"].asInt());
+	        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
+            ed::SetNodePosition((ed::NodeId)msg.json_msg["node_id"].asInt(), 
+                canvas_pos
+                );
+        } else if (cmd == "set_nodes_pos") {
+            SetNodesPos(msg.json_msg["desc"].asString());
+        } else if (cmd == "save_graph_step1") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            if (g == nullptr) {
+                LOG(WARNING) << "cur edit graph is nullptr";
+                return;
+            }
+            auto& ev_nodes = g->GetEvNodes();
+            auto& nodes = g->GetNodes();
+            Json::Value root;
+            for (const auto& it : ev_nodes) {
+                Json::Value v;
+                auto pos = ed::GetNodePosition((ed::NodeId(it.second->GetID())));
+                v["pos"].append(pos.x);
+                v["pos"].append(pos.y);
+                root[std::to_string(it.second->GetID())] = v;
+            }
+            for (const auto& it : nodes) {
+                Json::Value v;
+                auto pos = ed::GetNodePosition((ed::NodeId(it->GetID())));
+                v["pos"].append(pos.x);
+                v["pos"].append(pos.y);
+                root[std::to_string(it->GetID())] = v;
+            }
+            Json::Value msg2;
+            msg2["command"] = "save_graph_step2";
+            msg2["path"] = msg.json_msg["path"].asString();
+            msg2["nodes_pos"] = bp::BpCommon::Json2Str(root);;
+            SendMessage({PanelName(), "editor", "", msg2});
+        }
+    }
 }
 
 } // namespace sfe

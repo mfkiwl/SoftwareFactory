@@ -1,5 +1,6 @@
 #include "SFEPanelLib.hpp"
 #include "Bp.hpp"
+#include "bpcommon.hpp"
 
 namespace sfe {
 
@@ -59,6 +60,10 @@ void SFEPanelLib::ShowLib(std::shared_ptr<BpContents> c) {
             // 变量节点, 需要使用界面设置get/set和变量名称
             if (_drag_item.lock()->GetLeafType() == BpContents::LeafType::VAL) {
                 // show setting
+                _drag_info.clear();
+                ImVec2 xy = ImGui::GetMousePos();
+                _drag_info["x"] = xy.x;
+                _drag_info["y"] = xy.y;
                 _show_var_setting = true;
             } else {
                 Json::Value v2;
@@ -97,20 +102,23 @@ void SFEPanelLib::ShowVarSetting() {
         }
         static char buf[64] = "";
         ImGui::InputText("variable name", buf, 64, ImGuiInputTextFlags_CharsNoBlank);
-
         if (ImGui::Button("OK", ImVec2(120, 0))) { 
-            Json::Value v2;
-            v2["command"] = "spawn_node";
-            v2["node_name"] = _drag_item.lock()->GetName();
-            v2["type"] = (int)_drag_item.lock()->GetLeafType();
-            v2["is_get"] = is_get;
-            v2["var_name"] = buf;
-            ImVec2 xy = ImGui::GetMousePos();
-            v2["x"] = xy.x;
-            v2["y"] = xy.y;
-            SendMessage({PanelName(), "editor", "", v2});
+            if (!bp::BpCommon::IsName(buf, strlen(buf))) {
+                UILog("name is not availdable", sfe::WARNING);
+            } else {
+                Json::Value v2;
+                v2["command"] = "spawn_node";
+                v2["node_name"] = _drag_item.lock()->GetName();
+                v2["type"] = (int)_drag_item.lock()->GetLeafType();
+                v2["is_get"] = is_get;
+                v2["var_name"] = buf;
+                v2["x"] = _drag_info["x"];
+                v2["y"] = _drag_info["y"];
+                SendMessage({PanelName(), "editor", "", v2});
+            }
             _drag_item.reset();
             ImGui::CloseCurrentPopup();
+            memset(buf, 0, sizeof(buf));
         }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();

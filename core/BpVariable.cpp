@@ -44,12 +44,11 @@ bool BpVariable::SetValue(const pb_msg_ptr_t& v) {
 }
 
 bool BpVariable::SetValue(const std::string& v) {
-	Json::Value value;
-	Json::Reader reader(Json::Features::strictMode());
-	if (!reader.parse(v, value)) {    
+	auto value = bp::BpCommon::Str2Json(v);
+    if (value == Json::Value::null) {
 		LOG(ERROR) << "parse json failed";
-		return false;
-	}
+        return false;
+    }
 	return SetValue(value);
 }
 

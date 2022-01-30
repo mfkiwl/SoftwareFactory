@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <sstream>
 #include <chrono>
+#include <regex>
 #include "bpcommon.hpp"
 
 namespace bp {
@@ -10,14 +11,12 @@ namespace bp {
 void JsonPbConvert::PbMsg2JsonStr(const ProtobufMsg& src, std::string& dst, bool enum2str) {
     Json::Value value;
     PbMsg2Json(src, value, enum2str);
-    Json::FastWriter writer;
-    dst = writer.write(value);
+    dst = BpCommon::Json2Str(value);
 }
 
 bool JsonPbConvert::JsonStr2PbMsg(const std::string& src, ProtobufMsg& dst, bool str2enum) {
-    Json::Value value;
-    Json::Reader reader(Json::Features::strictMode());
-    if (!reader.parse(src, value)) {
+    auto value = bp::BpCommon::Str2Json(src);
+    if (value == Json::Value::null) {
         return false;
     }
     if (true != Json2PbMsg(value, dst, str2enum)) {
@@ -411,6 +410,29 @@ std::vector<std::string> BpCommon::GetDirFiles(const std::string& conf_path) {
     }
     closedir(dir);
     return res;
+}
+
+std::string BpCommon::Json2Str(const Json::Value& v) {
+    return Json::FastWriter().write(v);
+}
+
+Json::Value BpCommon::Str2Json(const std::string& str) {
+    Json::Value value;
+    Json::Reader reader(Json::Features::strictMode());
+    if (!reader.parse(str, value)) {
+        return Json::Value::null;
+    }
+    return value;
+}
+
+bool BpCommon::IsName(const char* buf, int sz) {
+    // 字母或下划线开头, 后面只能跟数字和字母和下划线
+    std::regex ex("^[_[:alpha:]][[_[:alnum:]]*");
+    return std::regex_match(std::string(buf, sz), ex);
+}
+
+bool BpCommon::IsName(const std::string& str) {
+    return IsName(str.c_str(), str.size());
 }
 
 } // namespace bp

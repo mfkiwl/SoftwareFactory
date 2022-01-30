@@ -35,6 +35,7 @@ public:
 	std::shared_ptr<BpNode> GetNode(int id);
 	void AddNode(std::shared_ptr<BpNode>);
 	void DelNode(std::shared_ptr<BpNode>);
+	void DelNode(int id);
 
 	std::vector<BpLink> SearchLinks(int id);
 	std::vector<BpLink>& GetLinks() { return _links; }

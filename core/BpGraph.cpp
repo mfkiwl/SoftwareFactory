@@ -112,6 +112,15 @@ void BpGraph::DelNode(std::shared_ptr<BpNode> node) {
 	}
 }
 
+void BpGraph::DelNode(int id) {
+	for (auto it = _nodes.begin(); it != _nodes.end(); ++it) {
+		if ((*it)->GetID() == id) {
+			DelNode(*it);
+			return;
+		}
+	}
+}
+
 std::vector<BpLink> BpGraph::SearchLinks(int id) {
 	std::vector<BpLink> ret;
 	for (int i = 0; i < _links.size(); ++i) {

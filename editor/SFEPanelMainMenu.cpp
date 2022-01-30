@@ -1,5 +1,6 @@
 #include "SFEPanelMainMenu.hpp"
 #include "nfd.h"
+#include "bpcommon.hpp"
 
 namespace sfe {
 
@@ -96,11 +97,16 @@ void SFEPanelMainMenu::CreateNewGraph() {
         }
 
         if (ImGui::Button("OK", ImVec2(120, 0))) { 
-            Json::Value v;
-            v["command"] = "create_new";
-            v["graph_type"] = graph_type;
-            v["graph_name"] = buf;
-            SendMessage({PanelName(), "editor", "", v});
+            if (!bp::BpCommon::IsName(buf, strlen(buf))) {
+                UILog("graph name is not availdable", sfe::WARNING);
+            } else {
+                Json::Value v;
+                v["command"] = "create_new";
+                v["graph_type"] = graph_type;
+                v["graph_name"] = buf;
+                SendMessage({PanelName(), "editor", "", v});
+            }
+            memset(buf, 0, sizeof(buf));
             ImGui::CloseCurrentPopup(); 
         }
         ImGui::SetItemDefaultFocus();

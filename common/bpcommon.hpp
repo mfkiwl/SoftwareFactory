@@ -44,6 +44,10 @@ namespace bp {
         static std::string GetModName(const std::string& full_path);
         static std::string GetCurTime();
         static std::vector<std::string> GetDirFiles(const std::string& conf_path);
+        static std::string Json2Str(const Json::Value& v);
+        static Json::Value Str2Json(const std::string& str);
+        static bool IsName(const char* buf, int sz);
+        static bool IsName(const std::string& str);
     };
 }; // namespace bp
 
