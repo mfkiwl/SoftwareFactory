@@ -41,7 +41,9 @@ public:
     virtual void OnMessage(const SFEMessage& msg) override;
 
 private:
+    void ShowNodeInfo();
     void ShowVarNodeAttr();
+    void ShowPinSetting();
     void ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpNode>& node);
     void NodeLinkCreate(std::shared_ptr<bp::BpGraph>&);
     void NodeLinkDelete(std::shared_ptr<bp::BpGraph>&);
@@ -60,6 +62,11 @@ private:
     std::string _doubleclick_node_attr = "";
     char _doubleclick_node_edit_attr[2048] = {};
     std::shared_ptr<bp::BpNode> _doubleclick_node = nullptr;
+    ed::NodeId _right_click_nodeid;
+    ed::PinId _right_click_pinid;
+    ed::LinkId _right_click_linkid;
+    bool _show_graph_setting = false;
+    Json::Value _graph_pin_info;
 };
 
 } // namespace sfe

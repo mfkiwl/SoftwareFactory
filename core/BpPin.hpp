@@ -89,6 +89,9 @@ public:
 
     int           ID;
 
+	/* 仅用于graph的输入输出节点 */
+	int GetGraphPinID() { return _graph_pin_id; }
+	void SetGraphPinID(int id) { _graph_pin_id = id; }
 private:
 	bool          _executable;
 	bool          _linked;
@@ -98,8 +101,8 @@ private:
 	std::string           _name;
     BpPinType             _type;
     BpPinKind             _kind;
-	std::weak_ptr<BpNode>  _node;
-
+	std::weak_ptr<BpNode> _node;
+	int                   _graph_pin_id;
 	BpVariable            _v;
 };
 

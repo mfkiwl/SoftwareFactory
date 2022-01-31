@@ -58,8 +58,13 @@ void SFEPanelBp::Update() {
         // create/delete
         NodeLinkCreate(graph);
         NodeLinkDelete(graph);
+
+        ShowNodeInfo();
     }
 	ed::End();
+    
+    // graph input/output setting
+    ShowPinSetting();
 
     // node attr
     if (_is_doubleclick_node) {
@@ -223,6 +228,32 @@ void SFEPanelBp::ShowVarNodeAttr() {
     }
 }
 
+void SFEPanelBp::ShowPinSetting() {
+	if (_show_graph_setting) {
+        _show_graph_setting = false;
+		ImGui::OpenPopup("Graph pin setting");
+    }
+
+	if (ImGui::BeginPopupModal("Graph pin setting", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+        static char buf[64] = "";
+        if (_graph_pin_info["command"] == "add_graph_pin") {
+            ImGui::InputText("variable type", buf, 64, ImGuiInputTextFlags_CharsNoBlank);
+        }
+        if (ImGui::Button("OK", ImVec2(120, 0))) { 
+            _graph_pin_info["var_type"] = buf;
+            SendMessage({PanelName(), "editor", "", _graph_pin_info});
+            ImGui::CloseCurrentPopup();
+            memset(buf, 0, sizeof(buf));
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::EndPopup();
+    }
+}
+
 void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<bp::BpNode>& node) {
 	if (node->GetNodeStyle() != bp::BpNodeStyle::BP_BLUPRINT
 		&& node->GetNodeStyle() != bp::BpNodeStyle::BP_SIMPLE)
@@ -258,11 +289,17 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
 	}
     if (node->GetNodeType() == bp::BpNodeType::BP_GRAPH_OUTPUT) {
         if (ImGui::Button(" + ")) {
-            // TODO
+            _show_graph_setting = true;
+            _graph_pin_info.clear();
+            _graph_pin_info["command"] = "add_graph_pin";
+            _graph_pin_info["node_type"] = (int)bp::BpNodeType::BP_GRAPH_OUTPUT;
         } 
         // ImGui::SameLine();
         if (ImGui::Button(" - ")) {
-            // TODO
+            _show_graph_setting = true;
+            _graph_pin_info.clear();
+            _graph_pin_info["command"] = "del_graph_pin";
+            _graph_pin_info["node_id"] = node->GetID();
         }
     }
 
@@ -292,15 +329,87 @@ void SFEPanelBp::ShowNode(util::BlueprintNodeBuilder& builder, std::shared_ptr<b
     // add pin icon
     if (node->GetNodeType() == bp::BpNodeType::BP_GRAPH_INPUT) {
         if (ImGui::Button(" + ")) {
-            // TODO
+            _show_graph_setting = true;
+            _graph_pin_info.clear();
+            _graph_pin_info["command"] = "add_graph_pin";
+            _graph_pin_info["node_type"] = (int)bp::BpNodeType::BP_GRAPH_INPUT;
         }
         ImGui::SameLine();
         if (ImGui::Button(" - ")) {
-            // TODO
+            _show_graph_setting = true;
+            _graph_pin_info.clear();
+            _graph_pin_info["command"] = "del_graph_pin";
+            _graph_pin_info["node_id"] = node->GetID();
         }
     }
 
 	builder.End();
+}
+
+void SFEPanelBp::ShowNodeInfo()
+{
+	auto openPopupPosition = ImGui::GetMousePos();
+	ed::Suspend();
+	if (ed::ShowNodeContextMenu(&_right_click_nodeid)) {
+		ImGui::OpenPopup("Node Context Menu");
+    } else if (ed::ShowPinContextMenu(&_right_click_pinid)) {
+		ImGui::OpenPopup("Pin Context Menu");
+    } else if (ed::ShowLinkContextMenu(&_right_click_linkid)) {
+		ImGui::OpenPopup("Link Context Menu");
+    }
+	ed::Resume();
+
+	ed::Suspend();
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
+    auto g = bp::Bp::Instance().CurEditGraph();
+	// 显示节点信息
+	if (ImGui::BeginPopup("Node Context Menu")) {
+		auto node = g->GetNode((int)_right_click_nodeid.Get());
+		ImGui::TextUnformatted("Node Context Menu");
+		ImGui::Separator();
+		if (node) {
+			ImGui::Text("ID: %d", node->GetID());
+			ImGui::Text("Type: %s", node->GetNodeStyle() == bp::BpNodeStyle::BP_BLUPRINT ? "Blueprint" : "Simple");
+			ImGui::Text("Inputs: %d", (int)node->GetPins(bp::BpPinKind::BP_INPUT).size());
+			ImGui::Text("Outputs: %d", (int)node->GetPins(bp::BpPinKind::BP_OUTPUT).size());
+		} else {
+			ImGui::Text("Unknown node: %p", _right_click_nodeid.AsPointer());
+        }
+		ImGui::EndPopup();
+	}
+	// 显示针脚信息
+	if (ImGui::BeginPopup("Pin Context Menu")) {
+		auto pin = g->SearchPin((int)_right_click_pinid.Get());
+		ImGui::TextUnformatted("Pin Context Menu");
+		ImGui::Separator();
+		if (pin) {
+			ImGui::Text("ID: %d", pin->ID);
+			if (pin->GetObj()) {
+				ImGui::Text("Node: %d", pin->GetObj()->GetID());
+            } else {
+				ImGui::Text("Node: %s", "<none>");
+            }
+		} else {
+			ImGui::Text("Unknown pin: %p", _right_click_pinid.AsPointer());
+        }
+		ImGui::EndPopup();
+	}
+	// 显示连线信息
+	if (ImGui::BeginPopup("Link Context Menu")) {
+		auto link = g->GetLink((int)_right_click_linkid.Get());
+		ImGui::TextUnformatted("Link Context Menu");
+		ImGui::Separator();
+		if (link.ID != 0) {
+			ImGui::Text("ID: %d", link.ID);
+			ImGui::Text("From: %d", link.StartPinID);
+			ImGui::Text("To: %d", link.EndPinID);
+		} else {
+			ImGui::Text("Unknown link: %p", _right_click_linkid.AsPointer());
+        }
+		ImGui::EndPopup();
+	}
+	ImGui::PopStyleVar();
+	ed::Resume();
 }
 
 void SFEPanelBp::SetNodesPos(const std::string& desc) {
@@ -437,6 +546,7 @@ void SFEPanelBp::OnMessage(const SFEMessage& msg) {
         }
     }
     if (msg.msg.empty()) {
+        auto jmsg = msg.json_msg;
         auto cmd = msg.json_msg["command"].asString();
         if (cmd == "set_node_pos") {
             auto mouse_pos = ImVec2(msg.json_msg["x"].asInt(), msg.json_msg["y"].asInt());
@@ -474,6 +584,9 @@ void SFEPanelBp::OnMessage(const SFEMessage& msg) {
             msg2["path"] = msg.json_msg["path"].asString();
             msg2["nodes_pos"] = bp::BpCommon::Json2Str(root);;
             SendMessage({PanelName(), "editor", "", msg2});
+        } else if (cmd == "move_node_to_center") {
+            ed::SelectNode(jmsg["id"].asInt());
+            ed::NavigateToSelection();
         }
     }
 }

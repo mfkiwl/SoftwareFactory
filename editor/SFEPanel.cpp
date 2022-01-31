@@ -21,7 +21,7 @@ void SFEPanel::UILog(const std::string& msg, UILogLv lv) {
     }
     ss << str_lv << " ";
     ss << bp::BpCommon::GetCurTime() << "] ";
-    ss << msg;
+    ss << msg << "\n";
     SendMessage({PanelName(), "log", ss.str(), Json::Value()});
 }
 

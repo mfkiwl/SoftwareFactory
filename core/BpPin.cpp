@@ -36,6 +36,7 @@ BpPin& BpPin::operator=(const BpPin& o) {
 	_kind = o._kind;
 	_node = o._node.lock();
 	_v = o._v;
+	_graph_pin_id = o._graph_pin_id;
 	return *this;
 }
 

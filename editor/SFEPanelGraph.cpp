@@ -90,6 +90,10 @@ void SFEPanelGraph::ShowNodes() {
         if (ImGui::Selectable(title.c_str())) {
             // 显示详情
             LOG(INFO) << "select node " << title;
+            Json::Value v;
+            v["command"] = "move_node_to_center";
+            v["id"] = node->GetID();
+            SendMessage({PanelName(), "bp editor", "", v});
         }
     }
     auto& ev_nodes = bp::Bp::Instance().CurEditGraph()->GetEvNodes();

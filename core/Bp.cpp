@@ -361,6 +361,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 	}else if (t == BpNodeType::BP_GRAPH_OUTPUT) {
 		auto output = std::make_shared<BpNode>("output", nullptr);
 		output->SetNodeType(BpNodeType::BP_GRAPH_OUTPUT);
+		output->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
 		return output;
 	}
 	return nullptr;

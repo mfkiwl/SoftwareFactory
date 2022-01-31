@@ -264,6 +264,13 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             auto end_pin = g->SearchPin(jmsg["end_pin_id"].asInt());
             g->AddLink(*start_pin, *end_pin);
             g->GetLinks().back().SetColor(jmsg["color"][0].asFloat(), jmsg["color"][1].asFloat(), jmsg["color"][2].asFloat(), jmsg["color"][3].asFloat());
+        } else if (cmd == "add_graph_pin") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            auto var = bp::Bp::Instance().CreateVariable(jmsg["var_type"].asString(), "");
+            g->AddModGraphPin(var.GetType(), (bp::BpNodeType)jmsg["node_type"].asInt(), var);
+        } else if (cmd == "del_graph_pin") {
+            auto g = bp::Bp::Instance().CurEditGraph();
+            g->DelModGraphPin(jmsg["node_id"].asInt());
         }
     }
 }

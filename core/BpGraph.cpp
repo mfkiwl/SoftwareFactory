@@ -35,6 +35,48 @@ void BpGraph::SetNextID(int id) {
 	_next_id = id - 1;
 }
 
+bool BpGraph::AddModGraphPin(const std::string& name, BpNodeType nt, const BpVariable& v) {
+	if (nt == BpNodeType::BP_GRAPH_INPUT && !_input_node.expired()) {
+		auto in_node = _input_node.lock();
+		auto graph_node_pin_id = AddPin(name, BpPinKind::BP_INPUT, BpPinType::BP_VALUE, v).ID;
+		in_node->AddPin(name, BpPinKind::BP_OUTPUT, BpPinType::BP_VALUE, v).SetGraphPinID(graph_node_pin_id);
+	} else if (nt == BpNodeType::BP_GRAPH_OUTPUT && !_output_node.expired()) {
+		auto out_node = _output_node.lock();
+		auto graph_node_pin_id = AddPin(name, BpPinKind::BP_OUTPUT, BpPinType::BP_VALUE, v).ID;
+		out_node->AddPin(name, BpPinKind::BP_INPUT, BpPinType::BP_VALUE, v).SetGraphPinID(graph_node_pin_id);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+bool BpGraph::DelModGraphPin(int id) {
+	auto node = GetNode(id);
+	// FIXME: 删除pin时，如果有连线那么连线状态未重置
+	if (node->GetNodeType() == BpNodeType::BP_GRAPH_INPUT) {
+		auto sz = node->GetPins(BpPinKind::BP_OUTPUT).size();
+		if (sz > 1) {
+			auto pin = node->GetPins(BpPinKind::BP_OUTPUT)[sz - 1];
+			auto graph_pin_id = pin.GetGraphPinID();
+			auto pin_id = pin.ID;
+			node->DelPin(pin_id);
+			DelPin(graph_pin_id);
+		}
+	} else if (node->GetNodeType() == BpNodeType::BP_GRAPH_OUTPUT) {
+		auto sz = node->GetPins(BpPinKind::BP_INPUT).size();
+		if (sz > 1) {
+			auto pin = node->GetPins(BpPinKind::BP_INPUT)[sz - 1];
+			auto graph_pin_id = pin.GetGraphPinID();
+			auto pin_id = pin.ID;
+			node->DelPin(pin_id);
+			DelPin(graph_pin_id);
+		}
+	} else {
+		return false;
+	}
+	return true;
+}
+
 BpVariable& BpGraph::GetVariable(const std::string& name) {
 	if (_vars.find(name) == _vars.end()) {
 		LOG(ERROR) << "can't find var " << name;
@@ -129,6 +171,15 @@ std::vector<BpLink> BpGraph::SearchLinks(int id) {
 		}
 	}
 	return ret;
+}
+
+BpLink BpGraph::GetLink(int id) {
+	for (int i = 0; i < _links.size(); ++i) {
+		if (_links[i].ID == id) {
+			return _links[i];
+		}
+	}
+	return BpLink(0, 0, 0);
 }
 
 BpPin* BpGraph::SearchPin(int id) {

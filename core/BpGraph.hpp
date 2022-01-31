@@ -27,6 +27,9 @@ public:
 		}
 	}
 
+	bool AddModGraphPin(const std::string& name, BpNodeType nt, const BpVariable& v);
+	bool DelModGraphPin(int id);
+
 	event_node_map_t& GetEvNodes() { return _event_nodes; }
 	bool AddEventNode(std::shared_ptr<BpNode>);
 	void DelEventNode(std::string name);
@@ -41,6 +44,7 @@ public:
 	std::vector<BpLink>& GetLinks() { return _links; }
 	int AddLink(BpPin& start_pin, BpPin& end_pin);
 	void DelLink(int id);
+	BpLink GetLink(int id);
 	
 	BpPin* SearchPin(int id);
 
