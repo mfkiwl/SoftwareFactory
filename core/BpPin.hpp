@@ -47,6 +47,7 @@ public:
 		return ID == o.ID;
 	}
 
+	BpVariable& GetBpValue() { return _v; }
 	const pb_msg_ptr_t GetValue() { return _v.Get<pb_msg_t>(); }
 	void SetValue(const std::string& v, bool b = false/* 不要设置该值 */) {
 		_vaild = b;

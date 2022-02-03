@@ -185,6 +185,42 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 		} else {
 			g->AddNode(node);
 		}
+		// 添加自定义的pins
+		auto pins_desc = (json_node.isMember("pins") ? json_node["pins"] : Json::Value::null);
+		if (pins_desc.isNull()) {
+			continue;
+		}
+		if (t == BpNodeType::BP_GRAPH) {
+			// 图 设置ID并添加pin(其中需要引用input node和output node pin的变量)
+			auto graph_node = std::dynamic_pointer_cast<BpGraph>(node);
+			auto in_node = graph_node->_input_node.lock();
+			auto out_node = graph_node->_output_node.lock();
+
+			for (int i = 0; i < pins_desc.size(); ++i) {
+				auto pin_id = pins_desc[i]["id"].asInt();
+				auto idx = pins_desc[i]["idx"].asInt();
+				auto pin_kind = (BpPinKind)pins_desc[i]["pin_kind"].asInt();
+				if (pin_kind == BpPinKind::BP_INPUT) {
+					graph_node->GetPins(BpPinKind::BP_INPUT)[idx].ID = pin_id;
+					in_node->GetPins(BpPinKind::BP_OUTPUT)[idx].SetGraphPinID(pin_id);
+				} else {
+					graph_node->GetPins(BpPinKind::BP_OUTPUT)[idx].ID = pin_id;
+					out_node->GetPins(BpPinKind::BP_INPUT)[idx].SetGraphPinID(pin_id);
+				}
+			}
+		} else if (t == BpNodeType::BP_GRAPH_INPUT || t == BpNodeType::BP_GRAPH_OUTPUT) {
+			// input/output节点，设置ID，并添加pin
+			for (int i = 0; i < pins_desc.size(); ++i) {
+				auto pb_msg = _base_mods->CreateVal(pins_desc[i]["var_type"].asString());
+				g->SetNextID(pins_desc[i]["id"].asInt());
+				g->AddModGraphPin(pins_desc[i]["var_name"].asString(), t, 
+						BpVariable(
+							pins_desc[i]["var_name"].asString(),
+							pins_desc[i]["var_type"].asString(),
+							pb_msg
+						));
+			}
+		}
 	}
 	g->SetNodesPos(desc);
 	// 解析link并创建link
@@ -252,6 +288,61 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 		if (nor->GetNodeType() == BpNodeType::BP_NODE_VAR) {
 			auto var_node = std::dynamic_pointer_cast<BpNodeVar>(nor);
 			json_nornode["get"] = var_node->IsGet();
+		} else if (nor->GetNodeType() == BpNodeType::BP_GRAPH) {
+			// input pin
+			auto& in_pins = nor->GetPins(BpPinKind::BP_INPUT);
+			for(int i = 1; i < in_pins.size(); ++i) {
+				Json::Value v;
+				v["id"] = in_pins[i].ID;
+				v["idx"] = i;
+				v["pin_kind"] = (int)BpPinKind::BP_INPUT;
+				json_nornode["pins"].append(v);
+			}
+			// output pin
+			auto& out_pins = nor->GetPins(BpPinKind::BP_OUTPUT);
+			for(int i = 1; i < out_pins.size(); ++i) {
+				Json::Value v;
+				v["id"] = out_pins[i].ID;
+				v["idx"] = i;
+				v["pin_kind"] = (int)BpPinKind::BP_OUTPUT;
+				json_nornode["pins"].append(v);
+			}
+		} else if (nor->GetNodeType() == BpNodeType::BP_GRAPH_INPUT) {
+			/*
+			pins: [
+				{
+					id: pin_id,
+					pin_kind: BP_OUTPUT,
+					pin_type: BP_VALUE,
+					var_type: bpbase.BpInt,
+					var_name: x
+				},
+				...
+			]
+			*/
+			// output pin
+			auto& out_pins = nor->GetPins(BpPinKind::BP_OUTPUT);
+			for(int i = 1; i < out_pins.size(); ++i) {
+				Json::Value v;
+				v["id"] = out_pins[i].ID;
+				v["pin_kind"] = (int)out_pins[i].GetPinType();
+				v["pin_type"] = (int)out_pins[i].GetPinKind();
+				v["var_type"] = out_pins[i].GetVarType();
+				v["var_name"] = out_pins[i].GetName();
+				json_nornode["pins"].append(v);
+			}
+		} else if (nor->GetNodeType() == BpNodeType::BP_GRAPH_OUTPUT) {
+			// input pin
+			auto& in_pins = nor->GetPins(BpPinKind::BP_INPUT);
+			for(int i = 1; i < in_pins.size(); ++i) {
+				Json::Value v;
+				v["id"] = in_pins[i].ID;
+				v["pin_kind"] = (int)in_pins[i].GetPinType();
+				v["pin_type"] = (int)in_pins[i].GetPinKind();
+				v["var_type"] = in_pins[i].GetVarType();
+				v["var_name"] = in_pins[i].GetName();
+				json_nornode["pins"].append(v);
+			}
 		}
 		json_graph["nodes"][std::to_string(nor->GetID())] = json_nornode;
 	}
@@ -347,7 +438,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 			}
 		} else {
 			graph->AddNode(SpawnNode("input", BpNodeType::BP_GRAPH_INPUT));
-			graph->AddNode(SpawnNode("input", BpNodeType::BP_GRAPH_OUTPUT));
+			graph->AddNode(SpawnNode("output", BpNodeType::BP_GRAPH_OUTPUT));
 			LOG(WARNING) << "mod graph lib has no graph: " << node_name;
 		}
 		return graph;

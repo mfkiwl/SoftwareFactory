@@ -249,6 +249,11 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             v["command"] = "set_nodes_pos";
             v["desc"] = bp::BpCommon::Json2Str(g->GetNodesPos());
             SendMessage({_name, "bp editor", "", v});
+
+            v.clear();
+            v["command"] = "set_cur_graph";
+            v["graph_name"] = jmsg["name"].asString();
+            SendMessage({_name, "graph", "", v});
         } else if (cmd == "del_node") {
             auto g = bp::Bp::Instance().CurEditGraph();
             g->DelNode(jmsg["id"].asInt());
