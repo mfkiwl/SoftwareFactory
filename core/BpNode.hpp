@@ -37,6 +37,8 @@ public:
 	BpNode(const std::string& name, std::shared_ptr<BpGraph> parent = nullptr);
 	virtual ~BpNode();
 
+	virtual void Init() {};
+
     virtual void Run();
     virtual void Logic() {};
 	

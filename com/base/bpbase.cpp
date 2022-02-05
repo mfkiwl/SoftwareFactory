@@ -3,6 +3,7 @@
 #include "bpbase.hpp"
 
 static std::unordered_map<std::string, std::function<std::shared_ptr<::google::protobuf::Message>()>> g_msg_map = {
+    {"bpbase.BpBool", [](){ return std::make_shared<bp_pb::BpBool>(); }},
     {"bpbase.BpInt", [](){ return std::make_shared<bp_pb::BpInt>(); }},
     {"bpbase.BpFloat", [](){ return std::make_shared<bp_pb::BpFloat>(); }},
     {"bpbase.BpString", [](){ return std::make_shared<bp_pb::BpString>(); }},

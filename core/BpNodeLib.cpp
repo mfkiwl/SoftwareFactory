@@ -2,6 +2,8 @@
 #include "BpNodeVar.hpp"
 #include "BpNodeFunc.hpp"
 #include "BpNodeEvTick.hpp"
+#include "basenode/BpNodeBaseDelay.hpp"
+#include "basenode/BpNodeBaseBranch.hpp"
 
 namespace bp {
 BpNodeLib::BpNodeLib() 
@@ -12,7 +14,18 @@ BpNodeLib::BpNodeLib()
             return node; }
         }
     },
-    _base_nodes {}
+    _base_nodes {
+        {"Delay", [](){
+            auto node = std::make_shared<BpNodeBaseDelay>(nullptr, 0.0f); 
+            node->Init();
+            return node;
+        }},
+        {"Branch", [](){
+            auto node = std::make_shared<BpNodeBaseBranch>(nullptr);
+            node->Init();
+            return node;
+        }}
+    }
 {
     _root_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
     // 创建事件目录
@@ -20,13 +33,13 @@ BpNodeLib::BpNodeLib()
     _ev_contents->AddChild(std::make_shared<BpContents>(nullptr, "Tick", BpContents::Type::LEAF, BpContents::LeafType::EV));
     _root_contents->AddChild(_ev_contents);
     // 创建基础节点目录
-    // _base_contents = std::make_shared<BpContents>(nullptr, "base", BpContents::Type::CONTENTS);
-    // _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Print", BpContents::Type::LEAF, BpContents::LeafType::BASE));
-    // _root_contents->AddChild(_base_contents);
+    _base_contents = std::make_shared<BpContents>(nullptr, "base", BpContents::Type::CONTENTS);
+    _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Delay", BpContents::Type::LEAF, BpContents::LeafType::BASE));
+    _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Branch", BpContents::Type::LEAF, BpContents::LeafType::BASE));
+    _root_contents->AddChild(_base_contents);
 }
 
 BpNodeLib::~BpNodeLib() {
-
 }
 
 std::shared_ptr<BpNode> BpNodeLib::CreateFuncNode(BpModuleFunc func_info, 

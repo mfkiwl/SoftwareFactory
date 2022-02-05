@@ -1,6 +1,10 @@
 syntax = "proto3";
 package bp_pb;
 
+message BpBool {
+    bool var = 1;
+}
+
 message BpInt {
     int32 var = 1;
 }

@@ -396,6 +396,16 @@ std::string BpCommon::GetCurTime() {
     return std::string(str_time);
 }
 
+double BpCommon::GetTimestamp() {
+    auto now = std::chrono::high_resolution_clock::now();
+    auto nano_time_point =
+        std::chrono::time_point_cast<std::chrono::nanoseconds>(now);
+    auto epoch = nano_time_point.time_since_epoch();
+    uint64_t now_nano =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(epoch).count();
+    return static_cast<double>(now_nano) / 1000000000UL;
+}
+
 std::vector<std::string> BpCommon::GetDirFiles(const std::string& conf_path) {
     std::vector<std::string> res;
     DIR* dir = opendir(conf_path.c_str());

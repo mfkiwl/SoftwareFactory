@@ -42,6 +42,7 @@ namespace bp {
     class BpCommon {
     public:
         static std::string GetModName(const std::string& full_path);
+        static double GetTimestamp();
         static std::string GetCurTime();
         static std::vector<std::string> GetDirFiles(const std::string& conf_path);
         static std::string Json2Str(const Json::Value& v);
