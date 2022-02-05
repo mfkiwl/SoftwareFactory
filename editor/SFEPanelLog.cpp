@@ -4,7 +4,6 @@
 namespace sfe {
 
 bool SFEPanelLog::Init() {
-    SetPanelName("log");
     AutoScroll = true;
     Clear();
     return true;

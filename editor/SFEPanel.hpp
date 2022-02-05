@@ -55,6 +55,26 @@ public:
 
     virtual void Exit() = 0;
 
+    static bool RegPanel(const std::string& panel_name, std::shared_ptr<SFEPanel> p) {
+        p->SetPanelName(panel_name);
+        if (_s_panels.find(p->PanelName()) == _s_panels.end()) {
+            _s_panels[p->PanelName()] = p;
+            return true;
+        }
+        return false;
+    }
+
+    static std::shared_ptr<SFEPanel> GetPanel(const std::string& panel_name) {
+        if (_s_panels.find(panel_name) == _s_panels.end()) {
+            return nullptr;
+        }
+        return _s_panels[panel_name];
+    }
+
+    static const std::unordered_map<std::string, std::shared_ptr<SFEPanel>>& GetPanels() {
+        return _s_panels;
+    }
+
     /* Call by SFEditor */
     void ProcMessage();
     void RecvMessage(const SFEMessage& msg) {
@@ -63,15 +83,7 @@ public:
     const std::vector<SFEMessage>& GetDispatchMessage() { return _send_que; }
     void ClearDispathMessage() { _send_que.clear(); }
     /* Call by child */
-    void SendMessage(const SFEMessage& msg) {
-        if (msg.src == "uinodes") {
-            LOG_EVERY_N(INFO, 30) << "per 30 msg: " << msg.Print();
-        } else {
-            LOG(INFO) << msg.Print();
-        }
-        _send_que.emplace_back(msg);
-        OnPostSendMessage(msg);
-    }
+    void SendMessage(const SFEMessage& msg);
 protected:
     /* Call by this */
     virtual void OnMessage(const SFEMessage& msg) {}
@@ -82,6 +94,8 @@ private:
     std::string _name;
     std::vector<SFEMessage> _send_que;
     std::vector<SFEMessage> _recv_que;
+
+    static std::unordered_map<std::string, std::shared_ptr<SFEPanel>> _s_panels;
 };
 
 } // namespace sfe

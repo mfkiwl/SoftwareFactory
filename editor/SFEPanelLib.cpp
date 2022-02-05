@@ -5,7 +5,6 @@
 namespace sfe {
 
 bool SFEPanelLib::Init() {
-    SetPanelName("lib");
     return true;
 }
 

@@ -77,10 +77,11 @@ TEST(bpcore, BpModule) {
     bp::BpModuleLinux bml;
     EXPECT_FALSE(bml.LoadModule(""));
     EXPECT_TRUE(bml.LoadModule(cur_path + "/../conf/bpmath.json"));
+    EXPECT_TRUE(bml.LoadModule(cur_path + "/../conf/bpbase.json"));
     LOG(INFO) << "bpmath.json contents:";
     LOG(INFO) << "\n" << bml.GetContents()->PrintContents();
 
-    auto pbmsg = bml.CreateModuleVal("bpmath.BpIntPair");
+    auto pbmsg = bml.CreateModuleVal("bpbase.BpIntPair");
     EXPECT_TRUE(nullptr != pbmsg);
     auto pbintpair = std::static_pointer_cast<::bp_pb::BpIntPair>(pbmsg);
     pbintpair->set_a(100);
@@ -107,7 +108,7 @@ TEST(bpcore, BpModLib) {
     auto cur_path = std::filesystem::current_path().string();
     bp::BpModLibLinux bll;
     EXPECT_TRUE(bll.Init(cur_path + "/../conf/"));
-    EXPECT_TRUE(nullptr != bll.CreateVal("bpmath.BpIntPair"));
+    EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.BpIntPair"));
     auto func = bll.GetFunc("bpmath.add_int");
     EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
 }

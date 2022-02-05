@@ -3,7 +3,6 @@
 namespace sfe {
 
 bool SFEPanelDragTip::Init() {
-    SetPanelName("drag tip");
     return true;
 }
 

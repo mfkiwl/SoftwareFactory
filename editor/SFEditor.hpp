@@ -36,7 +36,6 @@ private:
     const std::shared_ptr<SFEPanel> GetPanel(const std::string& name);
     void ProcEditorMessage(const SFEMessage& msg);
 
-    std::vector<std::shared_ptr<SFEPanel>> _panels;
     std::vector<SFEMessage> _send_que;
     bool _show_demo = false;
 };

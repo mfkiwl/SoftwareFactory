@@ -5,7 +5,6 @@
 namespace sfe {
 
 bool SFEPanelMainMenu::Init() {
-    SetPanelName("mainmenu");
     return true;
 }
 

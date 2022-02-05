@@ -11,7 +11,6 @@ extern "C" {
 namespace sfe {
 
 bool SFEPanelBp::Init() {
-    SetPanelName("bp editor");
     LoadTexture("../assets/BlueprintBackground.png");
 
     ed::Config config;

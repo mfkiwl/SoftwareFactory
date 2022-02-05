@@ -5,7 +5,6 @@
 namespace sfe {
 
 bool SFEPanelGraph::Init() {
-    SetPanelName("graph");
     return true;
 }
 

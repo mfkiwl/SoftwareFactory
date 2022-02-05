@@ -6,7 +6,6 @@
 namespace sfe {
 
 bool SFEPanelPlot::Init() {
-    SetPanelName("plot");
     return true;
 }
 

@@ -17,24 +17,28 @@ bool SFEditor::Init() {
     bp::InitLogging("SoftwareFactory");
     auto log_panel = std::make_shared<SFEPanelLog>();
     bp::RegisterWriteCallback(std::bind(&SFEPanelLog::AddLogCB, log_panel.get(), std::placeholders::_1));
-    _panels.emplace_back(log_panel);
-    _panels.emplace_back(std::make_shared<SFEPanelUINodes>());
-    _panels.emplace_back(std::make_shared<SFEPanelMainMenu>());
-    _panels.emplace_back(std::make_shared<SFEPanelBp>());
-    _panels.emplace_back(std::make_shared<SFEPanelLib>());
-    _panels.emplace_back(std::make_shared<SFEPanelDragTip>());
-    _panels.emplace_back(std::make_shared<SFEPanelGraph>());
-    _panels.emplace_back(std::make_shared<SFEPanelPlot>());
 
-    for (auto it = _panels.begin(); it != _panels.end(); ++it) {
-        (*it)->Init();
+    SFEPanel::RegPanel("log", log_panel);
+    SFEPanel::RegPanel("uinodes", std::make_shared<SFEPanelUINodes>());
+    SFEPanel::RegPanel("mainmenu", std::make_shared<SFEPanelMainMenu>());
+    SFEPanel::RegPanel("bp editor", std::make_shared<SFEPanelBp>());
+    SFEPanel::RegPanel("lib", std::make_shared<SFEPanelLib>());
+    SFEPanel::RegPanel("drag tip", std::make_shared<SFEPanelDragTip>());
+    SFEPanel::RegPanel("graph", std::make_shared<SFEPanelGraph>());
+    SFEPanel::RegPanel("plot", std::make_shared<SFEPanelPlot>());
+
+    const auto& panels = SFEPanel::GetPanels();
+    LOG(INFO) << "Reg panel, " << panels.size();
+    for (auto it = panels.begin(); it != panels.end(); ++it) {
+        (it->second)->Init();
     }
     return true;
 }
 
 void SFEditor::ProcEvent(const SDL_Event event) {
-    for (auto it = _panels.begin(); it != _panels.end(); ++it) {
-        (*it)->ProcEvent(event);
+    const auto& panels = SFEPanel::GetPanels();
+    for (auto it = panels.begin(); it != panels.end(); ++it) {
+        (it->second)->ProcEvent(event);
     }
 }
 
@@ -44,23 +48,24 @@ void SFEditor::Update() {
     if (_show_demo) {
         ImGui::ShowDemoWindow(&_show_demo);
     }
-
-    for (auto it = _panels.begin(); it != _panels.end(); ++it) {
-        (*it)->Update();
+    const auto& panels = SFEPanel::GetPanels();
+    for (auto it = panels.begin(); it != panels.end(); ++it) {
+        (it->second)->Update();
     }
 }
 
 void SFEditor::DispatchMessage() {
+    const auto& panels = SFEPanel::GetPanels();
     // dispatch this message
     for (int j = 0; j < _send_que.size(); ++j) {
         // boardcast
         if (_send_que[j].dst == "all") {
             ProcEditorMessage(_send_que[j]);
-            for (int k = 0; k < _panels.size(); ++k) {
-                if (_panels[k]->PanelName() == _send_que[j].src) {
+            for (auto it = panels.begin(); it != panels.end(); ++it) {
+                if (it->second->PanelName() == _send_que[j].src) {
                     continue;
                 }
-                _panels[k]->RecvMessage(_send_que[j]);
+                it->second->RecvMessage(_send_que[j]);
             }
             continue;
         }
@@ -73,8 +78,8 @@ void SFEditor::DispatchMessage() {
     }
     _send_que.clear();
     // dispatch panel message
-    for (auto it = _panels.begin(); it != _panels.end(); ++it) {
-        auto msgs = (*it)->GetDispatchMessage();
+    for (auto it = panels.begin(); it != panels.end(); ++it) {
+        auto msgs = (it->second)->GetDispatchMessage();
         for (int j = 0; j < msgs.size(); ++j) {
             if (msgs[j].dst == "editor") {
                 ProcEditorMessage(msgs[j]);
@@ -83,11 +88,11 @@ void SFEditor::DispatchMessage() {
             // boardcast
             if (msgs[j].dst == "all") {
                 ProcEditorMessage(msgs[j]);
-                for (int k = 0; k < _panels.size(); ++k) {
-                    if (_panels[k]->PanelName() == msgs[j].src) {
+                for (auto it = panels.begin(); it != panels.end(); ++it) {
+                    if (it->second->PanelName() == msgs[j].src) {
                         continue;
                     }
-                    _panels[k]->RecvMessage(msgs[j]);
+                    it->second->RecvMessage(msgs[j]);
                 }
                 continue;
             }
@@ -98,29 +103,26 @@ void SFEditor::DispatchMessage() {
             }
             panel->RecvMessage(msgs[j]);
         }
-        (*it)->ClearDispathMessage();
+        (it->second)->ClearDispathMessage();
     }
 }
 
 void SFEditor::ProcMessage() {
-    for (auto it = _panels.begin(); it != _panels.end(); ++it) {
-        (*it)->ProcMessage();
+    const auto& panels = SFEPanel::GetPanels();
+    for (auto it = panels.begin(); it != panels.end(); ++it) {
+        (it->second)->ProcMessage();
     }
 }
 
 void SFEditor::Exit() {
-    for (auto it = _panels.begin(); it != _panels.end(); ++it) {
-        (*it)->Exit();
+    const auto& panels = SFEPanel::GetPanels();
+    for (auto it = panels.begin(); it != panels.end(); ++it) {
+        (it->second)->Exit();
     }
 }
 
 const std::shared_ptr<SFEPanel> SFEditor::GetPanel(const std::string& name) {
-    for (auto it = _panels.begin(); it != _panels.end(); ++it) {
-        if ((*it)->PanelName() == name) {
-            return (*it);
-        }
-    }
-    return nullptr;
+    return SFEPanel::GetPanel(name);
 }
 
 void SFEditor::ProcEditorMessage(const SFEMessage& msg) {

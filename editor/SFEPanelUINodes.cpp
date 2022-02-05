@@ -6,7 +6,6 @@
 namespace sfe {
 
 bool SFEPanelUINodes::Init() {
-    SetPanelName("uinodes");
     // 创建UINode目录
     _uinode_contents = std::make_shared<BpContents>(nullptr, "ui", ::BpContents::Type::CONTENTS);
     _uinode_contents->AddChild(std::make_shared<BpContents>(nullptr, "Print", ::BpContents::Type::LEAF, ::BpContents::LeafType::USER));
