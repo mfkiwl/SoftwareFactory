@@ -13,6 +13,7 @@ public:
 
     virtual void OnMessage(const SFEMessage& msg) override;
 
+    void AddLogCB(const std::string& msg);
 private:
     void Clear();
     void AddLog(const char* fmt, ...) IM_FMTARGS(2);

@@ -1,4 +1,5 @@
 #include "SFEPanelLog.hpp"
+#include "bplog/bplog.hpp"
 
 namespace sfe {
 
@@ -24,6 +25,10 @@ void SFEPanelLog::AddLog(const char* fmt, ...) {
     for (int new_size = Buf.size(); old_size < new_size; old_size++)
         if (Buf[old_size] == '\n')
             LineOffsets.push_back(old_size + 1);
+}
+
+void SFEPanelLog::AddLogCB(const std::string& msg) {
+    AddLog("%s", msg.c_str());
 }
 
 void SFEPanelLog::Update() {
@@ -95,7 +100,7 @@ void SFEPanelLog::Update() {
 }
 
 void SFEPanelLog::Exit() {
-
+    bp::UnRegisterWriteCallback();
 }
 
 void SFEPanelLog::OnMessage(const SFEMessage& msg) {

@@ -1,5 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+ADD_SUBDIRECTORY(bplog)
+
 ADD_LIBRARY(bpcommon SHARED
     bpcommon.cpp
 )

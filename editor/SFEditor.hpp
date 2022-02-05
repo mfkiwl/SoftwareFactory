@@ -33,19 +33,6 @@ private:
         }
         _send_que.emplace_back(msg);
     }
-    void UILog(const std::string& msg, UILogLv lv) {
-        std::stringstream ss;
-        static std::string str_lv = "INFO";
-        if (lv == UILogLv::ERROR) {
-            str_lv = "ERROR";
-        } else if (lv == UILogLv::WARNING) {
-            str_lv = "WARNING";
-        }
-        ss << str_lv << " ";
-        ss << bp::BpCommon::GetCurTime() << "] ";
-        ss << msg << "\n";
-        SendMessage({_name, "log", ss.str(), Json::Value::null});
-    }
     const std::shared_ptr<SFEPanel> GetPanel(const std::string& name);
     void ProcEditorMessage(const SFEMessage& msg);
 

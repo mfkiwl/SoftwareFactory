@@ -98,7 +98,7 @@ void SFEPanelMainMenu::CreateNewGraph() {
 
         if (ImGui::Button("OK", ImVec2(120, 0))) { 
             if (!bp::BpCommon::IsName(buf, strlen(buf))) {
-                UILog("graph name is not availdable", sfe::WARNING);
+                LOG(WARNING) << "graph name is not availdable";
             } else {
                 Json::Value v;
                 v["command"] = "create_new";

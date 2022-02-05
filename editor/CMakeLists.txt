@@ -19,6 +19,7 @@ find_package(imgui REQUIRED)
 include_directories(${imgui_INCLUDE_DIRS})
 include_directories(${CMAKE_SOURCE_DIR}/3rd/glew-cmake-2.2.0/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/common)
 set(editor_srcs
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_opengl3.cpp
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_sdl.cpp
@@ -48,6 +49,7 @@ target_link_libraries(SoftwareFactoryEditor
     imgui_canvas
     imgui_node_editor
     
+    bplog
     bp_pb
     bpcore
     bpcommon

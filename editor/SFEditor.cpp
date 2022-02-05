@@ -9,17 +9,21 @@
 #include "SFEPanelPlot.hpp"
 #include "bpcommon.hpp"
 #include "Bp.hpp"
+#include "bplog/bplog.hpp"
 
 namespace sfe {
 
 bool SFEditor::Init() {
+    bp::InitLogging("SoftwareFactory");
+    auto log_panel = std::make_shared<SFEPanelLog>();
+    bp::RegisterWriteCallback(std::bind(&SFEPanelLog::AddLogCB, log_panel.get(), std::placeholders::_1));
+    _panels.emplace_back(log_panel);
     _panels.emplace_back(std::make_shared<SFEPanelUINodes>());
     _panels.emplace_back(std::make_shared<SFEPanelMainMenu>());
     _panels.emplace_back(std::make_shared<SFEPanelBp>());
     _panels.emplace_back(std::make_shared<SFEPanelLib>());
     _panels.emplace_back(std::make_shared<SFEPanelDragTip>());
     _panels.emplace_back(std::make_shared<SFEPanelGraph>());
-    _panels.emplace_back(std::make_shared<SFEPanelLog>());
     _panels.emplace_back(std::make_shared<SFEPanelPlot>());
 
     for (auto it = _panels.begin(); it != _panels.end(); ++it) {
@@ -130,7 +134,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             auto graph_name = jmsg["graph_name"].asString();
             auto graph_type = jmsg["graph_type"].asString() == "mod graph" ? bp::BpNodeType::BP_GRAPH : bp::BpNodeType::BP_GRAPH_EXEC;
             if (bp::Bp::Instance().HasEditGraph(graph_name)) {
-                UILog(graph_name + " graph has exist", UILogLv::WARNING);
+                LOG(WARNING) << graph_name << " graph has exist";
                 return;
             }
             auto g = std::dynamic_pointer_cast<bp::BpGraph>(bp::Bp::Instance().SpawnNode(graph_name, graph_type));

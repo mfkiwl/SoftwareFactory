@@ -22,7 +22,7 @@ public:
             if (_inputs[i].GetPinType() == ::bp::BpPinType::BP_VALUE) {
                 if (_inputs[i].GetValue() != nullptr) {
                     Json::Value v;
-                    _panel.lock()->UILog(_inputs[i].GetValue()->DebugString());
+                    LOG(INFO) << _inputs[i].GetValue()->DebugString();
                 } else {
                     LOG(ERROR) << "value is nullptr";
                 }

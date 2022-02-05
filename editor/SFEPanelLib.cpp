@@ -104,7 +104,7 @@ void SFEPanelLib::ShowVarSetting() {
         ImGui::InputText("variable name", buf, 64, ImGuiInputTextFlags_CharsNoBlank);
         if (ImGui::Button("OK", ImVec2(120, 0))) { 
             if (!bp::BpCommon::IsName(buf, strlen(buf))) {
-                UILog("name is not availdable", sfe::WARNING);
+                LOG(WARNING) << "name is not availdable";
             } else {
                 Json::Value v2;
                 v2["command"] = "spawn_node";

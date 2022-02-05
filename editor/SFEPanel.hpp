@@ -12,12 +12,6 @@
 
 namespace sfe {
 
-enum UILogLv : int {
-    INFO,
-    WARNING,
-    ERROR,
-};
-
 struct SFEMessage {
     std::string src;
     std::string dst;
@@ -60,8 +54,6 @@ public:
     virtual void Update() = 0;
 
     virtual void Exit() = 0;
-
-    void UILog(const std::string& msg, UILogLv lv = UILogLv::INFO);
 
     /* Call by SFEditor */
     void ProcMessage();
