@@ -61,7 +61,7 @@ fun(std::vector<std::shared_ptr<::google::protobuf::Message>>);
             ],
             "_comment":"定义函数输出参数",
             "_output":[
-                "bpbase.BpInt"
+                "bpbase.Int"
             ]
         }
     },

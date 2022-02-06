@@ -3,15 +3,15 @@
 #include "bpbase.hpp"
 
 static std::unordered_map<std::string, std::function<std::shared_ptr<::google::protobuf::Message>()>> g_msg_map = {
-    {"bpbase.BpBool", [](){ return std::make_shared<bp_pb::BpBool>(); }},
-    {"bpbase.BpInt", [](){ return std::make_shared<bp_pb::BpInt>(); }},
-    {"bpbase.BpFloat", [](){ return std::make_shared<bp_pb::BpFloat>(); }},
-    {"bpbase.BpString", [](){ return std::make_shared<bp_pb::BpString>(); }},
-    {"bpbase.BpBytes", [](){ return std::make_shared<bp_pb::BpBytes>(); }},
-    {"bpbase.BpIntPair", [](){ return std::make_shared<bp_pb::BpIntPair>(); }},
-    {"bpbase.BpFloatPair", [](){ return std::make_shared<bp_pb::BpFloatPair>(); }},
-    {"bpbase.BpIntAry", [](){ return std::make_shared<bp_pb::BpIntAry>(); }},
-    {"bpbase.BpFloatAry", [](){ return std::make_shared<bp_pb::BpFloatAry>(); }},
+    {"bpbase.Bool", [](){ return std::make_shared<bp::Bool>(); }},
+    {"bpbase.Int", [](){ return std::make_shared<bp::Int>(); }},
+    {"bpbase.Float", [](){ return std::make_shared<bp::Float>(); }},
+    {"bpbase.String", [](){ return std::make_shared<bp::String>(); }},
+    {"bpbase.Bytes", [](){ return std::make_shared<bp::Bytes>(); }},
+    {"bpbase.IntPair", [](){ return std::make_shared<bp::IntPair>(); }},
+    {"bpbase.FloatPair", [](){ return std::make_shared<bp::FloatPair>(); }},
+    {"bpbase.IntAry", [](){ return std::make_shared<bp::IntAry>(); }},
+    {"bpbase.FloatAry", [](){ return std::make_shared<bp::FloatAry>(); }},
 };
 
 std::shared_ptr<::google::protobuf::Message> create_msg(const std::string& msg_name) {

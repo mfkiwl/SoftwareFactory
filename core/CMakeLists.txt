@@ -34,7 +34,7 @@ SET(BP_CORE_SRC
 )
 
 ADD_LIBRARY(bpcore SHARED ${BP_CORE_SRC})
-TARGET_LINK_LIBRARIES(bpcore bpcommon)
+TARGET_LINK_LIBRARIES(bpcore bpcommon bppb)
 
 INSTALL(TARGETS bpcore
     LIBRARY DESTINATION ${ITOOLS_INSTALL_LIB_DIR}
@@ -49,7 +49,7 @@ foreach(ut_file ${bpcore_files})
     TARGET_LINK_LIBRARIES(${ut_file_target}
         gtest_main    
         gtest
-        bp_pb
+        bppb
         bpcore
         bpcommon
     )

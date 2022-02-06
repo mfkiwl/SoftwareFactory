@@ -17,7 +17,7 @@ public:
 
     void Init() override {
         AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
-        auto var = Bp::Instance().CreateVariable("bpbase.BpBool", "bpbase.BpBool");
+        auto var = Bp::Instance().CreateVariable("bpbase.Bool", "bpbase.Bool");
         AddPin("Condition", BpPinKind::BP_INPUT, BpPinType::BP_VALUE, var);
 
         AddPin("True", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable()); // true
@@ -25,7 +25,7 @@ public:
     }
 
 	void Logic() override {
-        bool b = _inputs[1].GetBpValue().Get<bp_pb::BpBool>()->var();
+        bool b = _inputs[1].GetBpValue().Get<bp::Bool>()->var();
         if (b) {
             _outputs[0].SetExecutable(true);
             _outputs[1].SetExecutable(false);

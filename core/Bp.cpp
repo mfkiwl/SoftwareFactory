@@ -8,6 +8,7 @@
 #include "BpGraphModLib.hpp"
 #include "BpNodeVar.hpp"
 #include "BpGraph.hpp"
+#include "bpflags.hpp"
 
 namespace bp {
 	
@@ -22,9 +23,9 @@ Bp::Bp()
 	_cur_edit_graph.reset();
 
 	_base_mods = std::make_shared<BpModLibLinux>();
-	_base_mods->Init("../conf/");
+	_base_mods->Init(bp::FLAGS_base_mod_cfg_dir);
 	_graph_mods = std::make_shared<BpGraphModLib>();
-	_graph_mods->Init("/home/caros/mod/");
+	_graph_mods->Init(bp::FLAGS_mod_graph_dir);
 	_nodes_lib = std::make_shared<BpNodeLib>();
 
 	_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
@@ -314,7 +315,7 @@ LoadSaveState Bp::SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g
 					id: pin_id,
 					pin_kind: BP_OUTPUT,
 					pin_type: BP_VALUE,
-					var_type: bpbase.BpInt,
+					var_type: bpbase.Int,
 					var_name: x
 				},
 				...

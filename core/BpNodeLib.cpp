@@ -2,17 +2,23 @@
 #include "BpNodeVar.hpp"
 #include "BpNodeFunc.hpp"
 #include "BpNodeEvTick.hpp"
+#include "BpNodeEvBegin.hpp"
 #include "basenode/BpNodeBaseDelay.hpp"
 #include "basenode/BpNodeBaseBranch.hpp"
 
 namespace bp {
 BpNodeLib::BpNodeLib() 
     : _ev_nodes {
+        {"Begin", [](){ 
+            auto node = std::make_shared<BpNodeEvBegin>(nullptr); 
+            node->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable()); 
+            return node; }
+        },
         {"Tick", [](){ 
             auto node = std::make_shared<BpNodeEvTick>(nullptr); 
             node->AddPin("", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable()); 
             return node; }
-        }
+        },
     },
     _base_nodes {
         {"Delay", [](){
@@ -30,6 +36,7 @@ BpNodeLib::BpNodeLib()
     _root_contents = std::make_shared<BpContents>(nullptr, "", BpContents::Type::CONTENTS);
     // 创建事件目录
     _ev_contents = std::make_shared<BpContents>(nullptr, "event", BpContents::Type::CONTENTS);
+    _ev_contents->AddChild(std::make_shared<BpContents>(nullptr, "Begin", BpContents::Type::LEAF, BpContents::LeafType::EV));
     _ev_contents->AddChild(std::make_shared<BpContents>(nullptr, "Tick", BpContents::Type::LEAF, BpContents::LeafType::EV));
     _root_contents->AddChild(_ev_contents);
     // 创建基础节点目录

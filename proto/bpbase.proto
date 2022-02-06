@@ -1,40 +1,40 @@
 syntax = "proto3";
-package bp_pb;
+package bp;
 
-message BpBool {
+message Bool {
     bool var = 1;
 }
 
-message BpInt {
+message Int {
     int32 var = 1;
 }
 
-message BpFloat {
+message Float {
     float var = 1;
 }
 
-message BpString {
+message String {
     string var = 1;
 }
 
-message BpBytes {
+message Bytes {
     bytes var = 1;
 }
 
-message BpIntPair {
+message IntPair {
     int32 a = 1;
     int32 b = 2;
 }
 
-message BpFloatPair {
+message FloatPair {
     float a = 1;
     float b = 2;
 }
 
-message BpIntAry {
+message IntAry {
     repeated int32 ary = 1;
 }
 
-message BpFloatAry {
+message FloatAry {
     repeated float ary = 1;
 }

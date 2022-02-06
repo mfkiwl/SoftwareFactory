@@ -33,10 +33,10 @@ std::shared_ptr<bp::BpNode> SFEPanelUINodes::SpawnUINode(const std::string& full
         auto node = std::make_shared<SFEUINodePlot>(full_path, nullptr, shared_from_this()); 
         node->AddPin("", ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_FLOW, ::bp::BpVariable()); 
         node->AddPin("", ::bp::BpPinKind::BP_OUTPUT, ::bp::BpPinType::BP_FLOW, ::bp::BpVariable()); 
-        std::string cmd_type = "bpbase.BpString";
+        std::string cmd_type = "bpbase.String";
         auto cmd = bp::Bp::Instance().CreateVariable(cmd_type, "cmd");
         node->AddPin(cmd_type, ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, cmd); 
-        std::string var_type = "bpbase.BpFloat";
+        std::string var_type = "bpbase.Float";
         auto x = bp::Bp::Instance().CreateVariable(var_type, "x");
         auto y = bp::Bp::Instance().CreateVariable(var_type, "y");
         node->AddPin(var_type, ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, x); 

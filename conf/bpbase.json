@@ -1,14 +1,14 @@
 {
     "_lib":"libbpbase.so",
     "_val":[
-        "bpbase.BpBool",
-        "bpbase.BpInt",
-        "bpbase.BpFloat",
-        "bpbase.BpString",
-        "bpbase.BpBytes",
-        "bpbase.BpIntPair",
-        "bpbase.BpFloatPair",
-        "bpbase.BpIntAry",
-        "bpbase.BpFloatAry"
+        "bpbase.Bool",
+        "bpbase.Int",
+        "bpbase.Float",
+        "bpbase.String",
+        "bpbase.Bytes",
+        "bpbase.IntPair",
+        "bpbase.FloatPair",
+        "bpbase.IntAry",
+        "bpbase.FloatAry"
     ]
 }

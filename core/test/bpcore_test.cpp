@@ -39,33 +39,33 @@ TEST(bpcore, BpContents) {
 }
 
 TEST(bpcore, BpVariable) {
-    std::weak_ptr<bp_pb::BpInt> w_msg;
-    std::weak_ptr<bp_pb::BpInt> w_msg2;
-    std::weak_ptr<bp_pb::BpInt> w_msg3;
+    std::weak_ptr<bp::Int> w_msg;
+    std::weak_ptr<bp::Int> w_msg2;
+    std::weak_ptr<bp::Int> w_msg3;
     {
-        auto msg = std::make_shared<bp_pb::BpInt>();
+        auto msg = std::make_shared<bp::Int>();
         bp::BpVariable var("", "", msg);
         w_msg = msg;
         EXPECT_FALSE(w_msg.expired());
         // 设置值传递
-        auto msg_tmp = std::make_shared<bp_pb::BpInt>();
+        auto msg_tmp = std::make_shared<bp::Int>();
         msg_tmp->set_var(100);
         bp::BpVariable var2("", "", msg_tmp);
-        auto msg2 = std::make_shared<bp_pb::BpInt>();
+        auto msg2 = std::make_shared<bp::Int>();
         msg2->set_var(200);
         w_msg2 = msg2;
         var2.SetValue(msg2);
         msg2->set_var(300);
         EXPECT_EQ(300, msg2->var());
-        EXPECT_EQ(200, var2.Get<bp_pb::BpInt>()->var());
+        EXPECT_EQ(200, var2.Get<bp::Int>()->var());
         // 设置引用传递
-        auto msg3 = std::make_shared<bp_pb::BpInt>();
+        auto msg3 = std::make_shared<bp::Int>();
         w_msg3 = msg3;
         msg3->set_var(100);
         bp::BpVariable var3;
         var3.SetValueByRef(msg3);
         msg3->set_var(200);
-        EXPECT_EQ(200, var3.Get<bp_pb::BpInt>()->var());
+        EXPECT_EQ(200, var3.Get<bp::Int>()->var());
     }
     EXPECT_TRUE(w_msg.expired());
     EXPECT_TRUE(w_msg2.expired());
@@ -81,26 +81,26 @@ TEST(bpcore, BpModule) {
     LOG(INFO) << "bpmath.json contents:";
     LOG(INFO) << "\n" << bml.GetContents()->PrintContents();
 
-    auto pbmsg = bml.CreateModuleVal("bpbase.BpIntPair");
+    auto pbmsg = bml.CreateModuleVal("bpbase.IntPair");
     EXPECT_TRUE(nullptr != pbmsg);
-    auto pbintpair = std::static_pointer_cast<::bp_pb::BpIntPair>(pbmsg);
+    auto pbintpair = std::static_pointer_cast<::bp::IntPair>(pbmsg);
     pbintpair->set_a(100);
 
     {
         auto func = bml.GetModuleFunc("add_int");
-        auto p = std::make_shared<::bp_pb::BpIntPair>();
+        auto p = std::make_shared<::bp::IntPair>();
         p->set_a(1);
         p->set_b(1);
         auto res = std::any_cast<module_func2_t>(func.func)(p);
-        EXPECT_EQ(std::static_pointer_cast<::bp_pb::BpInt>(res)->var(), 2);
+        EXPECT_EQ(std::static_pointer_cast<::bp::Int>(res)->var(), 2);
     }
     {
         auto func = bml.GetModuleFunc("sub_int");
-        auto p = std::make_shared<::bp_pb::BpIntPair>();
+        auto p = std::make_shared<::bp::IntPair>();
         p->set_a(1);
         p->set_b(1);
         auto res = std::any_cast<module_func2_t>(func.func)(p);
-        EXPECT_EQ(std::static_pointer_cast<::bp_pb::BpInt>(res)->var(), 0);
+        EXPECT_EQ(std::static_pointer_cast<::bp::Int>(res)->var(), 0);
     }
 }
 
@@ -108,7 +108,7 @@ TEST(bpcore, BpModLib) {
     auto cur_path = std::filesystem::current_path().string();
     bp::BpModLibLinux bll;
     EXPECT_TRUE(bll.Init(cur_path + "/../conf/"));
-    EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.BpIntPair"));
+    EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.IntPair"));
     auto func = bll.GetFunc("bpmath.add_int");
     EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
 }

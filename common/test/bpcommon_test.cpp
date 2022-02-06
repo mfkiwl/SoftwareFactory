@@ -6,7 +6,7 @@
 
 TEST(bpcommon, PbJsonConvert) {
     {
-        ::bp_pb::BpInt msg;
+        ::bp::Int msg;
         // msg.set_var(100);
         std::string json;
         bp::JsonPbConvert::PbMsg2JsonStr(msg, json);
@@ -16,7 +16,7 @@ TEST(bpcommon, PbJsonConvert) {
     }
 
     {
-        ::bp_pb::BpIntPair msg;
+        ::bp::IntPair msg;
         Json::Value v;
         bp::JsonPbConvert::PbMsg2Json(msg, v);
         std::cout << "json: " << v.toStyledString() << std::endl;
@@ -43,7 +43,7 @@ TEST(bpcommon, PbJsonConvert) {
     {
         // test repeate data
         // TODO
-        ::bp_pb::BpIntAry msg;
+        ::bp::IntAry msg;
         std::string json;
         bp::JsonPbConvert::PbMsg2JsonStr(msg, json);
         std::cout << "repeat ary: " << json << std::endl;

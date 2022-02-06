@@ -3,35 +3,35 @@
     "_func":{
         "add_int":{
             "_input":[
-                "bpbase.BpIntPair"
+                "bpbase.IntPair"
             ],
             "_output":[
-                "bpbase.BpInt"
+                "bpbase.Int"
             ]
         },
         "sub_int":{
             "_input":[
-                "bpbase.BpIntPair"
+                "bpbase.IntPair"
             ],
             "_output":[
-                "bpbase.BpInt"
+                "bpbase.Int"
             ]
         },
         "sin_float":{
             "_input":[
-                "bpbase.BpFloat"
+                "bpbase.Float"
             ],
             "_output":[
-                "bpbase.BpFloat"
+                "bpbase.Float"
             ]
         },
         "add_float":{
             "_input":[
-                "bpbase.BpFloat",
-                "bpbase.BpFloat"
+                "bpbase.Float",
+                "bpbase.Float"
             ],
             "_output":[
-                "bpbase.BpFloat"
+                "bpbase.Float"
             ]
         }
     }

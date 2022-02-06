@@ -50,7 +50,7 @@ target_link_libraries(SoftwareFactoryEditor
     imgui_node_editor
     
     bplog
-    bp_pb
+    bppb
     bpcore
     bpcommon
 )
@@ -65,4 +65,4 @@ INSTALL(FILES
     DESTINATION ${ITOOLS_INSTALL_ASSETS_DIR}
 )
 
-FILE(COPY ${assets_files} DESTINATION "${CMAKE_BINARY_DIR}/build/assets/")
+FILE(COPY ${assets_files} DESTINATION ${ITOOLS_OUTPUT_ASSETS_DIR})

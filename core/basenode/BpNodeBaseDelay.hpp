@@ -18,7 +18,7 @@ public:
 
     void Init() override {
         AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
-        auto var = Bp::Instance().CreateVariable("bpbase.BpFloat", "bpbase.BpFloat");
+        auto var = Bp::Instance().CreateVariable("bpbase.Float", "bpbase.Float");
         AddPin("Duration", BpPinKind::BP_INPUT, BpPinType::BP_VALUE, var);
         
         auto& pin = AddPin("Completed", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
@@ -35,7 +35,7 @@ public:
             double cur_timestamp = BpCommon::GetTimestamp();
             _time += (cur_timestamp - _last_timestamp);
             _last_timestamp = cur_timestamp;
-            float duration = _inputs[1].GetBpValue().Get<bp_pb::BpFloat>()->var();
+            float duration = _inputs[1].GetBpValue().Get<bp::Float>()->var();
             if (_time >= duration) {
                 _outputs[0].SetExecutable(true);
             }

@@ -21,9 +21,9 @@ public:
         }
         auto p = _panel.lock();
         Json::Value v;
-        v["command"] = std::dynamic_pointer_cast<::bp_pb::BpString>(_inputs[1].GetValue())->var();
-        v["x"] = std::dynamic_pointer_cast<::bp_pb::BpFloat>(_inputs[2].GetValue())->var();
-        v["y"] = std::dynamic_pointer_cast<::bp_pb::BpFloat>(_inputs[3].GetValue())->var();
+        v["command"] = _inputs[1].Get<::bp::String>()->var();
+        v["x"] = _inputs[2].Get<::bp::Float>()->var();;
+        v["y"] = _inputs[3].Get<::bp::Float>()->var();;
         p->SendMessage({p->PanelName(), "plot", "", v});
     }
 

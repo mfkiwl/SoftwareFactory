@@ -4,6 +4,7 @@ ADD_SUBDIRECTORY(bplog)
 
 ADD_LIBRARY(bpcommon SHARED
     bpcommon.cpp
+    bpflags.cpp
 )
 TARGET_LINK_LIBRARIES(bpcommon)
 
@@ -20,7 +21,7 @@ foreach(ut_file ${bpcommon_files})
     TARGET_LINK_LIBRARIES(${ut_file_target}
         gtest_main    
         gtest
-        bp_pb
+        bppb
         pthread
         bpcommon
         jsoncpp

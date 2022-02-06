@@ -2,6 +2,7 @@
 #include <fstream>
 #include <filesystem>
 #include <glog/logging.h>
+#include "bpflags.hpp"
 #include "BpModule.hpp"
 
 namespace bp {
@@ -40,8 +41,7 @@ bool BpModule::LoadModule(const std::string& json_file) {
     _mod_name = _mod_name.substr(3, _mod_name.size() - 6);
     _contents = std::make_shared<BpContents>(nullptr, _mod_name, BpContents::Type::CONTENTS);
     // 初始化dll
-    std::filesystem::path p(json_file);
-    std::string dll_path = p.parent_path().string() + "/../lib/" + root["_lib"].asString();
+    std::string dll_path = bp::FLAGS_base_mod_lib_dir + root["_lib"].asString();
     if (!Init(dll_path.c_str())) {
         LOG(ERROR) << "load dll " << dll_path << " failed";
         return false;
