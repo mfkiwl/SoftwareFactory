@@ -3,6 +3,7 @@
 #include "BpNodeFunc.hpp"
 #include "BpNodeEvTick.hpp"
 #include "BpNodeEvBegin.hpp"
+#include "basenode/BpNodeBasePrint.hpp"
 #include "basenode/BpNodeBaseDelay.hpp"
 #include "basenode/BpNodeBaseBranch.hpp"
 
@@ -21,6 +22,11 @@ BpNodeLib::BpNodeLib()
         },
     },
     _base_nodes {
+        {"Print", [](){
+            auto node = std::make_shared<BpNodeBasePrint>(nullptr); 
+            node->Init();
+            return node;
+        }},
         {"Delay", [](){
             auto node = std::make_shared<BpNodeBaseDelay>(nullptr, 0.0f); 
             node->Init();
@@ -41,6 +47,7 @@ BpNodeLib::BpNodeLib()
     _root_contents->AddChild(_ev_contents);
     // 创建基础节点目录
     _base_contents = std::make_shared<BpContents>(nullptr, "base", BpContents::Type::CONTENTS);
+    _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Print", BpContents::Type::LEAF, BpContents::LeafType::BASE));
     _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Delay", BpContents::Type::LEAF, BpContents::LeafType::BASE));
     _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Branch", BpContents::Type::LEAF, BpContents::LeafType::BASE));
     _root_contents->AddChild(_base_contents);

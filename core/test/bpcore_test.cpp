@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <set>
 #include <gtest/gtest.h>
 #include <glog/logging.h>
 
@@ -12,6 +13,19 @@
 #include "../BpGraph.hpp"
 #include "../Bp.hpp"
 #include "../BpVariable.hpp"
+#include "evnode/BpNodeEv.hpp"
+
+TEST(bpcore, BpNodeEv) {
+    auto begin_node = std::make_shared<bp::BpNodeEv>("Begin", nullptr, 1, 1);
+    auto tick_node = std::make_shared<bp::BpNodeEv>("Tick", nullptr, 2, -1);
+
+    std::set<std::shared_ptr<bp::BpNodeEv>, bp::BpNodeEvCmp> ev_node_set;
+    ev_node_set.insert(begin_node);
+    ev_node_set.insert(tick_node);
+    for (const auto& it : ev_node_set) {
+        LOG(INFO) << "lv: " << it->GetName();
+    }
+}
 
 TEST(bpcore, BpContents) {
     auto bpcontents = std::make_shared<BpContents>(nullptr, "pb_int_a", BpContents::Type::LEAF, BpContents::LeafType::VAL);

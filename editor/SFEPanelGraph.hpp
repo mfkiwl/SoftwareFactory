@@ -19,6 +19,7 @@ private:
     void ShowNodes();
     std::string _set_graph = "";
     bool _runing = false;
+    int _run_state = 1;
     int _drag_state = 0;
     std::string _drag_var_name = "";
     bool _show_var_setting = false;

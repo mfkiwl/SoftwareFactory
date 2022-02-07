@@ -70,7 +70,18 @@ void SFEPanelGraph::Update() {
             g->ClearFlag();
             g->Logic();
         } else {
-            g->Run();
+            if (_run_state == 1) {
+                g->RunNextEventBeign();
+                _run_state = 2;
+            } else {
+                if (!g->RunNextEvent()) {
+                    Json::Value v;
+                    v["command"] = "run_cur_graph";
+                    v["run"] = false;
+                    SendMessage({PanelName(), "all", "", v});
+                    OnMessage({PanelName(), "graph", "", v});
+                }
+            }
         }
     }
 }
@@ -191,7 +202,9 @@ void SFEPanelGraph::OnMessage(const SFEMessage& msg) {
             _set_graph = msg.json_msg["graph_name"].asString();
         }
         if (cmd == "run_cur_graph") {
-            _runing = msg.json_msg["run"].asBool();
+            bool is_run = msg.json_msg["run"].asBool();
+            _runing = is_run;
+            _run_state = 1;
             LOG(INFO) << (_runing ? "Runing" : "Stop") << " current graph";
         }
     }

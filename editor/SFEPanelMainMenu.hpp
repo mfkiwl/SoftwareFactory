@@ -11,6 +11,8 @@ public:
 
     virtual void Exit() override;
 
+    virtual void OnMessage(const SFEMessage& msg) override;
+
 private:
     void CreateNewGraph();
     void OpenGraph();

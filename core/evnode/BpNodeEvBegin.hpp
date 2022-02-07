@@ -10,7 +10,7 @@ class BpNodeEvBegin : public BpNodeEv
 {
 public:
 	BpNodeEvBegin(std::shared_ptr<BpGraph> parent)
-	    : BpNodeEv("Begin", parent, 99, 1)
+	    : BpNodeEv("Begin", parent, 1, 1)
     {}
 
 	void Logic() override {}

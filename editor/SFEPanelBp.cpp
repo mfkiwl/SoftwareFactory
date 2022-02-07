@@ -40,7 +40,8 @@ void SFEPanelBp::Update() {
     if (graph != nullptr) {
         // ev nodes
         for (auto& p : graph->GetEvNodes()) {
-            ShowNode(builder, p.second);
+            auto n = std::dynamic_pointer_cast<bp::BpNode>(p.second);
+            ShowNode(builder, n);
         }
 		
 		// nodes

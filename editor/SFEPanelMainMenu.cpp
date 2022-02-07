@@ -148,4 +148,14 @@ void SFEPanelMainMenu::SaveGraph() {
     }
 }
 
+void SFEPanelMainMenu::OnMessage(const SFEMessage& msg) {
+    if (msg.msg.empty()) {
+        auto cmd = msg.json_msg["command"].asString();
+        if (cmd == "run_cur_graph") {
+            bool is_run = msg.json_msg["run"].asBool();
+            _runing = is_run;
+        }
+    }
+}
+
 } // namespace sfe

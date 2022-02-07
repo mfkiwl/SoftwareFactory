@@ -29,8 +29,6 @@ SET(BP_CORE_SRC
     BpGraph.cpp
     Bp.hpp
     Bp.cpp
-
-    evnode/BpNodeEvTick.cpp
 )
 
 ADD_LIBRARY(bpcore SHARED ${BP_CORE_SRC})

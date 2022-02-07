@@ -9,9 +9,11 @@ namespace bp {
 class BpNodeEvTick : public BpNodeEv
 {
 public:
-	BpNodeEvTick(std::shared_ptr<BpGraph> parent);
+	BpNodeEvTick(std::shared_ptr<BpGraph> parent)
+		: BpNodeEv("Tick", parent, 2, -1)
+	{}
 
-	virtual void Logic() override;
+	void Logic() override {}
 };
 
 } // namespace bp

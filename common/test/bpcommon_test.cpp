@@ -1,3 +1,4 @@
+#include <map>
 #include <gtest/gtest.h>
 
 #include "../bpcommon.hpp"
@@ -60,5 +61,16 @@ TEST(bpcommon, PbJsonConvert) {
         EXPECT_TRUE(bp::BpCommon::IsName(str));
         str = "__maixxxx";
         EXPECT_TRUE(bp::BpCommon::IsName(str));
+    }
+
+    {
+        std::map<int, int> m = {
+            {3, 3},
+            {9, 9},
+            {1, 1},
+        };
+        for (const auto& p : m) {
+            std::cout << p.first << std::endl;
+        }
     }
 }

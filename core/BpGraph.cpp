@@ -227,12 +227,13 @@ bool BpGraph::AddEventNode(std::shared_ptr<BpNode> node) {
 		LOG(ERROR) << node->GetName() << " not ev node";
 		return false;
 	}
+	auto ev_node = std::dynamic_pointer_cast<BpNodeEv>(node);
 	if (_event_nodes.find(node->GetName()) == _event_nodes.end()) {
-		node->SetParentGraph(std::dynamic_pointer_cast<BpGraph>(shared_from_this()));
-		_event_nodes[node->GetName()] = node;
+		ev_node->SetParentGraph(std::dynamic_pointer_cast<BpGraph>(shared_from_this()));
+		_event_nodes[ev_node->GetName()] = ev_node;
 		return true;
 	}
-	LOG(ERROR) << "add event " << node->GetName() << "failed";
+	LOG(ERROR) << "add event " << ev_node->GetName() << "failed";
 	return false;
 }
 
@@ -252,11 +253,29 @@ void BpGraph::ClearFlag() {
 	}
 }
 
-void BpGraph::RunEvent(std::string ev) {
-	if (_event_nodes.find(ev) == _event_nodes.end()) return;
-	auto com = _event_nodes[ev];
+void BpGraph::RunNextEventBeign() {
+	_event_nodes_run.clear();
+	for (auto& p : _event_nodes) {
+		LOG(INFO) << "Insert event node " << p.first;
+		p.second->ResetLoop();
+		_event_nodes_run.insert(p.second);
+	}
 	ClearFlag();
-	com->Run();
+}
+
+bool BpGraph::RunNextEvent() {
+	for (const auto& it : _event_nodes_run) {
+		auto cnt = it->LoopOnce();
+		if (cnt >= 0) {
+			it->Run();
+		}
+		if (cnt == 0) {
+			LOG(INFO) << "erase event node: " << it->GetName();
+			_event_nodes_run.erase(it);
+		}
+		return cnt >= 0;
+	}
+	return false;
 }
 
 void BpGraph::Run() {
@@ -264,8 +283,8 @@ void BpGraph::Run() {
 		ClearFlag();
 		BpNode::Run();
 	} else {
-		// TODO 应该按事件优先级依次执行
-		RunEvent("Tick");
+		RunNextEventBeign();
+		while(RunNextEvent());
 	}
 }
 
