@@ -4,15 +4,26 @@ SET(TEMPLATE_SRC
 	main.cpp
     TemplateFlags.cpp
 )
-add_executable(template ${TEMPLATE_SRC})
-target_link_libraries(template
+add_executable(bptemplate ${TEMPLATE_SRC})
+target_link_libraries(bptemplate
     bpcommon
     bplog
     bppb
     bpcore
 )
-INSTALL(TARGETS template
-    LIBRARY DESTINATION ${ITOOLS_INSTALL_LIB_DIR}
-    ARCHIVE DESTINATION ${ITOOLS_INSTALL_LIB_DIR}
-    RUNTIME DESTINATION ${ITOOLS_INSTALL_BIN_DIR}
+
+FILE(GLOB bptemplates_headers "*.hpp")
+INSTALL(FILES 
+    ${bptemplates_headers}
+    PERMISSIONS
+    OWNER_READ
+    GROUP_READ
+    WORLD_READ
+    DESTINATION ${SF_INSTALL_INC_DIR}
+)
+
+INSTALL(TARGETS bptemplate
+    LIBRARY DESTINATION ${SF_INSTALL_LIB_DIR}
+    ARCHIVE DESTINATION ${SF_INSTALL_LIB_DIR}
+    RUNTIME DESTINATION ${SF_INSTALL_BIN_DIR}
 )

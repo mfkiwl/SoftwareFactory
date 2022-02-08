@@ -35,9 +35,9 @@ set(editor_srcs
     SFEPanelUINodes.cpp
     SFEPanelPlot.cpp
 )
-add_executable(SoftwareFactoryEditor ${editor_srcs})
-target_compile_definitions(SoftwareFactoryEditor PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(SoftwareFactoryEditor
+add_executable(${PROJECT_NAME} ${editor_srcs})
+target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
+target_link_libraries(${PROJECT_NAME}
     SDL2
     SDL2main
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libglew.a
@@ -55,6 +55,8 @@ target_link_libraries(SoftwareFactoryEditor
     bpcommon
 )
 
+INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SF_INSTALL_BIN_DIR})
+
 FILE(GLOB assets_files "assets/*")
 INSTALL(FILES 
     ${assets_files}
@@ -62,7 +64,7 @@ INSTALL(FILES
     OWNER_READ
     GROUP_READ
     WORLD_READ
-    DESTINATION ${ITOOLS_INSTALL_ASSETS_DIR}
+    DESTINATION ${SF_INSTALL_ASSETS_DIR}
 )
 
-FILE(COPY ${assets_files} DESTINATION ${ITOOLS_OUTPUT_ASSETS_DIR})
+FILE(COPY ${assets_files} DESTINATION ${SF_OUTPUT_ASSETS_DIR})
