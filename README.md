@@ -29,7 +29,7 @@ sudo make install
 ## 编辑
 ```sh
 # 打开编辑器
-sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib ./SoftwareFactoryEditor
+sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/SoftwareFactoryEditor
 ```
 
 ## 导出
@@ -37,7 +37,7 @@ Save as... --> xxx.json
 
 ## 运行
 ```sh
-sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib ./bptemplate -graph_exec_file="xxx.json"
+sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/bptemplate -graph_exec_file="xxx.json"
 ```
 
 # 基础模块开发
