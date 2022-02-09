@@ -9,7 +9,7 @@ bp::BpLogger* g_bp_logger = nullptr;
 namespace bp {
 
 void InitLogging(const char* binary_name) {
-    FLAGS_log_dir = ".";
+    FLAGS_log_dir = "/opt/SoftwareFactory/log";
     // output log immediately
     FLAGS_logbufsecs = 0;
     // set the log file to 100MB

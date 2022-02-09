@@ -2,6 +2,7 @@
 #include "Bp.hpp"
 #include "BpGraph.hpp"
 #include "bpcommon.hpp"
+#include "bpflags.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 extern "C" {
@@ -11,7 +12,8 @@ extern "C" {
 namespace sfe {
 
 bool SFEPanelBp::Init() {
-    LoadTexture("../assets/BlueprintBackground.png");
+    std::string title_png_path = bp::FLAGS_assets_dir + "BlueprintBackground.png";
+    LoadTexture(title_png_path.c_str());
 
     ed::Config config;
     _node_editor = ed::CreateEditor(&config);

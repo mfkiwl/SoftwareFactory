@@ -1,0 +1,11 @@
+{
+    "_lib":"libtemplate_mod.so",
+    "_func":{
+        "print_hello":{
+            "_input":[],
+            "_output":[
+                "bpbase.String"
+            ]
+        }
+    }
+}

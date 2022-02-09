@@ -12,6 +12,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "SFEditor.hpp"
+#include "bpflags.hpp"
 
 // About Desktop OpenGL function loaders:
 //  Modern desktop OpenGL doesn't have a standard portable header file to load OpenGL function pointers.
@@ -93,6 +94,9 @@ int main(int, char**)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    static std::string conf_path = bp::FLAGS_conf_dir + "imgui.ini";
+    io.IniFilename = conf_path.c_str();
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;

@@ -12,6 +12,8 @@ target_link_libraries(bptemplate
     bpcore
 )
 
+INSTALL(DIRECTORY base_mod DESTINATION ${SF_INSTALL_TEMPLATES_DIR})
+
 FILE(GLOB bptemplates_headers "*.hpp")
 INSTALL(FILES 
     ${bptemplates_headers}
