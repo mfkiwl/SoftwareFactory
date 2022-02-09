@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(template_mod)
+PROJECT(@template_mod@)
 
 SET(CMAKE_INSTALL_PREFIX "/")
 SET(SF_ROOT /opt/SoftwareFactory/)

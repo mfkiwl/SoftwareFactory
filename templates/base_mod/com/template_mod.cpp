@@ -1,8 +1,9 @@
 #include <cmath>
-#include <unordered_map>
+#include <memory>
 #include <functional>
+#include <unordered_map>
 
-#include "template_mod.hpp"
+#include "bpbase.pb.h"
 
 static std::unordered_map<std::string, std::function<std::shared_ptr<::google::protobuf::Message>()>> g_msg_map = {
     // {"bpmath.String", [](){ return std::make_shared<bp::String>(); }}

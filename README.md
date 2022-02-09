@@ -43,8 +43,7 @@ sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/bptemplat
 # 基础模块开发
 ## 创建自定义基础模块工程
 ```py
-# TODO
-python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --dir=/home/xxx/base_mode_dir --name="user_define_name"
+python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --dir="/path/to/base_mode_dir" --name="user_define_name"
 ```
 
 ## 基础模块开发目录组织结构
