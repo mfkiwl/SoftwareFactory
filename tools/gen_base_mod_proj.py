@@ -43,7 +43,7 @@ def replaceFile(params, file):
             break
         # replaceParams(params, line)
         file_content = file_content + replaceParams(params, line)
-    print(file_content)
+    # print(file_content)
     rf.close()
 
     wf = open(file, 'w')

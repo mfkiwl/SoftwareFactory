@@ -11,12 +11,14 @@
 
 # 安装依赖
 ```sh
-sudo apt-get install build-essential
+sudo apt-get install build-essential cmake
 sudo apt-get install libjsoncpp-dev libprotobuf-dev protobuf-compiler libgflags-dev libgtest-dev libgoogle-glog-dev 
 sudo apt-get install libsdl2-dev libglew-dev libgtk-3-dev
 ```
 
 # 构建
+![build install gif](doc/pics/build_install_sf.gif)
+
 ```sh
 mkdir build
 cd build
@@ -25,36 +27,31 @@ make
 sudo make install
 ```
 
-# 可视化软件制作
-## 编辑
-```sh
-# 打开编辑器
-sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/SoftwareFactoryEditor
-```
-
-## 导出
-Save as... --> xxx.json
-
-## 运行
-```sh
-sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/bptemplate -graph_exec_file="xxx.json"
-```
-
 # 基础模块开发
+![build install gif](doc/pics/create_base_mod_proj.gif)
+
 ## 创建自定义基础模块工程
 ```py
-python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --dir="/path/to/base_mode_dir" --name="user_define_name"
+python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --dir="/path/to/base_mode_dir/" --name="user_define_name"
+```
+
+## 自定义模块构建和安装
+```sh
+mkdir build
+cd build
+cmake ../
+make
+make install
 ```
 
 ## 基础模块开发目录组织结构
 ```
 |--conf
-|  |--bpmath.json
+|  |--hello.json
 |--proto
-|  |--bpmath.proto
+|  |--hello.proto
 |--com
-|  |--bpmath.hpp
-|  |--bpmath.cpp
+|  |--hello.cpp
 |--CMakeLists.txt
 ```
 
@@ -103,11 +100,12 @@ fun(std::vector<std::shared_ptr<::google::protobuf::Message>>);
 ### (三)开发模块需要定义的proto文件
 可以自定义proto消息文件, 也可以使用基础模块已经有的proto消息文件
 
-## 自定义模块构建和安装
+# 软件制作
+## 编辑/导出/运行
+![edit software gif](doc/pics/make_software.gif)
 ```sh
-mkdir build
-cd build
-cmake ../
-make
-make install
+# 打开编辑器
+sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/SoftwareFactoryEditor
+# 运行编辑好的程序
+sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/bptemplate -graph_exec_file="/path/to/hello_exec.json"
 ```
