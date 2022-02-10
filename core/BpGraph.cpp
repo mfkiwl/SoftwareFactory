@@ -260,10 +260,10 @@ void BpGraph::RunNextEventBeign() {
 		p.second->ResetLoop();
 		_event_nodes_run.insert(p.second);
 	}
-	ClearFlag();
 }
 
 bool BpGraph::RunNextEvent() {
+	ClearFlag();
 	for (const auto& it : _event_nodes_run) {
 		auto cnt = it->LoopOnce();
 		if (cnt >= 0) {
