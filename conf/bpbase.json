@@ -1,14 +1,41 @@
 {
     "_lib":"libbpbase.so",
     "_val":[
-        "bpbase.Bool",
-        "bpbase.Int",
-        "bpbase.Float",
-        "bpbase.String",
-        "bpbase.Bytes",
-        "bpbase.IntPair",
-        "bpbase.FloatPair",
-        "bpbase.IntAry",
-        "bpbase.FloatAry"
+        {
+            "type" : "bpbase.Bool",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.Int",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.Float",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.String",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.Bytes",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.IntPair",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.FloatPair",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.IntAry",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.FloatAry",
+            "desc" : ""
+        }
     ]
 }

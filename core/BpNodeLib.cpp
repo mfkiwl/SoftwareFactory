@@ -78,9 +78,10 @@ std::shared_ptr<BpNode> BpNodeLib::CreateFuncNode(BpModuleFunc func_info,
 }
 
 /* 创建变量Node */
-std::shared_ptr<BpNode> BpNodeLib::CreateVarNode(BpVariable var, bool is_get) {
-    LOG(INFO) << "create var node " << var.GetName() << "(" << var.GetType() << ")";
+std::shared_ptr<BpNode> BpNodeLib::CreateVarNode(const std::string& var_name, BpVariable var, bool is_get) {
+    LOG(INFO) << "create var node " << var.GetType() << "(" << var.GetDesc() << ")";
     auto node = std::make_shared<BpNodeVar>(is_get, var, nullptr);
+    node->SetName(var_name);
     if (is_get) {
         node->AddPin(var.GetType(), BpPinKind::BP_OUTPUT, BpPinType::BP_VALUE, var);
     } else {

@@ -7,7 +7,7 @@ class BpNodeVar : public BpNode
 {
 public:
 	BpNodeVar(bool is_get, BpVariable& var, std::shared_ptr<BpGraph> parent)
-        : BpNode(var.GetName(), parent)
+        : BpNode(var.GetType(), parent)
         , _is_get(is_get)
     {
         _node_type = BpNodeType::BP_NODE_VAR;

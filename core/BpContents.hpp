@@ -82,6 +82,9 @@ public:
         return content_str;
     }
 
+    void SetData(const std::string& data) { _data = data; }
+    const std::string& GetData() { return _data; }
+
 private:
     void TraverseContents(std::shared_ptr<BpContents> c, int depth, std::string& content_str) {
         if (c == nullptr) {
@@ -106,6 +109,7 @@ private:
     Type _type;
     LeafType _leaf_type;
     std::string _name;
+    std::string _data;
     std::weak_ptr<BpContents> _parent;
     std::vector<std::shared_ptr<BpContents>> _next_contents;
 };

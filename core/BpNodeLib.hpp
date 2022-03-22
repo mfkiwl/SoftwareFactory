@@ -22,7 +22,7 @@ public:
             std::vector<BpVariable>& res);
 
     /* 创建变量Node */
-    std::shared_ptr<BpNode> CreateVarNode(BpVariable var, bool is_get);
+    std::shared_ptr<BpNode> CreateVarNode(const std::string& var_name, BpVariable var, bool is_get);
     
     /* 创建事件Node */
     std::shared_ptr<BpNode> CreateEvNode(const std::string& name);

@@ -123,7 +123,7 @@ void SFEPanelGraph::ShowVariable() {
     }
     auto& vars = bp::Bp::Instance().CurEditGraph()->GetVariables();
     for(auto& var : vars) {
-        auto title = var.second.GetName() + "(" + var.second.GetType() + ")";
+        auto title = var.first + "(" + var.second.GetType() + ")";
         if (ImGui::Selectable(title.c_str())) {
             // 显示详情
             LOG(INFO) << "select var " << title;
@@ -131,7 +131,7 @@ void SFEPanelGraph::ShowVariable() {
         // 初始状态&&在选中的item上鼠标按下，设置开始拖动
         if (_drag_state == 0 && ImGui::IsMouseDown(0) && ImGui::IsItemHovered()) {
             _drag_state = 1;
-            _drag_var_name = var.second.GetName();
+            _drag_var_name = var.first;
         }
         // 在开始拖动状态下，鼠标移动，设置拖动中状态
         ImVec2 mouse_delta = ImGui::GetMouseDragDelta(0);

@@ -7,18 +7,18 @@ namespace bp {
 
 BpVariable::BpVariable()
 	: _var_type("")
-	, _var_name("")
+	, _var_desc("")
 	, _var(nullptr)
 {}
 
-BpVariable::BpVariable(const std::string& vt, const std::string& name, const pb_msg_ptr_t& v) 
+BpVariable::BpVariable(const std::string& vt, const std::string& desc, const pb_msg_ptr_t& v) 
 	: _var_type(vt)
-	, _var_name(name)
+	, _var_desc(desc)
 	, _var(v)
 {}
 
 BpVariable::BpVariable(BpVariable&& v) {
-	_var_name = std::move(v._var_name);
+	_var_desc = std::move(v._var_desc);
 	_var_type = std::move(v._var_type);
 	_var = v._var;
 	v._var = nullptr;
@@ -26,7 +26,7 @@ BpVariable::BpVariable(BpVariable&& v) {
 
 BpVariable& BpVariable::operator=(const BpVariable& o) 
 {
-	_var_name = o._var_name;
+	_var_desc = o._var_desc;
 	_var_type = o._var_type;
 	_var = o._var;
 	return *this;
@@ -57,6 +57,8 @@ bool BpVariable::SetValue(const Json::Value& v) {
 		LOG(ERROR) << "json_value is empty";
 		return false;
 	}
+	// 设置值描述字符串
+	_var_desc = v["desc"].asString();
 	_var->Clear();
 	JsonPbConvert::Json2PbMsg(v, *_var);
 	return true;
@@ -68,7 +70,7 @@ void BpVariable::SetValueByRef(const pb_msg_ptr_t& v) {
 
 const std::string BpVariable::ToJson() const { 
 	if (_var == nullptr) {
-		LOG(ERROR) << "var " << _var_name << " is empty";
+		LOG(ERROR) << "var " << _var_type << " is empty";
 		return "";
 	}
 	std::string json;

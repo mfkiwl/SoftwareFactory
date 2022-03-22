@@ -15,7 +15,7 @@ class BpVariable
 public:
 	BpVariable();
 	// 引用传递
-	BpVariable(const std::string& vt, const std::string& name, const pb_msg_ptr_t& v);
+	BpVariable(const std::string& vt, const std::string& desc, const pb_msg_ptr_t& v);
 	BpVariable(const BpVariable& v){ operator=(v); }
 	BpVariable& operator=(const BpVariable& o);
 	BpVariable(BpVariable&& v);
@@ -25,7 +25,7 @@ public:
 	template<typename T>
 	std::shared_ptr<T> Get() { return std::dynamic_pointer_cast<T>(_var); }
 
-	const std::string& GetName() const { return _var_name; }
+	const std::string& GetDesc() const { return _var_desc; }
 
 	const std::string& GetType() const { return _var_type; }
 
@@ -43,7 +43,7 @@ public:
 
 private:
 	std::string _var_type;
-	std::string _var_name;
+	std::string _var_desc;
 	pb_msg_ptr_t _var;
 };
 

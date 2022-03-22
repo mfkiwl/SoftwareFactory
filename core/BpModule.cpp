@@ -86,9 +86,11 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                     continue;
                 }
                 for (int i = 0; i < v[*it].size(); ++i) {
-                    auto leaf_val = std::make_shared<BpContents>(contents, v[*it][i].asString(), BpContents::Type::LEAF, BpContents::LeafType::VAL);
+                    const auto& var_info = v[*it][i];
+                    auto leaf_val = std::make_shared<BpContents>(contents, var_info["type"].asString(), BpContents::Type::LEAF, BpContents::LeafType::VAL);
+                    leaf_val->SetData(var_info["desc"].asString());
                     contents->AddChild(leaf_val);
-                    _var_names.insert(v[*it][i].asString());
+                    _var_names.insert(var_info["type"].asString());
                 }
             }
         } else {

@@ -49,6 +49,7 @@ public:
     BpNodeType GetNodeType() { return _node_type; }
 	int GetID() { return _id; }
 	std::string& GetName() { return _name; }
+	void SetName(const std::string& name) { _name = name; }
 
 	BpPin& AddPin(const std::string& name, BpPinKind k, BpPinType t, const BpVariable& v);
 	bool DelPin(int id);

@@ -79,15 +79,15 @@ bool Bp::RegisterUserMod(std::shared_ptr<BpContents> contents, std::function<std
 	return true;
 }
 
-BpVariable Bp::CreateVariable(const std::string& type, const std::string& name) {
-	return CreateVariable(type, name, "");
+BpVariable Bp::CreateVariable(const std::string& type, const std::string& desc) {
+	return CreateVariable(type, desc, "");
 }
 
-BpVariable Bp::CreateVariable(const std::string& type, const std::string& name, const std::string& value_desc) {
+BpVariable Bp::CreateVariable(const std::string& type, const std::string& desc, const std::string& value_desc) {
 	auto v = _base_mods->CreateVal(type);
-	auto var = BpVariable(type, name, v);
+	auto var = BpVariable(type, desc, v);
 	if (v == nullptr) {
-		LOG(ERROR) << "Create var " << type << " " << name << " = " << value_desc << " failed";
+		LOG(ERROR) << "Create var " << type << " (" << desc << ") = " << value_desc << " failed";
 		return var;
 	}
 	if (!value_desc.empty()) {
@@ -465,7 +465,7 @@ std::shared_ptr<BpNode> Bp::SpawnVarNode(std::shared_ptr<BpGraph>& g, const std:
 		LOG(ERROR) << "var: " << var_name << "is empty";
 		return nullptr;
 	}
-	return _nodes_lib->CreateVarNode(var, is_get);
+	return _nodes_lib->CreateVarNode(var_name, var, is_get);
 }
 
 std::shared_ptr<BpNode> Bp::SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_type, const std::string& var_name, bool is_get) {
@@ -475,7 +475,7 @@ std::shared_ptr<BpNode> Bp::SpawnVarNode(std::shared_ptr<BpGraph>& g, const std:
 		return nullptr;
 	}
 	g->AddVariable(var_name, BpVariable(var_type, var_name, msg));
-	return _nodes_lib->CreateVarNode(g->GetVariable(var_name), is_get);
+	return _nodes_lib->CreateVarNode(var_name, g->GetVariable(var_name), is_get);
 }
 
 const std::shared_ptr<BpContents>& Bp::GetContents() const {
