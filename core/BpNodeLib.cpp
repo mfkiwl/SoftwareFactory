@@ -68,11 +68,11 @@ std::shared_ptr<BpNode> BpNodeLib::CreateFuncNode(BpModuleFunc func_info,
     // 根据函数输入参数设置输入pin
     for (int i = 0; i < func_info.type_args.size(); ++i) {
         // 根据描述创建变量
-        node->AddPin(func_info.type_args[i], BpPinKind::BP_INPUT, BpPinType::BP_VALUE, args[i]);
+        node->AddPin(func_info.name_args[i], BpPinKind::BP_INPUT, BpPinType::BP_VALUE, args[i]);
     }
     // 根据函数输出参数设置输出pin
     for (int i = 0; i < func_info.type_res.size(); ++i) {
-        node->AddPin(func_info.type_res[i], BpPinKind::BP_OUTPUT, BpPinType::BP_VALUE, res[i]);
+        node->AddPin(func_info.name_res[i], BpPinKind::BP_OUTPUT, BpPinType::BP_VALUE, res[i]);
     }
     return node;
 }

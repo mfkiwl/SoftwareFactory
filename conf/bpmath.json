@@ -3,35 +3,62 @@
     "_func":{
         "add_int":{
             "_input":[
-                "bpbase.IntPair"
+                {
+                    "type":"bpbase.IntPair",
+                    "name":"a and b"
+                }
             ],
             "_output":[
-                "bpbase.Int"
+                {
+                    "type":"bpbase.Int",
+                    "name":"c"
+                }
             ]
         },
         "sub_int":{
             "_input":[
-                "bpbase.IntPair"
+                {
+                    "type":"bpbase.IntPair",
+                    "name":"a and b"
+                }
             ],
             "_output":[
-                "bpbase.Int"
+                {
+                    "type":"bpbase.Int",
+                    "name":"c"
+                }
             ]
         },
         "sin_float":{
             "_input":[
-                "bpbase.Float"
+                {
+                    "type":"bpbase.Float",
+                    "name":"x"
+                }
             ],
             "_output":[
-                "bpbase.Float"
+                {
+                    "type":"bpbase.Float",
+                    "name":"y"
+                }
             ]
         },
         "add_float":{
             "_input":[
-                "bpbase.Float",
-                "bpbase.Float"
+                {
+                    "type":"bpbase.Float",
+                    "name":"a"
+                },
+                {
+                    "type":"bpbase.Float",
+                    "name":"b"
+                }
             ],
             "_output":[
-                "bpbase.Float"
+                {
+                    "type":"bpbase.Float",
+                    "name":"c"
+                }
             ]
         }
     }

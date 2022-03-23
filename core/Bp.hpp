@@ -40,8 +40,8 @@ public:
 	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g, const Json::Value& desc);
 	LoadSaveState SaveGraph(Json::Value& root, const std::shared_ptr<BpGraph>& g, const Json::Value& desc);
 
-	BpVariable CreateVariable(const std::string& type, const std::string& desc);
-	BpVariable CreateVariable(const std::string& type, const std::string& desc, const std::string& value_desc);
+	BpVariable CreateVariable(const std::string& type);
+	BpVariable CreateVariable(const std::string& type, const std::string& value_desc);
 
 	/* 生成非变量节点 */
 	std::shared_ptr<BpNode> SpawnNode(const std::string& node_name, const BpNodeType t = BpNodeType::BP_NODE_FUNC);

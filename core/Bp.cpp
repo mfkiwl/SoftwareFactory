@@ -79,15 +79,15 @@ bool Bp::RegisterUserMod(std::shared_ptr<BpContents> contents, std::function<std
 	return true;
 }
 
-BpVariable Bp::CreateVariable(const std::string& type, const std::string& desc) {
-	return CreateVariable(type, desc, "");
+BpVariable Bp::CreateVariable(const std::string& type) {
+	return CreateVariable(type, "");
 }
 
-BpVariable Bp::CreateVariable(const std::string& type, const std::string& desc, const std::string& value_desc) {
-	auto v = _base_mods->CreateVal(type);
-	auto var = BpVariable(type, desc, v);
-	if (v == nullptr) {
-		LOG(ERROR) << "Create var " << type << " (" << desc << ") = " << value_desc << " failed";
+BpVariable Bp::CreateVariable(const std::string& type, const std::string& value_desc) {
+	auto bpvar = _base_mods->CreateVal(type);
+	auto var = BpVariable(type, bpvar);
+	if (var.IsNone()) {
+		LOG(ERROR) << "Create var " << var << " failed";
 		return var;
 	}
 	if (!value_desc.empty()) {
@@ -145,7 +145,7 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 		auto name = vars[i]["name"].asString();
 		auto get = vars[i]["get"].asBool();
 		auto value_desc = vars[i]["value"].asString();
-		auto var = CreateVariable(type, name, value_desc);
+		auto var = CreateVariable(type, value_desc);
 		if (var.IsNone()) {
 			LOG(ERROR) << "create var " << name << " failed";
 			return LoadSaveState::ERR_VAR;
@@ -212,13 +212,12 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 		} else if (t == BpNodeType::BP_GRAPH_INPUT || t == BpNodeType::BP_GRAPH_OUTPUT) {
 			// input/output节点，设置ID，并添加pin
 			for (int i = 0; i < pins_desc.size(); ++i) {
-				auto pb_msg = _base_mods->CreateVal(pins_desc[i]["var_type"].asString());
+				auto pbvar = _base_mods->CreateVal(pins_desc[i]["var_type"].asString());
 				g->SetNextID(pins_desc[i]["id"].asInt());
 				g->AddModGraphPin(pins_desc[i]["var_name"].asString(), t, 
 						BpVariable(
-							pins_desc[i]["var_name"].asString(),
 							pins_desc[i]["var_type"].asString(),
-							pb_msg
+							pbvar
 						));
 			}
 		}
@@ -397,7 +396,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 		// args init
 		std::vector<BpVariable> args;
 		for (int i = 0; i < func_info.type_args.size(); ++i) {
-			auto var = CreateVariable(func_info.type_args[i], func_info.type_args[i]);
+			auto var = CreateVariable(func_info.type_args[i]);
 			if (var.IsNone()) {
 				LOG(ERROR) << "create var " << func_info.type_args[i] << " failed";
 				return nullptr;
@@ -407,7 +406,7 @@ std::shared_ptr<BpNode> Bp::SpawnNode(const std::string& node_name, const BpNode
 		// res init
 		std::vector<BpVariable> res;
 		for (int i = 0; i < func_info.type_res.size(); ++i) {
-			auto var = CreateVariable(func_info.type_res[i], func_info.type_res[i]);
+			auto var = CreateVariable(func_info.type_res[i]);
 			if (var.IsNone()) {
 				LOG(ERROR) << "create var " << func_info.type_res[i] << " failed";
 				return nullptr;
@@ -469,12 +468,12 @@ std::shared_ptr<BpNode> Bp::SpawnVarNode(std::shared_ptr<BpGraph>& g, const std:
 }
 
 std::shared_ptr<BpNode> Bp::SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_type, const std::string& var_name, bool is_get) {
-	auto msg = _base_mods->CreateVal(var_type);
-	if (msg == nullptr) {
+	auto bpvar = _base_mods->CreateVal(var_type);
+	if (bpvar.var == nullptr) {
 		LOG(ERROR) << "create var failed";
 		return nullptr;
 	}
-	g->AddVariable(var_name, BpVariable(var_type, var_name, msg));
+	g->AddVariable(var_name, BpVariable(var_type, bpvar));
 	return _nodes_lib->CreateVarNode(var_name, g->GetVariable(var_name), is_get);
 }
 

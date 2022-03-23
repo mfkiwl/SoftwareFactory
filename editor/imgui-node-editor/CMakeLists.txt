@@ -2,13 +2,6 @@ project(imgui_node_editor)
 
 find_package(imgui REQUIRED)
 
-add_library(imgui_canvas STATIC
-    imgui_canvas.cpp
-    imgui_canvas.h
-)
-
-target_link_libraries(imgui_canvas PUBLIC imgui)
-
 set(imgui_node_editor_SRC
     imgui_node_editor.h
     crude_json.cpp
@@ -37,8 +30,14 @@ set(imgui_node_editor_SRC
     Widgets.cpp
 )
 
-add_library(${PROJECT_NAME} STATIC ${imgui_node_editor_SRC})
+add_library(${PROJECT_NAME} SHARED ${imgui_node_editor_SRC})
 
 target_include_directories(${PROJECT_NAME} PUBLIC . ax)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC imgui)
+
+INSTALL(TARGETS ${PROJECT_NAME}
+    LIBRARY DESTINATION ${SF_INSTALL_LIB_DIR}
+    ARCHIVE DESTINATION ${SF_INSTALL_LIB_DIR}
+    RUNTIME DESTINATION ${SF_INSTALL_BIN_DIR}
+)

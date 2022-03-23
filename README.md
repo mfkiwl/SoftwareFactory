@@ -65,10 +65,10 @@ create_msg(const std::string& msg_name);
 //// 模块定义函数
 // 一个输入输出参数定义
 std::shared_ptr<::google::protobuf::Message> 
-fun(std::shared_ptr<::google::protobuf::Message>);
+fun1(std::shared_ptr<::google::protobuf::Message>);
 // 多个输入输出参数定义
 std::vector<std::shared_ptr<::google::protobuf::Message>> 
-fun(std::vector<std::shared_ptr<::google::protobuf::Message>>);
+fun2(std::vector<std::shared_ptr<::google::protobuf::Message>>);
 ```
 ### (二)开发模块需要定义的配置文件
 > 注1: "_comment" 为注释行, 实际没有该字段  
@@ -83,17 +83,26 @@ fun(std::vector<std::shared_ptr<::google::protobuf::Message>>);
         "add":{
             "_comment":"定义函数输入参数",
             "_input":[
-                "bpmath.BpIntPair"
+                {
+                    "type":"bpmath.BpIntPair",
+                    "name":"a and b"
+                }
             ],
             "_comment":"定义函数输出参数",
             "_output":[
-                "bpbase.Int"
+                {
+                    "type":"bpbase.Int",
+                    "name":"c"
+                }
             ]
         }
     },
     "_comment":"该模块定义的消息",
     "_val":[
-        "bpmath.BpIntPair"
+        {
+            "type":"bpmath.BpIntPair",
+            "desc":""
+        }
     ]
 }
 ```

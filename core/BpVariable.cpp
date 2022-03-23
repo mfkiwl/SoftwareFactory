@@ -11,6 +11,12 @@ BpVariable::BpVariable()
 	, _var(nullptr)
 {}
 
+BpVariable::BpVariable(const std::string& vt, const BpModuleVar& bpvar) 
+	: _var_type(vt)
+	, _var_desc(bpvar.desc)
+	, _var(bpvar.var)
+{}
+
 BpVariable::BpVariable(const std::string& vt, const std::string& desc, const pb_msg_ptr_t& v) 
 	: _var_type(vt)
 	, _var_desc(desc)

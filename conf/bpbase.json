@@ -3,7 +3,7 @@
     "_val":[
         {
             "type" : "bpbase.Bool",
-            "desc" : ""
+            "desc" : "true or false"
         },
         {
             "type" : "bpbase.Int",

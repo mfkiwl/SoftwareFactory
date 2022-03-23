@@ -88,9 +88,8 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                 for (int i = 0; i < v[*it].size(); ++i) {
                     const auto& var_info = v[*it][i];
                     auto leaf_val = std::make_shared<BpContents>(contents, var_info["type"].asString(), BpContents::Type::LEAF, BpContents::LeafType::VAL);
-                    leaf_val->SetData(var_info["desc"].asString());
                     contents->AddChild(leaf_val);
-                    _var_names.insert(var_info["type"].asString());
+                    _var_names[var_info["type"].asString()] = var_info["desc"].asString();
                 }
             }
         } else {
@@ -105,10 +104,12 @@ void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
     int in_n = v["_input"].size();
     int out_n = v["_output"].size();
     for (int i = 0; i < in_n; ++i) {
-        f.type_args.emplace_back(v["_input"][i].asString());
+        f.type_args.emplace_back(v["_input"][i]["type"].asString());
+        f.name_args.emplace_back(v["_input"][i]["name"].asString());
     }
     for (int i = 0; i < out_n; ++i) {
-        f.type_res.emplace_back(v["_output"][i].asString());
+        f.type_res.emplace_back(v["_output"][i]["type"].asString());
+        f.name_res.emplace_back(v["_output"][i]["name"].asString());
     }
     if (in_n == 0 && out_n == 1) {
         f.type = BpModuleFuncType::RES1_ARG0;
@@ -136,16 +137,24 @@ std::shared_ptr<BpContents> BpModule::GetContents() {
     return _contents;
 }
 
-pb_msg_ptr_t BpModule::CreateModuleVal(const std::string& msg_name) {
-    if (_var_names.find(msg_name) == _var_names.end()) {
-        LOG(ERROR) << _mod_name << ": can't find var " << msg_name;
+pb_msg_ptr_t BpModule::CreateModuleVal(const std::string& var_name) {
+    if (_var_names.find(var_name) == _var_names.end()) {
+        LOG(ERROR) << _mod_name << ": can't find var " << var_name;
         return nullptr;
     }
     if (_create_var_funcs == nullptr) {
         LOG(ERROR) << _mod_name << ": create_msg is nullptr";
         return nullptr;
     }
-    return _create_var_funcs(msg_name);
+    return _create_var_funcs(var_name);
+}
+
+const std::string BpModule::GetModuleVarDesc(const std::string& var_name) {
+    if (_var_names.find(var_name) == _var_names.end()) {
+        LOG(ERROR) << _mod_name << ": can't find var " << var_name;
+        return "";
+    }
+    return _var_names[var_name];
 }
 
 BpModuleFunc BpModule::GetModuleFunc(const std::string& func_name) {

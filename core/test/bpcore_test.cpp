@@ -122,7 +122,7 @@ TEST(bpcore, BpModLib) {
     auto cur_path = std::filesystem::current_path().string();
     bp::BpModLibLinux bll;
     EXPECT_TRUE(bll.Init(cur_path + "/../conf/"));
-    EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.IntPair"));
+    EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.IntPair").var);
     auto func = bll.GetFunc("bpmath.add_int");
     EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
 }

@@ -17,13 +17,15 @@ include_directories(${SDL2_INCLUDE_DIRS})
 
 find_package(imgui REQUIRED)
 include_directories(${imgui_INCLUDE_DIRS})
+
 include_directories(${CMAKE_SOURCE_DIR}/3rd/glew-cmake-2.2.0/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/common)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/imgui-node-editor)
+
 set(editor_srcs
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_opengl3.cpp
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_sdl.cpp
-    main.cpp
     SFEditor.cpp
     SFEPanel.cpp
     SFEPanelMainMenu.cpp
@@ -35,27 +37,51 @@ set(editor_srcs
     SFEPanelUINodes.cpp
     SFEPanelPlot.cpp
 )
-add_executable(${PROJECT_NAME} ${editor_srcs})
-target_compile_definitions(${PROJECT_NAME} PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
-target_link_libraries(${PROJECT_NAME}
+
+add_library(sfeui SHARED 
+    ${editor_srcs}
+)
+target_compile_definitions(sfeui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
+target_link_libraries(sfeui
     SDL2
     SDL2main
-    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libglew.a
     OpenGL
     GL
-    
-    nativefiledialog
-    imgui 
-    imgui_canvas
-    imgui_node_editor
-    
-    bplog
+
     bppb
     bpcore
     bpcommon
+
+    glew
+    imgui
+    imgui_node_editor
+    nativefiledialog
+)
+
+add_executable(${PROJECT_NAME} main.cpp)
+target_link_libraries(${PROJECT_NAME}
+    SDL2
+    SDL2main
+    OpenGL
+    GL
+    
+    bppb
+    bpcore
+    bpcommon
+
+    glew
+    imgui
+    imgui_node_editor
+    nativefiledialog
+    sfeui
 )
 
 INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SF_INSTALL_BIN_DIR})
+INSTALL(TARGETS sfeui
+    LIBRARY DESTINATION ${SF_INSTALL_LIB_DIR}
+    ARCHIVE DESTINATION ${SF_INSTALL_LIB_DIR}
+    RUNTIME DESTINATION ${SF_INSTALL_BIN_DIR}
+)
 
 FILE(GLOB assets_files "assets/*")
 INSTALL(FILES 

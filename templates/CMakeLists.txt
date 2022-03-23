@@ -7,7 +7,6 @@ SET(TEMPLATE_SRC
 add_executable(bptemplate ${TEMPLATE_SRC})
 target_link_libraries(bptemplate
     bpcommon
-    bplog
     bppb
     bpcore
 )

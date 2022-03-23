@@ -11,7 +11,7 @@
 
 typedef google::protobuf::Message pb_msg_t;
 typedef std::shared_ptr<google::protobuf::Message> pb_msg_ptr_t;
-typedef pb_msg_ptr_t (*module_create_val_func_t)(const std::string& msg_name);
+typedef pb_msg_ptr_t (*module_create_val_func_t)(const std::string& var_name);
 typedef pb_msg_ptr_t (*module_func0_t)();
 typedef std::vector<pb_msg_ptr_t> (*module_func1_t)();
 typedef pb_msg_ptr_t (*module_func2_t)(pb_msg_ptr_t);
@@ -31,11 +31,18 @@ enum class BpModuleFuncType {
     RESN_ARGN,
 };
 
+struct BpModuleVar {
+    pb_msg_ptr_t var = nullptr;
+    std::string desc = "";
+};
+
 struct BpModuleFunc {
     BpModuleFuncType type = BpModuleFuncType::UNKNOWN;
     std::string name;
     std::vector<std::string> type_args;
+    std::vector<std::string> name_args;
     std::vector<std::string> type_res;
+    std::vector<std::string> name_res;
     std::any func;
 };
 
@@ -51,7 +58,8 @@ public:
 
     std::shared_ptr<BpContents> GetContents();
 
-    pb_msg_ptr_t CreateModuleVal(const std::string& msg_name);
+    pb_msg_ptr_t CreateModuleVal(const std::string& var_name);
+    const std::string GetModuleVarDesc(const std::string& var_name);
 
     BpModuleFunc GetModuleFunc(const std::string& func_name);
 
@@ -73,7 +81,7 @@ protected:
     void AddFunc(std::string&, Json::Value&, void*);
     
     std::unordered_map<std::string, BpModuleFunc> _module_funcs;
-    std::unordered_set<std::string> _var_names;
+    std::unordered_map<std::string, std::string> _var_names;
     module_create_val_func_t _create_var_funcs = nullptr;
     std::shared_ptr<BpContents> _contents;
     std::string _mod_name;

@@ -1,10 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-ADD_SUBDIRECTORY(bplog)
-
 ADD_LIBRARY(bpcommon SHARED
     bpcommon.cpp
     bpflags.cpp
+    bplog/bplog.cpp
+    bplog/bplogger.cpp
 )
 TARGET_LINK_LIBRARIES(bpcommon)
 

@@ -17,7 +17,7 @@ public:
 
     void Init() override {
         AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
-        auto var = Bp::Instance().CreateVariable("bpbase.Bool", "bpbase.Bool");
+        auto var = Bp::Instance().CreateVariable("bpbase.Bool");
         AddPin("Condition", BpPinKind::BP_INPUT, BpPinType::BP_VALUE, var);
 
         AddPin("True", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable()); // true

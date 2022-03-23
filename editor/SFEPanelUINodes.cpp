@@ -26,13 +26,13 @@ std::shared_ptr<bp::BpNode> SFEPanelUINodes::SpawnUINode(const std::string& full
         node->AddPin("", ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_FLOW, ::bp::BpVariable()); 
         node->AddPin("", ::bp::BpPinKind::BP_OUTPUT, ::bp::BpPinType::BP_FLOW, ::bp::BpVariable()); 
         std::string cmd_type = "bpbase.String";
-        auto cmd = bp::Bp::Instance().CreateVariable(cmd_type, "cmd");
-        node->AddPin(cmd_type, ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, cmd); 
+        auto cmd = bp::Bp::Instance().CreateVariable(cmd_type);
+        node->AddPin("cmd", ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, cmd); 
         std::string var_type = "bpbase.Float";
-        auto x = bp::Bp::Instance().CreateVariable(var_type, "x");
-        auto y = bp::Bp::Instance().CreateVariable(var_type, "y");
-        node->AddPin(var_type, ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, x); 
-        node->AddPin(var_type, ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, y); 
+        auto x = bp::Bp::Instance().CreateVariable(var_type);
+        auto y = bp::Bp::Instance().CreateVariable(var_type);
+        node->AddPin("x", ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, x); 
+        node->AddPin("y", ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, y); 
         return node;
     }
     return nullptr;

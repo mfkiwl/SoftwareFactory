@@ -1,5 +1,6 @@
 #ifndef __BpVariable_hpp__
 #define __BpVariable_hpp__
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -12,9 +13,14 @@ namespace bp {
 class BpVariable
 {
 	friend class BpGraph;
+	friend std::ostream& operator<<(std::ostream& out, const BpVariable& var) {
+		out << var._var_type << "(" << var._var_desc << ") = " << var._var->DebugString();
+		return out;
+	}
 public:
 	BpVariable();
 	// 引用传递
+	BpVariable(const std::string& vt, const BpModuleVar& bpvar);
 	BpVariable(const std::string& vt, const std::string& desc, const pb_msg_ptr_t& v);
 	BpVariable(const BpVariable& v){ operator=(v); }
 	BpVariable& operator=(const BpVariable& o);

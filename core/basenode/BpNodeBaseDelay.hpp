@@ -18,7 +18,7 @@ public:
 
     void Init() override {
         AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());
-        auto var = Bp::Instance().CreateVariable("bpbase.Float", "bpbase.Float");
+        auto var = Bp::Instance().CreateVariable("bpbase.Float");
         AddPin("Duration", BpPinKind::BP_INPUT, BpPinType::BP_VALUE, var);
         
         auto& pin = AddPin("Completed", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());

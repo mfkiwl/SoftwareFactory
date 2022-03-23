@@ -40,16 +40,19 @@ public:
         return _mods;
     }
 
-    pb_msg_ptr_t CreateVal(const std::string& msg_name) {
+    BpModuleVar CreateVal(const std::string& msg_name) {
         // 搜索到对应模块,调用对应模块创建变量对象
         auto mod_name = BpCommon::GetModName(msg_name);
         for (int i = 0; i < _mods.size(); ++i) {
             if (_mods[i]->Name() == mod_name) {
-                return _mods[i]->CreateModuleVal(msg_name);
+                BpModuleVar bpvar;
+                bpvar.var = _mods[i]->CreateModuleVal(msg_name);
+                bpvar.desc = _mods[i]->GetModuleVarDesc(msg_name);
+                return bpvar;
             }
         }
         LOG(ERROR) << "Can't find var type \"" << msg_name << "\"";
-        return nullptr;
+        return BpModuleVar();
     }
 
     BpModuleFunc GetFunc(const std::string& full_path) {
