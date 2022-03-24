@@ -32,7 +32,7 @@ sudo make install
 
 ## 创建自定义基础模块工程
 ```py
-python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --dir="/path/to/base_mode_dir/" --name="user_define_name"
+python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --type="mod" --dir="/path/to/base_mode_dir/" --name="user_define_name"
 ```
 
 ## 自定义模块构建和安装

@@ -76,6 +76,19 @@ target_link_libraries(${PROJECT_NAME}
     sfeui
 )
 
+set(sfe_headers
+    SFEPanel.hpp
+)
+# FILE(GLOB sfe_headers "*.hpp")
+INSTALL(FILES 
+    ${sfe_headers}
+    PERMISSIONS
+    OWNER_READ
+    GROUP_READ
+    WORLD_READ
+    DESTINATION ${SF_INSTALL_INC_DIR}
+)
+
 INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SF_INSTALL_BIN_DIR})
 INSTALL(TARGETS sfeui
     LIBRARY DESTINATION ${SF_INSTALL_LIB_DIR}

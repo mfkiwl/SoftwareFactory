@@ -8,6 +8,7 @@ import shutil
 def dumpUsage():
     print("Usage: python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --name=MOD_NAME --dir=MOD_DIR")
     print("Options:")
+    print("  --type   MOD_TYPE            Base module type: [ mod | mod_with_ui | mod_panel ]")
     print("  --name   MOD_NAME            Base module name, for example: usermod")
     print("  --dir    MOD_DIR             Base module project dirtory, for example: /home/yourname/")
     print("")
@@ -28,11 +29,15 @@ def checkParams(opts):
                 return res
         elif opt in ('--dir'):
             res['dir'] = arg;
+        elif opt in ('--type'):
+            res['type'] = arg
+        else:
+            print("Unknown option " + arg)
     res['dir'] = res['dir'] + res['name'] + '/'
     return res
 
 def replaceParams(params, line):
-    return re.sub("@template_mod@", params["name"], line)
+    return re.sub("@template_name@", params["name"], line)
 
 def replaceFile(params, file):
     file_content = ""
@@ -54,12 +59,12 @@ if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(sys.argv[1:],
             "h",
-            ["name=", "dir="])
+            ["type=", "name=", "dir="])
     except getopt.GetOptError:
         dumpUsage()
         sys.exit(1)
     
-    opt_cnt = 2
+    opt_cnt = 3
     if len(opts) != opt_cnt:
         dumpUsage()
         sys.exit(1)
@@ -70,21 +75,41 @@ if __name__ == "__main__":
         dumpUsage()
         sys.exit(1)
     
+    proj_src_dir = ""
+    proj_rename_dict = {}
+    proj_modify_var_list = []
+    # 设置要修改的文件
+    proj_type = params_dict['type']
+    if proj_type == "mod":
+        proj_src_dir = "/opt/SoftwareFactory/templates/base_mod"
+        proj_rename_dict[params_dict["dir"] + "com/template_mod.cpp"] = params_dict["dir"] + "com/" + params_dict["name"] + ".cpp"
+        proj_rename_dict[params_dict["dir"] + "conf/template_mod.json"] = params_dict["dir"] + "conf/" + params_dict["name"] + ".json"
+        proj_modify_var_list.append(params_dict["dir"] + "CMakeLists.txt")
+        proj_modify_var_list.append(params_dict["dir"] + "conf/" + params_dict["name"] + ".json")
+    elif proj_type == "mod_with_ui":
+        proj_src_dir = "/opt/SoftwareFactory/templates/base_mod_with_ui"
+        proj_rename_dict[params_dict["dir"] + "com/template_mod_with_ui.cpp"] = params_dict["dir"] + "com/" + params_dict["name"] + ".cpp"
+        proj_rename_dict[params_dict["dir"] + "conf/template_mod_with_ui.json"] = params_dict["dir"] + "conf/" + params_dict["name"] + ".json"
+        proj_modify_var_list.append(params_dict["dir"] + "CMakeLists.txt")
+        proj_modify_var_list.append(params_dict["dir"] + "conf/" + params_dict["name"] + ".json")
+    elif proj_type == "mod_panel":
+        proj_src_dir = "/opt/SoftwareFactory/templates/base_panel"
+        proj_rename_dict[params_dict["dir"] + "template_panel.cpp"] = params_dict["dir"] + params_dict["name"] + ".cpp"
+        proj_modify_var_list.append(params_dict["dir"] + "CMakeLists.txt")
+    else:
+        dumpUsage()
+        sys.exit(1)
+
     # 拷贝到指定目录
-    shutil.copytree("/opt/SoftwareFactory/templates/base_mod", params_dict["dir"], True)
+    shutil.copytree(proj_src_dir, params_dict["dir"], True)
 
     # 重命名模板工程文件
-    rename_cpp = params_dict["dir"] + "com/" + params_dict["name"] + ".cpp"
-    rename_json = params_dict["dir"] + "conf/" + params_dict["name"] + ".json"
-    os.rename(params_dict["dir"] + "com/template_mod.cpp", rename_cpp)
-    os.rename(params_dict["dir"] + "conf/template_mod.json", rename_json)
+    for k in proj_rename_dict:
+        os.rename(k, proj_rename_dict[k])
 
     # 替换文件中变量
-    rename_cmakelist = params_dict["dir"] + "CMakeLists.txt"
-    print("replace content: " + rename_cmakelist)
-    replaceFile(params_dict, rename_cmakelist)
-    print("replace content: " + rename_json)
-    replaceFile(params_dict, rename_json)
+    for v in proj_modify_var_list:
+        replaceFile(params_dict, v)
 
     print("Success!!!")
     
