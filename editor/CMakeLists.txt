@@ -52,7 +52,7 @@ target_link_libraries(sfeui
     bpcore
     bpcommon
 
-    glew
+    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libglew.so
     imgui
     imgui_node_editor
     nativefiledialog
