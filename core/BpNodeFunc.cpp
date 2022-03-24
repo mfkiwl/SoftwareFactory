@@ -67,6 +67,10 @@ void BpNodeFunc::Logic() {
                 out.SetValue(res[i++]);
             }
         }
+    } else if (_info.type == BpModuleFuncType::RES0_ARG1) {
+        std::any_cast<module_func6_t>(_info.func)(args[0]);
+    } else if (_info.type == BpModuleFuncType::RES0_ARGN) {
+        std::any_cast<module_func7_t>(_info.func)(args);
     }
 }
 

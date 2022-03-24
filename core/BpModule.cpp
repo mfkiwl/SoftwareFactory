@@ -129,6 +129,12 @@ void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
     } else if (in_n > 1 && out_n > 1) {
         f.type = BpModuleFuncType::RESN_ARGN;
         f.func = reinterpret_cast<module_func5_t>(func);
+    } else if (in_n == 1 && out_n == 0) {
+        f.type = BpModuleFuncType::RES0_ARG1;
+        f.func = reinterpret_cast<module_func6_t>(func);
+    } else if (in_n > 1 && out_n == 0) {
+        f.type = BpModuleFuncType::RES0_ARGN;
+        f.func = reinterpret_cast<module_func7_t>(func);
     }
     _module_funcs[func_name] = f;
 }

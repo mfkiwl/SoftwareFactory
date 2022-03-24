@@ -18,6 +18,8 @@ typedef pb_msg_ptr_t (*module_func2_t)(pb_msg_ptr_t);
 typedef std::vector<pb_msg_ptr_t> (*module_func3_t)(pb_msg_ptr_t);
 typedef pb_msg_ptr_t (*module_func4_t)(std::vector<pb_msg_ptr_t>);
 typedef std::vector<pb_msg_ptr_t> (*module_func5_t)(std::vector<pb_msg_ptr_t>);
+typedef void (*module_func6_t)(pb_msg_ptr_t);
+typedef void (*module_func7_t)(std::vector<pb_msg_ptr_t>);
 
 namespace bp {
 
@@ -29,6 +31,8 @@ enum class BpModuleFuncType {
     RESN_ARG1,
     RES1_ARGN,
     RESN_ARGN,
+    RES0_ARG1,
+    RES0_ARGN,
 };
 
 struct BpModuleVar {
