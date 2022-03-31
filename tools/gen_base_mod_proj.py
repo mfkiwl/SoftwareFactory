@@ -95,7 +95,9 @@ if __name__ == "__main__":
     elif proj_type == "mod_panel":
         proj_src_dir = "/opt/SoftwareFactory/templates/base_panel"
         proj_rename_dict[params_dict["dir"] + "template_panel.cpp"] = params_dict["dir"] + params_dict["name"] + ".cpp"
+        proj_rename_dict[params_dict["dir"] + "template_panel.json"] = params_dict["dir"] + params_dict["name"] + ".json"
         proj_modify_var_list.append(params_dict["dir"] + "CMakeLists.txt")
+        proj_modify_var_list.append(params_dict["dir"] + params_dict["name"] + ".json")
     else:
         dumpUsage()
         sys.exit(1)

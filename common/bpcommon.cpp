@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <sstream>
+#include <fstream>
 #include <chrono>
 #include <regex>
 #include "bpcommon.hpp"
@@ -420,6 +421,21 @@ std::vector<std::string> BpCommon::GetDirFiles(const std::string& conf_path) {
     }
     closedir(dir);
     return res;
+}
+
+static Json::Value LoadJsonFromFile(const std::string& json_file) {
+    std::ifstream ifs(json_file);
+    if (!ifs.is_open()) {
+        return Json::Value::null;
+    }
+    Json::Value root;
+    Json::Reader reader(Json::Features::strictMode());
+    if (!reader.parse(ifs, root)) {
+        ifs.close();
+        return Json::Value::null;
+    }
+    ifs.close();
+    return root;
 }
 
 std::string BpCommon::Json2Str(const Json::Value& v) {

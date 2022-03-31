@@ -10,6 +10,10 @@
 
 #include "imgui.h"
 
+#define SFE_PANEL_TYPE \
+public: \
+virtual std::string TypeName() { return typeid(*this).name(); }
+
 namespace sfe {
 
 struct SFEMessage {
@@ -43,6 +47,7 @@ struct SFEMessage {
 */
 class SFEPanel : public std::enable_shared_from_this<SFEPanel> 
 {
+    friend class SFEditor;
 public:
     const std::string& PanelName() { return _name; }
     void SetPanelName(const std::string& name) { _name = name; }
@@ -54,6 +59,11 @@ public:
     virtual void Update() = 0;
 
     virtual void Exit() = 0;
+
+    void SetShow(bool b) { _show = b; }
+    bool IsShow() { return _show; }
+    
+    void SendMessage(const SFEMessage& msg);
 
     static bool RegPanel(const std::string& panel_name, std::shared_ptr<SFEPanel> p) {
         p->SetPanelName(panel_name);
@@ -75,6 +85,11 @@ public:
         return _s_panels;
     }
 
+protected:
+    virtual void OnMessage(const SFEMessage& msg) {}
+    virtual void OnPostSendMessage(const SFEMessage& msg) {}
+
+private:
     /* Call by SFEditor */
     void ProcMessage();
     void RecvMessage(const SFEMessage& msg) {
@@ -82,15 +97,8 @@ public:
     }
     const std::vector<SFEMessage>& GetDispatchMessage() { return _send_que; }
     void ClearDispathMessage() { _send_que.clear(); }
-    /* Call by child */
-    void SendMessage(const SFEMessage& msg);
-protected:
-    /* Call by this */
-    virtual void OnMessage(const SFEMessage& msg) {}
-    /* 主要用于undo/redo操作 */
-    virtual void OnPostSendMessage(const SFEMessage& msg) {}
 
-private:
+    bool _show = true;
     std::string _name;
     std::vector<SFEMessage> _send_que;
     std::vector<SFEMessage> _recv_que;

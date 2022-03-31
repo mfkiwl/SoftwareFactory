@@ -7,4 +7,5 @@ DEFINE_string(base_mod_cfg_dir, "/opt/SoftwareFactory/conf/", "基础模块配�
 DEFINE_string(mod_graph_dir, "/opt/SoftwareFactory/mods/", "组织模块目录");
 DEFINE_string(assets_dir, "/opt/SoftwareFactory/assets/", "资源目录");
 DEFINE_string(conf_dir, "/opt/SoftwareFactory/params/", "配置文件目录");
+DEFINE_string(plug_conf_dir, "/opt/SoftwareFactory/plug/", "配置文件目录");
 } // namespace bp

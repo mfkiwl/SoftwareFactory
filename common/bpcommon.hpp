@@ -45,6 +45,7 @@ namespace bp {
         static double GetTimestamp();
         static std::string GetCurTime();
         static std::vector<std::string> GetDirFiles(const std::string& conf_path);
+        static Json::Value LoadJsonFromFile(const std::string& json_file);
         static std::string Json2Str(const Json::Value& v);
         static Json::Value Str2Json(const std::string& str);
         static bool IsName(const char* buf, int sz);

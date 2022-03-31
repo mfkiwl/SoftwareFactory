@@ -9,5 +9,6 @@ DECLARE_string(base_mod_cfg_dir);
 DECLARE_string(mod_graph_dir);
 DECLARE_string(assets_dir);
 DECLARE_string(conf_dir);
+DECLARE_string(plug_conf_dir);
 
 } // namespace bp
