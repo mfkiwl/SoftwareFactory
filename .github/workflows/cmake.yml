@@ -31,4 +31,8 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    
+    - name: Test
+      run: cd ${{github.workspace}}/build/output/bin
+      run: for exec_file in `ls *test`; do eval ./${exec_file}; done
       
