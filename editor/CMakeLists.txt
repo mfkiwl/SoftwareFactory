@@ -36,6 +36,7 @@ set(editor_srcs
     SFEPanelLog.cpp
     SFEPanelUINodes.cpp
     SFEPanelPlot.cpp
+    SFEPlug.cpp
 )
 
 add_library(sfeui SHARED 

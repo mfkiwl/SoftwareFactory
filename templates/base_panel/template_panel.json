@@ -1,5 +1,9 @@
 {
     "_lib":"lib@template_name@.so",
     "_instance": [
+        {
+            "name":"@template_name@",
+            "type":"@template_name@"
+        }
     ]
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "SFEPanel.hpp"
 
-typedef std::shared_ptr<sfe::SFEPanel> (*create_panel_func_t)();
+typedef std::shared_ptr<sfe::SFEPanel> (*create_panel_func_t)(const std::string&);
 namespace sfe {
 
 class SFEPlug {

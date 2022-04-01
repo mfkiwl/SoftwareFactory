@@ -10,15 +10,17 @@
 #include "bpcommon.hpp"
 #include "Bp.hpp"
 #include "bplog/bplog.hpp"
+#include "bpflags.hpp"
 
 namespace sfe {
 
 bool SFEditor::Init() {
     bp::InitLogging("SoftwareFactory");
+
     auto log_panel = std::make_shared<SFEPanelLog>();
     bp::RegisterWriteCallback(std::bind(&SFEPanelLog::AddLogCB, log_panel.get(), std::placeholders::_1));
-
     SFEPanel::RegPanel("log", log_panel);
+
     SFEPanel::RegPanel("uinodes", std::make_shared<SFEPanelUINodes>());
     SFEPanel::RegPanel("mainmenu", std::make_shared<SFEPanelMainMenu>());
     SFEPanel::RegPanel("bp editor", std::make_shared<SFEPanelBp>());
@@ -27,11 +29,8 @@ bool SFEditor::Init() {
     SFEPanel::RegPanel("graph", std::make_shared<SFEPanelGraph>());
     SFEPanel::RegPanel("plot", std::make_shared<SFEPanelPlot>());
 
-    const auto& panels = SFEPanel::GetPanels();
-    LOG(INFO) << "Reg panel, " << panels.size();
-    for (auto it = panels.begin(); it != panels.end(); ++it) {
-        (it->second)->Init();
-    }
+    _pluglib = std::make_unique<SFEPlugLib>();
+    _pluglib->Init(bp::FLAGS_plug_conf_dir);
     return true;
 }
 

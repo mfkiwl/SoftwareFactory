@@ -423,7 +423,7 @@ std::vector<std::string> BpCommon::GetDirFiles(const std::string& conf_path) {
     return res;
 }
 
-static Json::Value LoadJsonFromFile(const std::string& json_file) {
+Json::Value BpCommon::LoadJsonFromFile(const std::string& json_file) {
     std::ifstream ifs(json_file);
     if (!ifs.is_open()) {
         return Json::Value::null;

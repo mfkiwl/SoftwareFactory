@@ -15,7 +15,7 @@ bool SFEPlug::Init(const char* dll_path) {
     if (OpenDll(dll_path)) {
         return false;
     }
-    _create_func = GetFunc("create_panel");
+    _create_func = (create_panel_func_t)GetFunc("create_panel");
     if (_create_func == nullptr) {
         return false;
     }

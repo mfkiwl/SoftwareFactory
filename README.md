@@ -118,3 +118,68 @@ sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/SoftwareF
 # 运行编辑好的程序
 sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/bptemplate -graph_exec_file="/path/to/hello_exec.json"
 ```
+
+# 界面插件开发
+## 创建界面插件工程
+```py
+python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --type="mod_panel" --dir="/path/to/panel_dir/" --name="user_panel_name"
+```
+
+## 界面插件构建和安装
+```sh
+mkdir build
+cd build
+cmake ../
+make
+make install
+```
+
+## 界面插件开发目录组织结构
+```
+|--panel_hello.json
+|--panel_hello.cpp
+|--CMakeLists.txt
+```
+
+## 界面插件开发两步走
+### (一)重写panel函数
+```c++ 
+class panel_hello : public SFEPanel {
+public:
+    virtual bool Init() override {
+        return true;
+    }
+    virtual void Update() override {
+        ImGui::Begin(PanelName().c_str());
+
+        ImGui::Button("Hello");
+        
+        ImGui::End();
+    }
+    virtual void Exit() override {
+
+    }
+    virtual void OnMessage(const SFEMessage& msg) override {
+
+    }
+};
+```
+### (二)修改界面插件配置文件
+> 注1: "_comment" 为注释行, 实际没有该字段  
+> 注2: 关键字都以下划线开头
+```json
+{
+    "_comment":"库模块名称",
+    "_lib":"libpanel_hello.so",
+    "_comment":"定义插件实例",
+    "_instance":[
+        {
+            "_comment":"实例1",
+            "_comment":"定义panel对象名",
+            "type":"panel_hello",
+            "_comment":"定义panel实例名",
+            "name":"panel_hello"
+        }
+    ]
+}
+```

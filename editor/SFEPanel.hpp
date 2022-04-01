@@ -31,20 +31,6 @@ struct SFEMessage {
     }
 };
 
-/*
-    初始化
-    输入系统
-    命令
-        {
-            command: "spawnnode",
-            arg1: "bpmath.add_int",
-            ...
-        }
-    更新
-    退出
-
-    面板公共设置
-*/
 class SFEPanel : public std::enable_shared_from_this<SFEPanel> 
 {
     friend class SFEditor;
@@ -65,25 +51,11 @@ public:
     
     void SendMessage(const SFEMessage& msg);
 
-    static bool RegPanel(const std::string& panel_name, std::shared_ptr<SFEPanel> p) {
-        p->SetPanelName(panel_name);
-        if (_s_panels.find(p->PanelName()) == _s_panels.end()) {
-            _s_panels[p->PanelName()] = p;
-            return true;
-        }
-        return false;
-    }
+    static bool RegPanel(const std::string& panel_name, std::shared_ptr<SFEPanel> p);
 
-    static std::shared_ptr<SFEPanel> GetPanel(const std::string& panel_name) {
-        if (_s_panels.find(panel_name) == _s_panels.end()) {
-            return nullptr;
-        }
-        return _s_panels[panel_name];
-    }
+    static std::shared_ptr<SFEPanel> GetPanel(const std::string& panel_name);
 
-    static const std::unordered_map<std::string, std::shared_ptr<SFEPanel>>& GetPanels() {
-        return _s_panels;
-    }
+    static const std::unordered_map<std::string, std::shared_ptr<SFEPanel>>& GetPanels();
 
 protected:
     virtual void OnMessage(const SFEMessage& msg) {}

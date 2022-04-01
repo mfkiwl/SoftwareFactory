@@ -5,6 +5,7 @@
 
 #include "bpcommon.hpp"
 #include "SFEPanel.hpp"
+#include "SFEPlugLib.hpp"
 
 namespace sfe {
 
@@ -38,6 +39,7 @@ private:
 
     std::vector<SFEMessage> _send_que;
     bool _show_demo = false;
+    std::unique_ptr<SFEPlugLib> _pluglib;
 };
 
 } // namespace sfe

@@ -98,6 +98,7 @@ if __name__ == "__main__":
         proj_rename_dict[params_dict["dir"] + "template_panel.json"] = params_dict["dir"] + params_dict["name"] + ".json"
         proj_modify_var_list.append(params_dict["dir"] + "CMakeLists.txt")
         proj_modify_var_list.append(params_dict["dir"] + params_dict["name"] + ".json")
+        proj_modify_var_list.append(params_dict["dir"] + params_dict["name"] + ".cpp")
     else:
         dumpUsage()
         sys.exit(1)
