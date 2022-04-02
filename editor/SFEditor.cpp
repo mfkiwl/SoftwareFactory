@@ -118,6 +118,7 @@ void SFEditor::Exit() {
     for (auto it = panels.begin(); it != panels.end(); ++it) {
         (it->second)->Exit();
     }
+    SFEPanel::ClearPanels();
 }
 
 const std::shared_ptr<SFEPanel> SFEditor::GetPanel(const std::string& name) {

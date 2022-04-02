@@ -21,6 +21,8 @@ INSTALL(TARGETS imgui
 set(imgui_headers 
     imgui.h
     imconfig.h
+    imgui_internal.h
+    imstb_textedit.h
 )
 INSTALL(FILES 
     ${imgui_headers}

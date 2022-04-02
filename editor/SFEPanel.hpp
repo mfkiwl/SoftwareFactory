@@ -57,6 +57,8 @@ public:
 
     static const std::unordered_map<std::string, std::shared_ptr<SFEPanel>>& GetPanels();
 
+    static void ClearPanels() { _s_panels.clear(); }
+
 protected:
     virtual void OnMessage(const SFEMessage& msg) {}
     virtual void OnPostSendMessage(const SFEMessage& msg) {}
