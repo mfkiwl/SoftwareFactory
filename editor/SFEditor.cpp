@@ -31,6 +31,8 @@ bool SFEditor::Init() {
 
     _pluglib = std::make_unique<SFEPlugLib>();
     _pluglib->Init(bp::FLAGS_plug_conf_dir);
+
+    _ratectrl.reset();
     return true;
 }
 

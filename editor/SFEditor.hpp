@@ -6,6 +6,7 @@
 #include "bpcommon.hpp"
 #include "SFEPanel.hpp"
 #include "SFEPlugLib.hpp"
+#include "SFERateCtrl.hpp"
 
 namespace sfe {
 
@@ -24,6 +25,8 @@ public:
 
     void Exit();
 
+    bool Sleep() { return _ratectrl.sleep(); }
+
 private:
     const std::string _name = "editor";
     void SendMessage(const SFEMessage& msg) {
@@ -40,6 +43,7 @@ private:
     std::vector<SFEMessage> _send_que;
     bool _show_demo = false;
     std::unique_ptr<SFEPlugLib> _pluglib;
+    sfe::RateCtl _ratectrl;
 };
 
 } // namespace sfe
