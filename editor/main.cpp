@@ -4,6 +4,7 @@
 // (GL3W is a helper library to access OpenGL functions since there is no standard header to access modern OpenGL functions easily. Alternatives are GLEW, Glad, etc.)
 #include <stdio.h>
 #include <memory>
+#include <iostream>
 
 #include <SDL.h>
 
