@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <fstream>
-#include <filesystem>
 #include <glog/logging.h>
 #include "bpflags.hpp"
 #include "BpModule.hpp"
@@ -113,29 +112,22 @@ void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
     }
     if (in_n == 0 && out_n == 1) {
         f.type = BpModuleFuncType::RES1_ARG0;
-        f.func = reinterpret_cast<module_func0_t>(func);
     } else if (in_n == 0 && out_n > 1) {
         f.type = BpModuleFuncType::RESN_ARG0;
-        f.func = reinterpret_cast<module_func1_t>(func);
     } else if (in_n == 1 && out_n == 1) {
         f.type = BpModuleFuncType::RES1_ARG1;
-        f.func = reinterpret_cast<module_func2_t>(func);
     } else if (in_n == 1 && out_n > 1) {
         f.type = BpModuleFuncType::RESN_ARG1;
-        f.func = reinterpret_cast<module_func3_t>(func);
     } else if (in_n > 1 && out_n == 1) {
         f.type = BpModuleFuncType::RES1_ARGN;
-        f.func = reinterpret_cast<module_func4_t>(func);
     } else if (in_n > 1 && out_n > 1) {
         f.type = BpModuleFuncType::RESN_ARGN;
-        f.func = reinterpret_cast<module_func5_t>(func);
     } else if (in_n == 1 && out_n == 0) {
         f.type = BpModuleFuncType::RES0_ARG1;
-        f.func = reinterpret_cast<module_func6_t>(func);
     } else if (in_n > 1 && out_n == 0) {
         f.type = BpModuleFuncType::RES0_ARGN;
-        f.func = reinterpret_cast<module_func7_t>(func);
     }
+    f.func = func;
     _module_funcs[func_name] = f;
 }
 

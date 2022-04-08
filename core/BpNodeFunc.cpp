@@ -23,7 +23,7 @@ void BpNodeFunc::Logic() {
     }
     int i = 0;
     if (_info.type == BpModuleFuncType::RES1_ARG0) {
-        auto res = std::any_cast<module_func0_t>(_info.func)();
+        auto res = reinterpret_cast<module_func0_t>(_info.func)();
         for(auto& out : _outputs) {
             if (out.GetPinType() == BpPinType::BP_VALUE) {
                 out.SetValue(res);
@@ -31,14 +31,14 @@ void BpNodeFunc::Logic() {
             }
         }
     } else if (_info.type == BpModuleFuncType::RESN_ARG0) {
-        auto res = std::any_cast<module_func1_t>(_info.func)();
+        auto res = reinterpret_cast<module_func1_t>(_info.func)();
         for(auto& out : _outputs) {
             if (out.GetPinType() == BpPinType::BP_VALUE) {
                 out.SetValue(res[i++]);
             }
         }
     } else if (_info.type == BpModuleFuncType::RES1_ARG1) {
-        auto res = std::any_cast<module_func2_t>(_info.func)(args[0]);
+        auto res = reinterpret_cast<module_func2_t>(_info.func)(args[0]);
         for(auto& out : _outputs) {
             if (out.GetPinType() == BpPinType::BP_VALUE) {
                 out.SetValue(res);
@@ -46,14 +46,14 @@ void BpNodeFunc::Logic() {
             }
         }
     } else if (_info.type == BpModuleFuncType::RESN_ARG1) {
-        auto res = std::any_cast<module_func3_t>(_info.func)(args[0]);
+        auto res = reinterpret_cast<module_func3_t>(_info.func)(args[0]);
         for(auto& out : _outputs) {
             if (out.GetPinType() == BpPinType::BP_VALUE) {
                 out.SetValue(res[i++]);
             }
         }
     } else if (_info.type == BpModuleFuncType::RES1_ARGN) {
-        auto res = std::any_cast<module_func4_t>(_info.func)(args);
+        auto res = reinterpret_cast<module_func4_t>(_info.func)(args);
         for(auto& out : _outputs) {
             if (out.GetPinType() == BpPinType::BP_VALUE) {
                 out.SetValue(res);
@@ -61,16 +61,16 @@ void BpNodeFunc::Logic() {
             }
         }
     } else if (_info.type == BpModuleFuncType::RESN_ARGN) {
-        auto res = std::any_cast<module_func5_t>(_info.func)(args);
+        auto res = reinterpret_cast<module_func5_t>(_info.func)(args);
         for(auto& out : _outputs) {
             if (out.GetPinType() == BpPinType::BP_VALUE) {
                 out.SetValue(res[i++]);
             }
         }
     } else if (_info.type == BpModuleFuncType::RES0_ARG1) {
-        std::any_cast<module_func6_t>(_info.func)(args[0]);
+        reinterpret_cast<module_func6_t>(_info.func)(args[0]);
     } else if (_info.type == BpModuleFuncType::RES0_ARGN) {
-        std::any_cast<module_func7_t>(_info.func)(args);
+        reinterpret_cast<module_func7_t>(_info.func)(args);
     }
 }
 

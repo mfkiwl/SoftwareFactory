@@ -8,6 +8,7 @@
 
 # 开发/运行环境
 操作系统: Ubuntu 20.04
+开发语言：C++14
 
 # 安装依赖
 ```sh
@@ -183,3 +184,7 @@ public:
     ]
 }
 ```
+
+# Useful example
+> 基础模块工程例子：[https://github.com/lkpworkspace/bpio](https://github.com/lkpworkspace/bpio)
+

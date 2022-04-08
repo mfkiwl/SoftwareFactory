@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <set>
 #include <gtest/gtest.h>
 #include <glog/logging.h>
@@ -87,11 +86,10 @@ TEST(bpcore, BpVariable) {
 }
 
 TEST(bpcore, BpModule) {
-    auto cur_path = std::filesystem::current_path().string();
     bp::BpModuleLinux bml;
     EXPECT_FALSE(bml.LoadModule(""));
-    EXPECT_TRUE(bml.LoadModule(cur_path + "/../conf/bpmath.json"));
-    EXPECT_TRUE(bml.LoadModule(cur_path + "/../conf/bpbase.json"));
+    EXPECT_TRUE(bml.LoadModule("../conf/bpmath.json"));
+    EXPECT_TRUE(bml.LoadModule("../conf/bpbase.json"));
     LOG(INFO) << "bpmath.json contents:";
     LOG(INFO) << "\n" << bml.GetContents()->PrintContents();
 
@@ -105,7 +103,7 @@ TEST(bpcore, BpModule) {
         auto p = std::make_shared<::bp::IntPair>();
         p->set_a(1);
         p->set_b(1);
-        auto res = std::any_cast<module_func2_t>(func.func)(p);
+        auto res = reinterpret_cast<module_func2_t>(func.func)(p);
         EXPECT_EQ(std::static_pointer_cast<::bp::Int>(res)->var(), 2);
     }
     {
@@ -113,15 +111,14 @@ TEST(bpcore, BpModule) {
         auto p = std::make_shared<::bp::IntPair>();
         p->set_a(1);
         p->set_b(1);
-        auto res = std::any_cast<module_func2_t>(func.func)(p);
+        auto res = reinterpret_cast<module_func2_t>(func.func)(p);
         EXPECT_EQ(std::static_pointer_cast<::bp::Int>(res)->var(), 0);
     }
 }
 
 TEST(bpcore, BpModLib) {
-    auto cur_path = std::filesystem::current_path().string();
     bp::BpModLibLinux bll;
-    EXPECT_TRUE(bll.Init(cur_path + "/../conf/"));
+    EXPECT_TRUE(bll.Init("../conf/"));
     EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.IntPair").var);
     auto func = bll.GetFunc("bpmath.add_int");
     EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
