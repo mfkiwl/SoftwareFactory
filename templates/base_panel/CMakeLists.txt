@@ -22,9 +22,11 @@ FIND_PACKAGE(gflags REQUIRED)
 FIND_PACKAGE(Protobuf REQUIRED)
 FIND_PACKAGE(GTest REQUIRED)
 FIND_PACKAGE(SDL2 REQUIRED)
+FIND_PACKAGE(GLEW REQUIRED)
 
-#### include
+#### include directory
 INCLUDE_DIRECTORIES(${SDL2_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${SF_ROOT}/inc)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -42,12 +44,13 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME}
     SDL2main
     OpenGL
     GL
+    ${GLEW_LIBRARIES}
 
     bppb
     bpcore
     bpcommon
 
-    glew
+    sfeui
     imgui
     imgui_node_editor
     nativefiledialog
