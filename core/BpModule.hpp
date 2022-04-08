@@ -47,7 +47,6 @@ struct BpModuleFunc {
     std::vector<std::string> name_args;
     std::vector<std::string> type_res;
     std::vector<std::string> name_res;
-    // std::any func;
     void* func;
 };
 

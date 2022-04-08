@@ -29,12 +29,13 @@ foreach(ut_file ${bpcommon_files})
     GET_FILENAME_COMPONENT(ut_file_target ${ut_file} NAME_WE)
     ADD_EXECUTABLE(${ut_file_target} ${ut_file})
     TARGET_LINK_LIBRARIES(${ut_file_target}
-        gtest_main    
-        gtest
+        GTest::GTest
+        GTest::Main
         bppb
         pthread
         bpcommon
         jsoncpp
     )
+    add_test(AllTests ${ut_file_target})
 endforeach(ut_file ${bpcommon_files})
 

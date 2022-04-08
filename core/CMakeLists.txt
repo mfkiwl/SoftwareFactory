@@ -34,16 +34,6 @@ SET(BP_CORE_SRC
 ADD_LIBRARY(bpcore SHARED ${BP_CORE_SRC})
 TARGET_LINK_LIBRARIES(bpcore bpcommon bppb)
 
-# FILE(GLOB bpcore_headers "*.hpp")
-# INSTALL(FILES 
-#     ${bpcore_headers}
-#     PERMISSIONS
-#     OWNER_READ
-#     GROUP_READ
-#     WORLD_READ
-#     DESTINATION ${SF_INSTALL_INC_DIR}
-# )
-
 INSTALL(TARGETS bpcore
     LIBRARY DESTINATION ${SF_INSTALL_LIB_DIR}
     ARCHIVE DESTINATION ${SF_INSTALL_LIB_DIR}
@@ -55,10 +45,11 @@ foreach(ut_file ${bpcore_files})
     GET_FILENAME_COMPONENT(ut_file_target ${ut_file} NAME_WE)
     ADD_EXECUTABLE(${ut_file_target} ${ut_file})
     TARGET_LINK_LIBRARIES(${ut_file_target}
-        gtest_main    
-        gtest
+        GTest::GTest
+        GTest::Main
         bppb
         bpcore
         bpcommon
     )
+    add_test(AllTests ${ut_file_target})
 endforeach(ut_file ${bpcore_files})

@@ -7,7 +7,7 @@
 2. 软件工厂编辑器,主要用于编辑更高级的模块组件(或者可执行程序).
 
 # 开发/运行环境
-操作系统: Ubuntu 20.04
+操作系统: Ubuntu 18.04
 开发语言：C++14
 
 # 安装依赖
@@ -15,6 +15,11 @@
 sudo apt-get install build-essential cmake
 sudo apt-get install libjsoncpp-dev libprotobuf-dev protobuf-compiler libgflags-dev libgtest-dev libgoogle-glog-dev 
 sudo apt-get install libsdl2-dev libglew-dev libgtk-3-dev
+
+cd /usr/src/gtest
+sudo cmake CMakeLists.txt 
+sudo make 
+sudo cp *.a /usr/lib
 ```
 
 # 构建

@@ -22,6 +22,7 @@ include_directories(${CMAKE_SOURCE_DIR}/3rd/glew-cmake-2.2.0/include)
 include_directories(${CMAKE_SOURCE_DIR}/common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/imgui-node-editor)
+include_directories(${GLEW_INCLUDE_DIRS})
 
 set(editor_srcs
     ${CMAKE_SOURCE_DIR}/3rd/imgui/examples/imgui_impl_opengl3.cpp
@@ -42,18 +43,19 @@ set(editor_srcs
 add_library(sfeui SHARED 
     ${editor_srcs}
 )
+
 target_compile_definitions(sfeui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLEW)
 target_link_libraries(sfeui
     SDL2
     SDL2main
     OpenGL
     GL
+    ${GLEW_LIBRARIES}
 
     bppb
     bpcore
     bpcommon
 
-    ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libglew.so
     imgui
     imgui_node_editor
     nativefiledialog
@@ -65,12 +67,12 @@ target_link_libraries(${PROJECT_NAME}
     SDL2main
     OpenGL
     GL
-    
+    ${GLEW_LIBRARIES}
+
     bppb
     bpcore
     bpcommon
 
-    glew
     imgui
     imgui_node_editor
     nativefiledialog
@@ -80,7 +82,6 @@ target_link_libraries(${PROJECT_NAME}
 set(sfe_headers
     SFEPanel.hpp
 )
-# FILE(GLOB sfe_headers "*.hpp")
 INSTALL(FILES 
     ${sfe_headers}
     PERMISSIONS
