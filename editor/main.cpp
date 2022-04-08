@@ -12,6 +12,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "SFEditor.hpp"
+#include "SFETimeRecorder.hpp"
 #include "bpflags.hpp"
 
 // About Desktop OpenGL function loaders:
@@ -132,9 +133,14 @@ int main(int, char**)
         return -1;
     }
     // Main loop
+    auto& timerecorder = sfe::SFETimeRecorder::Instance();
     bool done = false;
     while (!done) {
+        std::cout << timerecorder.TimeCostInfo() << std::endl;
+        timerecorder.Clear();
+        timerecorder.Record("loop begin");
         editor->Sleep();
+        timerecorder.Record("sleep");
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -183,15 +189,19 @@ int main(int, char**)
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(2, 2));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 4.0f);
 
+        timerecorder.Record("new frame");
         // Views
         editor->Update();
+        timerecorder.Record("update");
         editor->DispatchMessage();
         editor->ProcMessage();
+        timerecorder.Record("proc message");
 
         ImGui::PopStyleVar(2);
         ImGui::End();
 
         // Rendering
+        timerecorder.Record("imgui end");
         ImGui::Render();
         glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -199,6 +209,7 @@ int main(int, char**)
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         SDL_GL_SwapWindow(window);
+        timerecorder.Record("rendering");
     }
     LOG(INFO) << "Exit loop";
     editor->Exit();
