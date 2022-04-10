@@ -208,3 +208,4 @@ public:
 > 基础模块工程例子：[https://github.com/lkpworkspace/bpio](https://github.com/lkpworkspace/bpio)  
 > 控制界面的基础模块例子: [https://github.com/lkpworkspace/uimod_bitmap](https://github.com/lkpworkspace/uimod_bitmap)  
 > 界面插件例子: [https://github.com/lkpworkspace/panel_bitmap](https://github.com/lkpworkspace/panel_bitmap)  
+![bitmap demo](doc/pics/bitmap_demo.gif)
