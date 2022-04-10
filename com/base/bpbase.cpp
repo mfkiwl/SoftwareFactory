@@ -5,12 +5,14 @@
 static std::unordered_map<std::string, std::function<std::shared_ptr<::google::protobuf::Message>()>> g_msg_map = {
     {"bpbase.Bool", [](){ return std::make_shared<bp::Bool>(); }},
     {"bpbase.Int", [](){ return std::make_shared<bp::Int>(); }},
+    {"bpbase.UInt32", [](){ return std::make_shared<bp::UInt32>(); }},
     {"bpbase.Float", [](){ return std::make_shared<bp::Float>(); }},
     {"bpbase.String", [](){ return std::make_shared<bp::String>(); }},
     {"bpbase.Bytes", [](){ return std::make_shared<bp::Bytes>(); }},
     {"bpbase.IntPair", [](){ return std::make_shared<bp::IntPair>(); }},
     {"bpbase.FloatPair", [](){ return std::make_shared<bp::FloatPair>(); }},
     {"bpbase.IntAry", [](){ return std::make_shared<bp::IntAry>(); }},
+    {"bpbase.UInt32Ary", [](){ return std::make_shared<bp::UInt32Ary>(); }},
     {"bpbase.FloatAry", [](){ return std::make_shared<bp::FloatAry>(); }},
 };
 

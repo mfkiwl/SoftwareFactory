@@ -9,6 +9,10 @@ message Int {
     int32 var = 1;
 }
 
+message UInt32 {
+    uint32 var = 1;
+}
+
 message Float {
     float var = 1;
 }
@@ -33,6 +37,10 @@ message FloatPair {
 
 message IntAry {
     repeated int32 ary = 1;
+}
+
+message UInt32Ary {
+    repeated uint32 ary = 1;
 }
 
 message FloatAry {

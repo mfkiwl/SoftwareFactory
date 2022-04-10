@@ -48,7 +48,10 @@ sudo make install
 
 ## 创建自定义基础模块工程
 ```py
+# 创建工程方式1(不与界面panel做交互)
 python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --type="mod" --dir="/path/to/base_mode_dir/" --name="user_define_name"
+# 创建工程方式2(需要与界面panel做交互)
+python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --type="mod_with_ui" --dir="/path/to/base_mode_dir/" --name="user_define_name"
 ```
 
 ## 自定义模块构建和安装
@@ -73,6 +76,7 @@ make install
 
 ## 自定义模块开发三步走
 ### (一)开发模块需要定义的函数
+> 注1: FIXME 不要定义这样的函数名, 如fun, fun_some, ..., 这样会导致程序加载函数时匹配函数错误
 ```c++ 
 // 创建变量对象函数
 std::shared_ptr<::google::protobuf::Message> 
@@ -201,5 +205,6 @@ public:
 ```
 
 # Useful example
-> 基础模块工程例子：[https://github.com/lkpworkspace/bpio](https://github.com/lkpworkspace/bpio)
-
+> 基础模块工程例子：[https://github.com/lkpworkspace/bpio](https://github.com/lkpworkspace/bpio)  
+> 控制界面的基础模块例子: [https://github.com/lkpworkspace/uimod_bitmap](https://github.com/lkpworkspace/uimod_bitmap)  
+> 界面插件例子: [https://github.com/lkpworkspace/panel_bitmap](https://github.com/lkpworkspace/panel_bitmap)  

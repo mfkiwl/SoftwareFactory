@@ -24,7 +24,7 @@ public:
         v["command"] = _inputs[1].Get<::bp::String>()->var();
         v["x"] = _inputs[2].Get<::bp::Float>()->var();;
         v["y"] = _inputs[3].Get<::bp::Float>()->var();;
-        p->SendMessage({p->PanelName(), "plot", "", v});
+        p->SendMessage("plot", v);
     }
 
 private:

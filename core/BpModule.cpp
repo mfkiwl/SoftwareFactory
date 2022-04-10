@@ -75,7 +75,9 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                         continue;
                     }
                     // 函数符号添加到_module_funcs中
-                    AddFunc(*func_it, func, f);
+                    if (!AddFunc(*func_it, func, f)) {
+                        continue;
+                    }
                     contents->AddChild(leaf_func);
                 }
             }
@@ -98,8 +100,9 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
     }
 }
 
-void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
+bool BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
     BpModuleFunc f;
+    // TODO check has field
     int in_n = v["_input"].size();
     int out_n = v["_output"].size();
     for (int i = 0; i < in_n; ++i) {
@@ -126,9 +129,14 @@ void BpModule::AddFunc(std::string& func_name, Json::Value& v, void* func) {
         f.type = BpModuleFuncType::RES0_ARG1;
     } else if (in_n > 1 && out_n == 0) {
         f.type = BpModuleFuncType::RES0_ARGN;
+    } else {
+        f.type = BpModuleFuncType::UNKNOWN;
+        LOG(ERROR) << "UnKnown func type, " << v.toStyledString();
+        return false;
     }
     f.func = func;
     _module_funcs[func_name] = f;
+    return true;
 }
 
 std::shared_ptr<BpContents> BpModule::GetContents() {

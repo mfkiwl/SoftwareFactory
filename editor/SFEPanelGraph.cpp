@@ -34,7 +34,7 @@ void SFEPanelGraph::Update() {
                     Json::Value v;
                     v["command"] = "switch_graph";
                     v["name"] = g.first;
-                    SendMessage({PanelName(), "editor", "", v});
+                    SendMessage("editor", v);
                     break;
                 }
                 j++;
@@ -78,7 +78,7 @@ void SFEPanelGraph::Update() {
                     Json::Value v;
                     v["command"] = "run_cur_graph";
                     v["run"] = false;
-                    SendMessage({PanelName(), "all", "", v});
+                    SendMessage("all", v);
                     OnMessage({PanelName(), "graph", "", v});
                 }
             }
@@ -103,7 +103,7 @@ void SFEPanelGraph::ShowNodes() {
             Json::Value v;
             v["command"] = "move_node_to_center";
             v["id"] = node->GetID();
-            SendMessage({PanelName(), "bp editor", "", v});
+            SendMessage("bp editor", v);
         }
     }
     auto& ev_nodes = bp::Bp::Instance().CurEditGraph()->GetEvNodes();
@@ -141,14 +141,14 @@ void SFEPanelGraph::ShowVariable() {
             Json::Value v;
             v["command"] = "show";
             v["desc"] = _drag_var_name;
-            SendMessage({PanelName(), "drag tip", "", v});
+            SendMessage("drag tip", v);
         }
         // 鼠标松开，初始化状态
         if (_drag_state == 2 && ImGui::IsMouseReleased(0)) {
             // 给drag tip发送关闭展示消息
             Json::Value v;
             v["command"] = "close";
-            SendMessage({PanelName(), "drag tip", "", v});
+            SendMessage("drag tip", v);
             // 给 bp editor发送创建Node消息
             // 变量节点, 需要使用界面设置get/set
             _show_var_setting = true;
@@ -181,7 +181,7 @@ void SFEPanelGraph::ShowVarSetting() {
             ImVec2 xy = ImGui::GetMousePos();
             v2["x"] = xy.x;
             v2["y"] = xy.y;
-            SendMessage({PanelName(), "editor", "", v2});
+            SendMessage("editor", v2);
             _drag_var_name.clear();
             ImGui::CloseCurrentPopup();
         }

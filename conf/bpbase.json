@@ -10,6 +10,10 @@
             "desc" : ""
         },
         {
+            "type" : "bpbase.UInt32",
+            "desc" : ""
+        },
+        {
             "type" : "bpbase.Float",
             "desc" : ""
         },
@@ -31,6 +35,10 @@
         },
         {
             "type" : "bpbase.IntAry",
+            "desc" : ""
+        },
+        {
+            "type" : "bpbase.UInt32Ary",
             "desc" : ""
         },
         {

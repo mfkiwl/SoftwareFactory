@@ -49,7 +49,13 @@ public:
     void SetShow(bool b) { _show = b; }
     bool IsShow() { return _show; }
     
-    void SendMessage(const SFEMessage& msg);
+    void SendMessage(const std::string& dst, const std::string& msg);
+    void SendMessage(const std::string& dst, const Json::Value& msg);
+
+    static void SendMessage(const std::string& src, const std::string& dst, 
+        const std::string& msg1, const Json::Value& msg2);
+    static void SendMessage(const std::string& src, const std::string& dst, const std::string& msg);
+    static void SendMessage(const std::string& src, const std::string& dst, const Json::Value& msg);
 
     static bool RegPanel(const std::string& panel_name, std::shared_ptr<SFEPanel> p);
 
@@ -59,24 +65,28 @@ public:
 
     static void ClearPanels() { _s_panels.clear(); }
 
+    // 主要用于分发给不属于panel的模块
+    static const std::vector<SFEMessage>& GetDispatchMessage() { return _send_que; }
+    static void ClearDispathMessage() { _send_que.clear(); }
+
 protected:
     virtual void OnMessage(const SFEMessage& msg) {}
-    virtual void OnPostSendMessage(const SFEMessage& msg) {}
 
 private:
     /* Call by SFEditor */
     void ProcMessage();
     void RecvMessage(const SFEMessage& msg) {
+        if (msg.dst != "all") {
+            LOG(INFO) << msg.Print();
+        }
         _recv_que.emplace_back(msg);
     }
-    const std::vector<SFEMessage>& GetDispatchMessage() { return _send_que; }
-    void ClearDispathMessage() { _send_que.clear(); }
 
     bool _show = true;
     std::string _name;
-    std::vector<SFEMessage> _send_que;
     std::vector<SFEMessage> _recv_que;
 
+    static std::vector<SFEMessage> _send_que;
     static std::unordered_map<std::string, std::shared_ptr<SFEPanel>> _s_panels;
 };
 

@@ -34,6 +34,22 @@ SET(BP_CORE_SRC
 ADD_LIBRARY(bpcore SHARED ${BP_CORE_SRC})
 TARGET_LINK_LIBRARIES(bpcore bpcommon bppb)
 
+set(bpcore_headers
+    BpContents.hpp
+    BpModule.hpp
+    BpVariable.hpp
+    BpPin.hpp
+    BpNode.hpp
+)
+INSTALL(FILES 
+    ${bpcore_headers}
+    PERMISSIONS
+    OWNER_READ
+    GROUP_READ
+    WORLD_READ
+    DESTINATION ${SF_INSTALL_INC_DIR}
+)
+
 INSTALL(TARGETS bpcore
     LIBRARY DESTINATION ${SF_INSTALL_LIB_DIR}
     ARCHIVE DESTINATION ${SF_INSTALL_LIB_DIR}

@@ -56,56 +56,31 @@ void SFEditor::Update() {
 }
 
 void SFEditor::DispatchMessage() {
-    const auto& panels = SFEPanel::GetPanels();
-    // dispatch this message
-    for (int j = 0; j < _send_que.size(); ++j) {
+    // 只需要处理属于editor的消息, 其它不属于panel的消息都丢弃掉
+    const auto& msgs = SFEPanel::GetDispatchMessage();
+    for (int i = 0; i < msgs.size(); ++i) {
         // boardcast
-        if (_send_que[j].dst == "all") {
-            ProcEditorMessage(_send_que[j]);
+        if (msgs[i].dst == "all") {
+            _recv_que.emplace_back(msgs[i]);
+            auto& panels = SFEPanel::GetPanels();
             for (auto it = panels.begin(); it != panels.end(); ++it) {
-                if (it->second->PanelName() == _send_que[j].src) {
+                if (it->second->PanelName() == msgs[i].src) {
                     continue;
                 }
-                it->second->RecvMessage(_send_que[j]);
+                it->second->RecvMessage(msgs[i]);
             }
+            LOG(INFO) << "boardcast msg: " << msgs[i].Print();
             continue;
         }
-        auto panel = GetPanel(_send_que[j].dst);
-        if (panel == nullptr) {
-            LOG(ERROR) << "Can't find panel, msg: " << _send_que[j].Print();
-            continue;
+        // dispatch
+        auto dst = msgs[i].dst;
+        if (dst == _name) {
+            _recv_que.emplace_back(msgs[i]);
+        } else {
+            LOG(WARNING) << "Unknown msg " << msgs[i].Print();
         }
-        panel->RecvMessage(_send_que[j]);
     }
-    _send_que.clear();
-    // dispatch panel message
-    for (auto it = panels.begin(); it != panels.end(); ++it) {
-        auto msgs = (it->second)->GetDispatchMessage();
-        for (int j = 0; j < msgs.size(); ++j) {
-            if (msgs[j].dst == "editor") {
-                ProcEditorMessage(msgs[j]);
-                continue;
-            }
-            // boardcast
-            if (msgs[j].dst == "all") {
-                ProcEditorMessage(msgs[j]);
-                for (auto it = panels.begin(); it != panels.end(); ++it) {
-                    if (it->second->PanelName() == msgs[j].src) {
-                        continue;
-                    }
-                    it->second->RecvMessage(msgs[j]);
-                }
-                continue;
-            }
-            auto panel = GetPanel(msgs[j].dst);
-            if (panel == nullptr) {
-                LOG(ERROR) << "Can't find panel, msg: " << msgs[j].Print();
-                continue;
-            }
-            panel->RecvMessage(msgs[j]);
-        }
-        (it->second)->ClearDispathMessage();
-    }
+    SFEPanel::ClearDispathMessage();
 }
 
 void SFEditor::ProcMessage() {
@@ -113,6 +88,10 @@ void SFEditor::ProcMessage() {
     for (auto it = panels.begin(); it != panels.end(); ++it) {
         (it->second)->ProcMessage();
     }
+    for (int i = 0; i < _recv_que.size(); ++i) {
+        ProcEditorMessage(_recv_que[i]);
+    }
+    _recv_que.clear();
 }
 
 void SFEditor::Exit() {
@@ -148,7 +127,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             Json::Value v;
             v["command"] = "set_cur_graph";
             v["graph_name"] = graph_name;
-            SendMessage({_name, "graph", "", v});
+            SFEPanel::SendMessage(_name, "graph", v);
         } else if (cmd == "spawn_node") {
             auto obj_type = bp::BpNodeType::BP_NONE;
             int contents_type = jmsg["type"].asInt();
@@ -179,7 +158,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 Json::Value v;
                 v["command"] = "set_nodes_pos";
                 v["desc"] = bp::BpCommon::Json2Str(new_graph->GetNodesPos());
-                SendMessage({_name, "bp editor", "", v});
+                SFEPanel::SendMessage(_name, "bp editor", v);
                 return;
             } else if (g == nullptr) {
                 LOG(WARNING) << "cur edit graph is nullptr";
@@ -216,7 +195,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             v["node_id"] = node->GetID();
             v["x"] = jmsg["x"];
             v["y"] = jmsg["y"];
-            SendMessage({_name, "bp editor", "", v});
+            SFEPanel::SendMessage(_name, "bp editor", v);
         } else if (cmd == "open_graph") {
             auto path = jmsg["path"].asString();
             std::shared_ptr<bp::BpGraph> g = nullptr;
@@ -229,7 +208,7 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 Json::Value msg2;
                 msg2["command"] = "set_nodes_pos";
                 msg2["desc"] = bp::BpCommon::Json2Str(nodes_pos);;
-                SendMessage({_name, "bp editor", "", msg2});
+                SFEPanel::SendMessage(_name, "bp editor", msg2);
             } else {
                 LOG(ERROR) << "Load graph " << path << " failed, " << (int)state;
             }
@@ -256,12 +235,12 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             Json::Value v;
             v["command"] = "set_nodes_pos";
             v["desc"] = bp::BpCommon::Json2Str(g->GetNodesPos());
-            SendMessage({_name, "bp editor", "", v});
+            SFEPanel::SendMessage(_name, "bp editor", v);
 
             v.clear();
             v["command"] = "set_cur_graph";
             v["graph_name"] = jmsg["name"].asString();
-            SendMessage({_name, "graph", "", v});
+            SFEPanel::SendMessage(_name, "graph", v);
         } else if (cmd == "del_node") {
             auto g = bp::Bp::Instance().CurEditGraph();
             g->DelNode(jmsg["id"].asInt());

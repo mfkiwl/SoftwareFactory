@@ -137,7 +137,7 @@ void SFEPanelBp::NodeLinkCreate(std::shared_ptr<bp::BpGraph>& graph) {
                         v["color"].append(c.Value.y);
                         v["color"].append(c.Value.z);
                         v["color"].append(c.Value.w);
-                        SendMessage({PanelName(), "editor", "", v});
+                        SendMessage("editor", v);
                     }
                 }
             }
@@ -171,7 +171,7 @@ void SFEPanelBp::NodeLinkDelete(std::shared_ptr<bp::BpGraph>& graph) {
                     Json::Value v;
                     v["command"] = "del_link";
                     v["id"] = id->ID;
-                    SendMessage({PanelName(), "editor", "", v});
+                    SendMessage("editor", v);
                 }
             }
         }
@@ -185,7 +185,7 @@ void SFEPanelBp::NodeLinkDelete(std::shared_ptr<bp::BpGraph>& graph) {
                     Json::Value v;
                     v["command"] = "del_node";
                     v["id"] = (*id)->GetID();
-                    SendMessage({PanelName(), "editor", "", v});
+                    SendMessage("editor", v);
                 }
 
                 auto& ev_nodes = graph->GetEvNodes();
@@ -194,7 +194,7 @@ void SFEPanelBp::NodeLinkDelete(std::shared_ptr<bp::BpGraph>& graph) {
                     Json::Value v;
                     v["command"] = "del_evnode";
                     v["name"] = (*p).first;
-                    SendMessage({PanelName(), "editor", "", v});
+                    SendMessage("editor", v);
                 }
             }
         }
@@ -243,7 +243,7 @@ void SFEPanelBp::ShowPinSetting() {
         }
         if (ImGui::Button("OK", ImVec2(120, 0))) { 
             _graph_pin_info["var_type"] = buf;
-            SendMessage({PanelName(), "editor", "", _graph_pin_info});
+            SendMessage("editor", _graph_pin_info);
             ImGui::CloseCurrentPopup();
             memset(buf, 0, sizeof(buf));
         }
@@ -522,7 +522,7 @@ void SFEPanelBp::OnDoubleclickNode() {
         Json::Value v;
         v["command"] = "switch_graph";
         v["name"] = g->GetName();
-        SendMessage({PanelName(), "editor", "", v});
+        SendMessage("editor", v);
     }
     break;
     }
@@ -584,8 +584,8 @@ void SFEPanelBp::OnMessage(const SFEMessage& msg) {
             Json::Value msg2;
             msg2["command"] = "save_graph_step2";
             msg2["path"] = msg.json_msg["path"].asString();
-            msg2["nodes_pos"] = bp::BpCommon::Json2Str(root);;
-            SendMessage({PanelName(), "editor", "", msg2});
+            msg2["nodes_pos"] = bp::BpCommon::Json2Str(root);
+            SendMessage("editor", msg2);
         } else if (cmd == "move_node_to_center") {
             ed::SelectNode(jmsg["id"].asInt());
             ed::NavigateToSelection();

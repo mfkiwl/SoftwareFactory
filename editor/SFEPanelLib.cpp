@@ -47,14 +47,14 @@ void SFEPanelLib::ShowLib(std::shared_ptr<BpContents> c) {
             Json::Value v;
             v["command"] = "show";
             v["desc"] = _drag_item.lock()->GetName();
-            SendMessage({PanelName(), "drag tip", "", v});
+            SendMessage("drag tip", v);
         }
         // 鼠标松开，初始化状态
         if (_drag_state == 2 && ImGui::IsMouseReleased(0)) {
             // 给drag tip发送关闭展示消息
             Json::Value v;
             v["command"] = "close";
-            SendMessage({PanelName(), "drag tip", "", v});
+            SendMessage("drag tip", v);
             // 给 bp editor发送创建Node消息
             // 变量节点, 需要使用界面设置get/set和变量名称
             if (_drag_item.lock()->GetLeafType() == BpContents::LeafType::VAL) {
@@ -73,7 +73,7 @@ void SFEPanelLib::ShowLib(std::shared_ptr<BpContents> c) {
                 ImVec2 xy = ImGui::GetMousePos();
                 v2["x"] = xy.x;
                 v2["y"] = xy.y;
-                SendMessage({PanelName(), "editor", "", v2});
+                SendMessage("editor", v2);
                 _drag_item.reset();
             }
             _drag_state = 0;
@@ -113,7 +113,7 @@ void SFEPanelLib::ShowVarSetting() {
                 v2["var_name"] = buf;
                 v2["x"] = _drag_info["x"];
                 v2["y"] = _drag_info["y"];
-                SendMessage({PanelName(), "editor", "", v2});
+                SendMessage("editor", v2);
             }
             _drag_item.reset();
             ImGui::CloseCurrentPopup();

@@ -6,6 +6,24 @@ namespace sfe {
 
 //// static member
 std::unordered_map<std::string, std::shared_ptr<SFEPanel>> SFEPanel::_s_panels;
+std::vector<SFEMessage> SFEPanel::_send_que;
+
+void SFEPanel::SendMessage(const std::string& src, const std::string& dst, const std::string& msg1, const Json::Value& msg2) {
+    auto p = GetPanel(dst);
+    if (p == nullptr) {
+        _send_que.push_back({src, dst, msg1, msg2});
+        return;
+    }
+    p->RecvMessage({src, dst, msg1, msg2});
+}
+
+void SFEPanel::SendMessage(const std::string& src, const std::string& dst, const std::string& msg) {
+    SendMessage(src, dst, msg, Json::Value::null);
+}
+
+void SFEPanel::SendMessage(const std::string& src, const std::string& dst, const Json::Value& msg) {
+    SendMessage(src, dst, "", msg);
+}
 
 bool SFEPanel::RegPanel(const std::string& panel_name, std::shared_ptr<SFEPanel> p) {
     p->SetPanelName(panel_name);
@@ -39,15 +57,12 @@ void SFEPanel::ProcMessage() {
     _recv_que.clear();
 }
 
-/* Call by child */
-void SFEPanel::SendMessage(const SFEMessage& msg) {
-    if (msg.src == "uinodes") {
-        LOG_EVERY_N(INFO, 30) << "per 30 msg: " << msg.Print();
-    } else {
-        LOG(INFO) << msg.Print();
-    }
-    _send_que.emplace_back(msg);
-    OnPostSendMessage(msg);
+void SFEPanel::SendMessage(const std::string& dst, const std::string& msg) {
+    SendMessage(_name, dst, msg, Json::Value::null);
+}
+
+void SFEPanel::SendMessage(const std::string& dst, const Json::Value& msg) {
+    SendMessage(_name, dst, "", msg);
 }
 
 } // namespace sfe

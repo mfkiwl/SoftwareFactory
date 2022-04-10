@@ -4,7 +4,10 @@
         "print_hello":{
             "_input":[],
             "_output":[
-                "bpbase.String"
+                {
+                    "type":"bpbase.Int",
+                    "name":"state"
+                }
             ]
         }
     }

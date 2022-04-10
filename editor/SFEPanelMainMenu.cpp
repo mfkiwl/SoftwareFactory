@@ -18,35 +18,35 @@ void SFEPanelMainMenu::Update() {
             if (ImGui::MenuItem("Open...", "")) {
                 OpenGraph();
             }
+            // ImGui::Separator();
+            // if (ImGui::MenuItem("Export...", "")) {}
             ImGui::Separator();
-            if (ImGui::MenuItem("Export...", "")) {}
-            ImGui::Separator();
-            if (ImGui::MenuItem("Save...", "CTRL+S")) {
-                LOG(INFO) << "Save...";
-            }
+            // if (ImGui::MenuItem("Save...", "CTRL+S")) {
+            //     LOG(INFO) << "Save...";
+            // }
             if (ImGui::MenuItem("Save as...", "CTRL+SHIFT+S")) {
                 SaveGraph();
             }
-            ImGui::Separator();
-            if (ImGui::MenuItem("Exit", "CTRL+Q")) {}
+            // ImGui::Separator();
+            // if (ImGui::MenuItem("Exit", "CTRL+Q")) {}
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Edit")) {
-            if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-            if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
-            ImGui::Separator();
-            if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-            if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-            if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-            ImGui::EndMenu();
-        }
+        // if (ImGui::BeginMenu("Edit")) {
+        //     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+        //     if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+        //     ImGui::Separator();
+        //     if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+        //     if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+        //     if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+        //     ImGui::EndMenu();
+        // }
         if (ImGui::BeginMenu("Run")) {
             if (ImGui::MenuItem("Start", "F5", false, !_runing)) {
                 _runing = true;
                 Json::Value v;
                 v["command"] = "run_cur_graph";
                 v["run"] = _runing;
-                SendMessage({PanelName(), "all", "", v});
+                SendMessage("all", v);
             }
             // if (ImGui::MenuItem("Pause", "CTRL+F5")) {}
             if (ImGui::MenuItem("Stop", "SHIFT+F5", false, _runing)) {
@@ -54,13 +54,13 @@ void SFEPanelMainMenu::Update() {
                 Json::Value v;
                 v["command"] = "run_cur_graph";
                 v["run"] = _runing;
-                SendMessage({PanelName(), "all", "", v});
+                SendMessage("all", v);
             }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View")) {
             if (ImGui::MenuItem("ShowDemo")) {
-                SendMessage({"", "editor", "show_demo"});
+                SendMessage("editor", std::string("show_demo"));
             }
             ImGui::EndMenu();
         }
@@ -103,7 +103,7 @@ void SFEPanelMainMenu::CreateNewGraph() {
                 v["command"] = "create_new";
                 v["graph_type"] = graph_type;
                 v["graph_name"] = buf;
-                SendMessage({PanelName(), "editor", "", v});
+                SendMessage("editor", v);
             }
             memset(buf, 0, sizeof(buf));
             ImGui::CloseCurrentPopup(); 
@@ -122,7 +122,7 @@ void SFEPanelMainMenu::OpenGraph() {
         Json::Value v;
         v["command"] = "open_graph";
         v["path"] = out_path;
-        SendMessage({PanelName(), "editor", "", v});
+        SendMessage("editor", v);
         free(out_path);
     } else if (result == NFD_CANCEL) {
         LOG(INFO) << "Open cancel";
@@ -139,7 +139,7 @@ void SFEPanelMainMenu::SaveGraph() {
         Json::Value v;
         v["command"] = "save_graph_step1";
         v["path"] = out_path;
-        SendMessage({PanelName(), "bp editor", "", v});
+        SendMessage("bp editor", v);
         free(out_path);
     } else if (result == NFD_CANCEL) {
         LOG(INFO) << "Save cancel";

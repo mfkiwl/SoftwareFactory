@@ -28,22 +28,15 @@ public:
     bool Sleep() { return _ratectrl.sleep(); }
 
 private:
-    const std::string _name = "editor";
-    void SendMessage(const SFEMessage& msg) {
-        if (msg.src == "uinodes") {
-            LOG_EVERY_N(INFO, 30) << "per 30 msg: " << msg.Print();
-        } else {
-            LOG(INFO) << msg.Print();
-        }
-        _send_que.emplace_back(msg);
-    }
     const std::shared_ptr<SFEPanel> GetPanel(const std::string& name);
     void ProcEditorMessage(const SFEMessage& msg);
 
-    std::vector<SFEMessage> _send_que;
+    const std::string _name = "editor";
     bool _show_demo = false;
     std::unique_ptr<SFEPlugLib> _pluglib;
+    std::vector<SFEMessage> _recv_que;
     sfe::RateCtl _ratectrl;
+
 };
 
 } // namespace sfe

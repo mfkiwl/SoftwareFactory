@@ -82,7 +82,7 @@ protected:
     virtual void* GetFunc(const std::string& func_name) = 0;
 
     void BuildContents(Json::Value&, std::shared_ptr<BpContents>);
-    void AddFunc(std::string&, Json::Value&, void*);
+    bool AddFunc(std::string&, Json::Value&, void*);
     
     std::unordered_map<std::string, BpModuleFunc> _module_funcs;
     std::unordered_map<std::string, std::string> _var_names;
