@@ -66,7 +66,7 @@ int BpModuleLinux::GetDllSymbol(const char* cmd) {
 
 int BpModuleLinux::OpenDll(const std::string& dll_file) {
     const char* dll_path = dll_file.c_str();
-    _dl = dlopen(dll_path, RTLD_LAZY | RTLD_LOCAL | RTLD_DEEPBIND);
+    _dl = dlopen(dll_path, RTLD_NOW | RTLD_LOCAL);
     if(nullptr == _dl) {
         return -1;
     }
