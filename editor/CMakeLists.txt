@@ -38,6 +38,7 @@ set(editor_srcs
     SFEPanelUINodes.cpp
     SFEPanelPlot.cpp
     SFEPlug.cpp
+    SFEParams.cpp
 )
 
 add_library(sfeui SHARED 
@@ -81,6 +82,7 @@ target_link_libraries(${PROJECT_NAME}
 
 set(sfe_headers
     SFEPanel.hpp
+    SFEParams.hpp
 )
 INSTALL(FILES 
     ${sfe_headers}
@@ -109,3 +111,19 @@ INSTALL(FILES
 )
 
 FILE(COPY ${assets_files} DESTINATION ${SF_OUTPUT_ASSETS_DIR})
+
+#### test
+AUX_SOURCE_DIRECTORY(test sfe_test_files)
+foreach(ut_file ${sfe_test_files})
+    GET_FILENAME_COMPONENT(ut_file_target ${ut_file} NAME_WE)
+    ADD_EXECUTABLE(${ut_file_target} ${ut_file})
+    TARGET_LINK_LIBRARIES(${ut_file_target}
+        GTest::GTest
+        GTest::Main
+        bppb
+        bpcore
+        bpcommon
+        sfeui
+    )
+    add_test(AllTests ${ut_file_target})
+endforeach(ut_file ${sfe_test_files})

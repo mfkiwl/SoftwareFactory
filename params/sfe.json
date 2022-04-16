@@ -1,0 +1,25 @@
+{
+    "system": {
+        "window":{
+            "width":1280,
+            "height":720
+        }
+    },
+    "panel":{
+        "log":{
+            "show":true
+        },
+        "bp editor":{
+            "show":true
+        },
+        "lib":{
+            "show":true
+        },
+        "graph":{
+            "show":true
+        },
+        "plot":{
+            "show":false
+        }
+    }
+}

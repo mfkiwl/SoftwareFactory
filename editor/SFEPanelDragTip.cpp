@@ -3,6 +3,7 @@
 namespace sfe {
 
 bool SFEPanelDragTip::Init() {
+	SetDisplayInMenu(false);
     return true;
 }
 

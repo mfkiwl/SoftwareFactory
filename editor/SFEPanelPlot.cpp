@@ -13,7 +13,10 @@ void SFEPanelPlot::Update() {
     static ImU32 colors[1] = { ImColor(0, 0, 255) };
     static uint32_t selection_start = 0, selection_length = 0;
 
-    ImGui::Begin("plot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    if (!ImGui::Begin(PanelName().c_str(), &_show, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::End();
+        return;
+    }
     ImGuiWindow* cur_win = ImGui::GetCurrentWindow();
     
     // Draw first plot with multiple sources

@@ -31,7 +31,10 @@ void SFEPanelLog::AddLogCB(const std::string& msg) {
 }
 
 void SFEPanelLog::Update() {
-    ImGui::Begin(PanelName().c_str());
+    if (!ImGui::Begin(PanelName().c_str(), &_show)) {
+        ImGui::End();
+        return;
+    }
 
     // Main window
     bool clear = ImGui::Button("Clear");

@@ -9,7 +9,10 @@ bool SFEPanelLib::Init() {
 }
 
 void SFEPanelLib::Update() {
-    ImGui::Begin(PanelName().c_str());
+    if (!ImGui::Begin(PanelName().c_str(), &_show)) {
+        ImGui::End();
+        return;
+    }
     auto root = bp::Bp::Instance().GetContents();
     auto children = root->GetChildren();
     for (int i = 0; i < children.size(); ++i) {

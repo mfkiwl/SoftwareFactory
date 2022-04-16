@@ -438,6 +438,17 @@ Json::Value BpCommon::LoadJsonFromFile(const std::string& json_file) {
     return root;
 }
 
+bool BpCommon::SaveJsonToFile(const Json::Value& root, const std::string& json_file) {
+    std::ofstream ofs(json_file);
+	if (!ofs.is_open()) {
+		return false;
+	}
+	Json::StyledWriter sw;
+	ofs << sw.write(root);
+	ofs.close();
+	return true;
+}
+
 std::string BpCommon::Json2Str(const Json::Value& v) {
     return Json::FastWriter().write(v);
 }

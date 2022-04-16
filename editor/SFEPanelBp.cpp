@@ -26,7 +26,10 @@ bool SFEPanelBp::Init() {
 void SFEPanelBp::Update() {
     auto graph = bp::Bp::Instance().CurEditGraph();
 
-    ImGui::Begin(PanelName().c_str());
+    if (!ImGui::Begin(PanelName().c_str(), &_show)) {
+        ImGui::End();
+        return;
+    }
     ed::SetCurrentEditor(_node_editor);
     // double click node
     ed::NodeId n_id = ed::GetDoubleClickedNode();

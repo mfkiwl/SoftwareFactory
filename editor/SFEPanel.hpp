@@ -9,6 +9,7 @@
 #include <jsoncpp/json/json.h>
 
 #include "imgui.h"
+#include "SFEParams.hpp"
 
 #define SFE_PANEL_TYPE \
 public: \
@@ -47,7 +48,9 @@ public:
     virtual void Exit() = 0;
 
     void SetShow(bool b) { _show = b; }
-    bool IsShow() { return _show; }
+    bool& IsShow() { return _show; }
+    bool DisplayInMenu() { return _display_in_menu; }
+    void SetDisplayInMenu(bool b = false) { _display_in_menu = b; }
     
     void SendMessage(const std::string& dst, const std::string& msg);
     void SendMessage(const std::string& dst, const Json::Value& msg);
@@ -71,8 +74,31 @@ public:
 
 protected:
     virtual void OnMessage(const SFEMessage& msg) {}
+    bool _show = true;
+    bool _display_in_menu = true;
 
 private:
+    bool GlobalInit() {
+        bool res = true;
+        auto& params = SFEParams::Instance();
+        const auto& v = params.GetParam("panel." + PanelName() + ".show");
+        if (!v.isNull() && v.isBool()) {
+            _show = v.asBool();
+        }
+        res = Init();
+        return res;
+    }
+    void GlobalUpdate() {
+        if (_show) {
+            Update();
+        }
+    }
+    void GlobalExit() {
+        auto& params = SFEParams::Instance();
+        params.SetParam("panel." + PanelName() + ".show", _show);
+        Exit();
+    }
+
     /* Call by SFEditor */
     void ProcMessage();
     void RecvMessage(const SFEMessage& msg) {
@@ -82,7 +108,6 @@ private:
         _recv_que.emplace_back(msg);
     }
 
-    bool _show = true;
     std::string _name;
     std::vector<SFEMessage> _recv_que;
 

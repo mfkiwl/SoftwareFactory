@@ -9,7 +9,10 @@ bool SFEPanelGraph::Init() {
 }
 
 void SFEPanelGraph::Update() {
-    ImGui::Begin(PanelName().c_str());
+    if (!ImGui::Begin(PanelName().c_str(), &_show)) {
+        ImGui::End();
+        return;
+    }
     const auto& edit_graphs = bp::Bp::Instance().GetEditGraphs();
     int graph_sz = edit_graphs.size();
     static int item_current = 0;

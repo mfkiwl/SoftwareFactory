@@ -5,6 +5,7 @@
 namespace sfe {
 
 bool SFEPanelUINodes::Init() {
+    SetDisplayInMenu(false);
     // 创建UINode目录
     _uinode_contents = std::make_shared<BpContents>(nullptr, "ui", ::BpContents::Type::CONTENTS);
     _uinode_contents->AddChild(std::make_shared<BpContents>(nullptr, "Plot", ::BpContents::Type::LEAF, ::BpContents::LeafType::USER));

@@ -28,7 +28,7 @@ void SFEPanel::SendMessage(const std::string& src, const std::string& dst, const
 bool SFEPanel::RegPanel(const std::string& panel_name, std::shared_ptr<SFEPanel> p) {
     p->SetPanelName(panel_name);
     if (_s_panels.find(p->PanelName()) == _s_panels.end()) {
-        if (!p->Init()) {
+        if (!p->GlobalInit()) {
             LOG(ERROR) << "Panel " << panel_name << " failed";
             return false;
         }

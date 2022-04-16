@@ -5,6 +5,7 @@
 namespace sfe {
 
 bool SFEPanelMainMenu::Init() {
+    SetDisplayInMenu(false);
     return true;
 }
 
@@ -61,6 +62,13 @@ void SFEPanelMainMenu::Update() {
         if (ImGui::BeginMenu("View")) {
             if (ImGui::MenuItem("ShowDemo")) {
                 SendMessage("editor", std::string("show_demo"));
+            }
+            auto& panels = SFEPanel::GetPanels();
+            for (auto& panel : panels) {
+                if (!panel.second->DisplayInMenu()) {
+                    continue;
+                }
+                ImGui::MenuItem(panel.first.c_str(), nullptr, &panel.second->IsShow());
             }
             ImGui::EndMenu();
         }

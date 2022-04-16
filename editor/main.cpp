@@ -15,6 +15,7 @@
 #include "SFEditor.hpp"
 #include "SFETimeRecorder.hpp"
 #include "bpflags.hpp"
+#include "SFEParams.hpp"
 
 // About Desktop OpenGL function loaders:
 //  Modern desktop OpenGL doesn't have a standard portable header file to load OpenGL function pointers.
@@ -33,6 +34,7 @@
 // Main code
 int main(int, char**)
 {
+    auto& params = sfe::SFEParams::Instance();
     // Setup SDL
     // (Some versions of SDL before <2.0.10 appears to have performance/stalling issues on a minority of Windows systems,
     // depending on whether SDL_INIT_GAMECONTROLLER is enabled or disabled.. updating to latest version of SDL is recommended!)
@@ -53,7 +55,18 @@ int main(int, char**)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    SDL_Window* window = SDL_CreateWindow("SoftwareFactoryEditor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+
+    int width = 1280;
+    int height = 720;
+    const auto& w = params.GetParam("system.window.width");
+    if (!w.isNull() && w.isInt()) {
+        width = w.asInt();
+    }
+    const auto& h = params.GetParam("system.window.height");
+    if (!h.isNull() && h.isInt()) {
+        height = h.asInt();
+    }
+    SDL_Window* window = SDL_CreateWindow("SoftwareFactoryEditor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
     if (window == nullptr) {
         LOG(ERROR) << SDL_GetError();
         return -1;
@@ -213,8 +226,13 @@ int main(int, char**)
         timerecorder.Record("rendering");
     }
     LOG(INFO) << "Exit loop";
-    editor->Exit();
+    LOG(INFO) << "Set global params";
+    int win_width, win_height;
+    SDL_GetWindowSize(window, &win_width, &win_height);
+    params.SetParam("system.window.width", win_width);
+    params.SetParam("system.window.height", win_height);
     LOG(INFO) << "Exit editor";
+    editor->Exit();
 
     // Cleanup
     ImGui_ImplOpenGL3_Shutdown();

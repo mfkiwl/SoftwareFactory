@@ -11,6 +11,7 @@
 #include "Bp.hpp"
 #include "bplog/bplog.hpp"
 #include "bpflags.hpp"
+#include "SFEParams.hpp"
 
 namespace sfe {
 
@@ -51,7 +52,7 @@ void SFEditor::Update() {
     }
     const auto& panels = SFEPanel::GetPanels();
     for (auto it = panels.begin(); it != panels.end(); ++it) {
-        (it->second)->Update();
+        (it->second)->GlobalUpdate();
     }
 }
 
@@ -97,9 +98,10 @@ void SFEditor::ProcMessage() {
 void SFEditor::Exit() {
     const auto& panels = SFEPanel::GetPanels();
     for (auto it = panels.begin(); it != panels.end(); ++it) {
-        (it->second)->Exit();
+        (it->second)->GlobalExit();
     }
     SFEPanel::ClearPanels();
+    SFEParams::Instance().SaveParams();
 }
 
 const std::shared_ptr<SFEPanel> SFEditor::GetPanel(const std::string& name) {
