@@ -112,8 +112,8 @@ TEST(bpcore, BpModule) {
 TEST(bpcore, BpModLib) {
     bp::BpModLibLinux bll;
     EXPECT_TRUE(bll.Init("../conf/"));
-    EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.IntPair").var);
-    auto func = bll.GetFunc("bpmath.add_int");
+    EXPECT_TRUE(nullptr != bll.CreateVal("bpbase.Int32").var);
+    auto func = bll.GetFunc("bpmath.add_int32");
     EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
 }
 
