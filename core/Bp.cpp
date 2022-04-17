@@ -481,6 +481,10 @@ const std::shared_ptr<BpContents>& Bp::GetContents() const {
 	return _contents;
 }
 
+uint32_t Bp::GetVarColor(const std::string& var_type) {
+	return _base_mods->GetValColor(var_type);
+}
+
 bool Bp::AddEditGraph(const std::string& name, std::shared_ptr<BpGraph> g) {
 	if (_edit_graphs.find(name) != _edit_graphs.end()) {
 		LOG(ERROR) << "add edit graph " << name << "failed";

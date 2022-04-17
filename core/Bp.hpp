@@ -32,6 +32,7 @@ class Bp
 public:
 	static Bp& Instance();
 
+	/* 用户注册模块，需要提供库目录和节点创建函数 */
 	bool RegisterUserMod(std::shared_ptr<BpContents>, 
 			std::function<std::shared_ptr<BpNode>(const std::string&)>);
 
@@ -50,8 +51,13 @@ public:
 	/* 已有变量,创建新变量节点,加入graph */
 	std::shared_ptr<BpNode> SpawnVarNode(std::shared_ptr<BpGraph>& g, const std::string& var_name, bool is_get = true);
 
+	/* 获得变量类型对应的颜色 */
+	uint32_t GetVarColor(const std::string& var_type);
+
+	/* 获得模块库目录 */
 	const std::shared_ptr<BpContents>& GetContents() const;
 
+	/* 设置当前编辑图 */
 	std::shared_ptr<BpGraph> CurEditGraph() { return _cur_edit_graph.lock(); }
 	void SetCurEditGraph(std::shared_ptr<BpGraph> g) { _cur_edit_graph = g; }
 	void SetCurEditGraph(const std::string& name) { 

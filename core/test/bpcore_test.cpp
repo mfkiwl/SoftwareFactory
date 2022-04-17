@@ -52,33 +52,33 @@ TEST(bpcore, BpContents) {
 }
 
 TEST(bpcore, BpVariable) {
-    std::weak_ptr<bp::Int> w_msg;
-    std::weak_ptr<bp::Int> w_msg2;
-    std::weak_ptr<bp::Int> w_msg3;
+    std::weak_ptr<bp::Int32> w_msg;
+    std::weak_ptr<bp::Int32> w_msg2;
+    std::weak_ptr<bp::Int32> w_msg3;
     {
-        auto msg = std::make_shared<bp::Int>();
+        auto msg = std::make_shared<bp::Int32>();
         bp::BpVariable var("", "", msg);
         w_msg = msg;
         EXPECT_FALSE(w_msg.expired());
         // 设置值传递
-        auto msg_tmp = std::make_shared<bp::Int>();
+        auto msg_tmp = std::make_shared<bp::Int32>();
         msg_tmp->set_var(100);
         bp::BpVariable var2("", "", msg_tmp);
-        auto msg2 = std::make_shared<bp::Int>();
+        auto msg2 = std::make_shared<bp::Int32>();
         msg2->set_var(200);
         w_msg2 = msg2;
         var2.SetValue(msg2);
         msg2->set_var(300);
         EXPECT_EQ(300, msg2->var());
-        EXPECT_EQ(200, var2.Get<bp::Int>()->var());
+        EXPECT_EQ(200, var2.Get<bp::Int32>()->var());
         // 设置引用传递
-        auto msg3 = std::make_shared<bp::Int>();
+        auto msg3 = std::make_shared<bp::Int32>();
         w_msg3 = msg3;
         msg3->set_var(100);
         bp::BpVariable var3;
         var3.SetValueByRef(msg3);
         msg3->set_var(200);
-        EXPECT_EQ(200, var3.Get<bp::Int>()->var());
+        EXPECT_EQ(200, var3.Get<bp::Int32>()->var());
     }
     EXPECT_TRUE(w_msg.expired());
     EXPECT_TRUE(w_msg2.expired());
@@ -93,26 +93,19 @@ TEST(bpcore, BpModule) {
     LOG(INFO) << "bpmath.json contents:";
     LOG(INFO) << "\n" << bml.GetContents()->PrintContents();
 
-    auto pbmsg = bml.CreateModuleVal("bpbase.IntPair");
+    auto pbmsg = bml.CreateModuleVal("bpbase.Int32");
     EXPECT_TRUE(nullptr != pbmsg);
-    auto pbintpair = std::static_pointer_cast<::bp::IntPair>(pbmsg);
-    pbintpair->set_a(100);
-
     {
-        auto func = bml.GetModuleFunc("add_int");
-        auto p = std::make_shared<::bp::IntPair>();
-        p->set_a(1);
-        p->set_b(1);
-        auto res = reinterpret_cast<module_func2_t>(func.func)(p);
-        EXPECT_EQ(std::static_pointer_cast<::bp::Int>(res)->var(), 2);
-    }
-    {
-        auto func = bml.GetModuleFunc("sub_int");
-        auto p = std::make_shared<::bp::IntPair>();
-        p->set_a(1);
-        p->set_b(1);
-        auto res = reinterpret_cast<module_func2_t>(func.func)(p);
-        EXPECT_EQ(std::static_pointer_cast<::bp::Int>(res)->var(), 0);
+        auto func = bml.GetModuleFunc("add_int32");
+        auto a = std::make_shared<::bp::Int32>();
+        auto b = std::make_shared<::bp::Int32>();
+        a->set_var(1);
+        b->set_var(1);
+        std::vector<pb_msg_ptr_t> args;
+        args.push_back(a);
+        args.push_back(b);
+        auto res = reinterpret_cast<module_func4_t>(func.func)(args);
+        EXPECT_EQ(std::static_pointer_cast<::bp::Int32>(res)->var(), 2);
     }
 }
 

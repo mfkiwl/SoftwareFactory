@@ -38,6 +38,7 @@ enum class BpModuleFuncType {
 struct BpModuleVar {
     pb_msg_ptr_t var = nullptr;
     std::string desc = "";
+    uint32_t color = 0x3396d7ff; // R:51, G:150, B:215, A:255
 };
 
 struct BpModuleFunc {
@@ -64,6 +65,8 @@ public:
 
     pb_msg_ptr_t CreateModuleVal(const std::string& var_name);
     const std::string GetModuleVarDesc(const std::string& var_name);
+    // rgba
+    const uint32_t GetModuleVarColor(const std::string& var_name);
 
     BpModuleFunc GetModuleFunc(const std::string& func_name);
 
@@ -86,6 +89,7 @@ protected:
     
     std::unordered_map<std::string, BpModuleFunc> _module_funcs;
     std::unordered_map<std::string, std::string> _var_names;
+    std::unordered_map<std::string, uint32_t> _var_colors;
     module_create_val_func_t _create_var_funcs = nullptr;
     std::shared_ptr<BpContents> _contents;
     std::string _mod_name;

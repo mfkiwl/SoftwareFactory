@@ -450,7 +450,8 @@ bool BpCommon::SaveJsonToFile(const Json::Value& root, const std::string& json_f
 }
 
 std::string BpCommon::Json2Str(const Json::Value& v) {
-    return Json::FastWriter().write(v);
+    return v.toStyledString();
+    // return Json::FastWriter().write(v);
 }
 
 Json::Value BpCommon::Str2Json(const std::string& str) {

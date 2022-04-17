@@ -90,7 +90,23 @@ void BpModule::BuildContents(Json::Value& v, std::shared_ptr<BpContents> content
                     const auto& var_info = v[*it][i];
                     auto leaf_val = std::make_shared<BpContents>(contents, var_info["type"].asString(), BpContents::Type::LEAF, BpContents::LeafType::VAL);
                     contents->AddChild(leaf_val);
-                    _var_names[var_info["type"].asString()] = var_info["desc"].asString();
+                    if (var_info["desc"].isNull()) {
+                        _var_names[var_info["type"].asString()] = "";
+                    } else {
+                        _var_names[var_info["type"].asString()] = var_info["desc"].asString();
+                    }
+                    if (var_info["color"].isNull()) {
+                        _var_colors[var_info["type"].asString()] = BpModuleVar().color;
+                    } else {
+                        auto R = var_info["color"]["R"].asUInt();
+                        auto G = var_info["color"]["G"].asUInt();
+                        auto B = var_info["color"]["B"].asUInt();
+                        uint32_t color = 0xff << 24;
+                        color |= (R & 0xff);
+                        color |= ((G & 0xff) << 8);
+                        color |= ((B & 0xff) << 16);
+                        _var_colors[var_info["type"].asString()] = color;
+                    }
                 }
             }
         } else {
@@ -161,6 +177,12 @@ const std::string BpModule::GetModuleVarDesc(const std::string& var_name) {
         return "";
     }
     return _var_names[var_name];
+}
+const uint32_t BpModule::GetModuleVarColor(const std::string& var_name) {
+    if (_var_colors.find(var_name) == _var_colors.end()) {
+        return BpModuleVar().color;
+    }
+    return _var_colors[var_name];
 }
 
 BpModuleFunc BpModule::GetModuleFunc(const std::string& func_name) {

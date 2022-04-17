@@ -5,7 +5,7 @@ message Bool {
     bool var = 1;
 }
 
-message Int {
+message Int32 {
     int32 var = 1;
 }
 
@@ -25,17 +25,7 @@ message Bytes {
     bytes var = 1;
 }
 
-message IntPair {
-    int32 a = 1;
-    int32 b = 2;
-}
-
-message FloatPair {
-    float a = 1;
-    float b = 2;
-}
-
-message IntAry {
+message Int32Ary {
     repeated int32 ary = 1;
 }
 

@@ -48,11 +48,22 @@ public:
                 BpModuleVar bpvar;
                 bpvar.var = _mods[i]->CreateModuleVal(msg_name);
                 bpvar.desc = _mods[i]->GetModuleVarDesc(msg_name);
+                bpvar.color = _mods[i]->GetModuleVarColor(msg_name);
                 return bpvar;
             }
         }
         LOG(ERROR) << "Can't find var type \"" << msg_name << "\"";
         return BpModuleVar();
+    }
+
+    uint32_t GetValColor(const std::string& msg_name) {
+        auto mod_name = BpCommon::GetModName(msg_name);
+        for (int i = 0; i < _mods.size(); ++i) {
+            if (_mods[i]->Name() == mod_name) {
+                return _mods[i]->GetModuleVarColor(msg_name);
+            }
+        }
+        return BpModuleVar().color;
     }
 
     BpModuleFunc GetFunc(const std::string& full_path) {

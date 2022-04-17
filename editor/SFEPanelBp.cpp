@@ -462,7 +462,9 @@ ImColor SFEPanelBp::GetIconColor(bp::BpPin& pin) {
 	case bp::BpPinType::BP_FLOW:      
         return ImColor(255, 255, 255);
 	}
-	return ImColor(51, 150, 215); // object
+    auto var_type = pin.GetVarType();
+    auto color = bp::Bp::Instance().GetVarColor(var_type);
+	return ImColor(color);
 }
 
 ImColor SFEPanelBp::GetNodeKindColor(bp::BpNodeType kind) {

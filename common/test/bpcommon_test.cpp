@@ -7,23 +7,12 @@
 
 TEST(bpcommon, PbJsonConvert) {
     {
-        ::bp::Int msg;
+        ::bp::Int32 msg;
         // msg.set_var(100);
         std::string json;
         bp::JsonPbConvert::PbMsg2JsonStr(msg, json);
         std::cout << "json: " << json << std::endl;
         EXPECT_TRUE(bp::JsonPbConvert::JsonStr2PbMsg(json, msg));
-        std::cout << "pb: \n{" << msg.DebugString() << "}" << std::endl;
-    }
-
-    {
-        ::bp::IntPair msg;
-        Json::Value v;
-        bp::JsonPbConvert::PbMsg2Json(msg, v);
-        std::cout << "json: " << v.toStyledString() << std::endl;
-        v["a"] = 10;
-        v["b"] = 100;
-        EXPECT_TRUE(bp::JsonPbConvert::Json2PbMsg(v, msg));
         std::cout << "pb: \n{" << msg.DebugString() << "}" << std::endl;
     }
 
@@ -44,7 +33,7 @@ TEST(bpcommon, PbJsonConvert) {
     {
         // test repeate data
         // TODO
-        ::bp::IntAry msg;
+        ::bp::Int32Ary msg;
         std::string json;
         bp::JsonPbConvert::PbMsg2JsonStr(msg, json);
         std::cout << "repeat ary: " << json << std::endl;

@@ -3,47 +3,84 @@
     "_val":[
         {
             "type" : "bpbase.Bool",
-            "desc" : "true or false"
+            "desc" : "true or false",
+            "color": {
+                "R":147,
+                "G":18,
+                "B":17
+            }
         },
         {
-            "type" : "bpbase.Int",
-            "desc" : ""
+            "type" : "bpbase.Int32",
+            "desc" : "",
+            "color": {
+                "R":0,
+                "G":255,
+                "B":0
+            }
         },
         {
             "type" : "bpbase.UInt32",
-            "desc" : ""
+            "desc" : "",
+            "color": {
+                "R":0,
+                "G":255,
+                "B":0
+            }
         },
         {
             "type" : "bpbase.Float",
-            "desc" : ""
+            "desc" : "",
+            "color": {
+                "R":66,
+                "G":133,
+                "B":244
+            }
         },
         {
             "type" : "bpbase.String",
-            "desc" : ""
+            "desc" : "",
+            "color": {
+                "R":251,
+                "G":0,
+                "B":201
+            }
         },
         {
             "type" : "bpbase.Bytes",
-            "desc" : ""
+            "desc" : "",
+            "color": {
+                "R":0,
+                "G":89,
+                "B":81
+            }
         },
         {
-            "type" : "bpbase.IntPair",
-            "desc" : ""
-        },
-        {
-            "type" : "bpbase.FloatPair",
-            "desc" : ""
-        },
-        {
-            "type" : "bpbase.IntAry",
-            "desc" : ""
+            "type" : "bpbase.Int32Ary",
+            "desc" : "",
+            "color": {
+                "R":255,
+                "G":255,
+                "B":0
+            }
         },
         {
             "type" : "bpbase.UInt32Ary",
-            "desc" : ""
+            "desc" : "",
+            "color": {
+                "R":255,
+                "G":255,
+                "B":0
+            }
         },
         {
             "type" : "bpbase.FloatAry",
-            "desc" : ""
+            "desc" : "",
+            "color": {
+                "R":255,
+                "G":255,
+                "B":0
+            }
         }
     ]
 }
