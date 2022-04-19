@@ -105,6 +105,9 @@ private:
         if (msg.dst != "all") {
             LOG(INFO) << msg.Print();
         }
+        if (msg.dst == "log") {
+            return;
+        }
         _recv_que.emplace_back(msg);
     }
 

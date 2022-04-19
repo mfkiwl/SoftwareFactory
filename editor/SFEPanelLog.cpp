@@ -106,6 +106,9 @@ void SFEPanelLog::Exit() {
 }
 
 void SFEPanelLog::OnMessage(const SFEMessage& msg) {
+    if (msg.msg.empty()) {
+        return;
+    }
     AddLog(msg.msg.c_str());
 }
 
