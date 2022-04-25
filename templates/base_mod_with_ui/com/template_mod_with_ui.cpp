@@ -21,7 +21,7 @@ pb_msg_ptr_t create_msg(const std::string& msg_name) {
 }
 
 pb_msg_ptr_t print_hello() {
-    auto res = std::make_shared<bp::Int>();
+    auto res = std::make_shared<bp::Int32>();
     sfe::SFEPanel::SendMessage("uinode_print_hello", "log", 
         std::string("++++++++++++++++++++++++ hello, world\n"));
     res->set_var(0);

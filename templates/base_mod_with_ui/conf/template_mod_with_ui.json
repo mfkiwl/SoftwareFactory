@@ -5,7 +5,7 @@
             "_input":[],
             "_output":[
                 {
-                    "type":"bpbase.Int",
+                    "type":"bpbase.Int32",
                     "name":"state"
                 }
             ]
