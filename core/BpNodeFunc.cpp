@@ -18,7 +18,7 @@ void BpNodeFunc::Logic() {
     std::vector<pb_msg_ptr_t> args;
     for (auto& in : _inputs) {
         if (in.GetPinType() == BpPinType::BP_VALUE) {
-            args.emplace_back(in.GetValue());
+            args.emplace_back(in.Get<pb_msg_t>());
         }
     }
     int i = 0;

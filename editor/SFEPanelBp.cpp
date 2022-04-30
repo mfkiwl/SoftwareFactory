@@ -513,7 +513,7 @@ void SFEPanelBp::OnDoubleclickNode() {
         if (pins.size() > 0){
             // FIXME, only show one variable
             _doubleclick_node_attr.clear();
-            bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].GetValue(), _doubleclick_node_attr);
+            bp::JsonPbConvert::PbMsg2JsonStr(*pins[0].Get<pb_msg_t>(), _doubleclick_node_attr);
             LOG(INFO) << "get var attr: " << _doubleclick_node_attr;
             strcpy(_doubleclick_node_edit_attr, _doubleclick_node_attr.c_str());
             ImGui::OpenPopup("node attr");

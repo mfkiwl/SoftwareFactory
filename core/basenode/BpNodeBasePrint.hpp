@@ -20,8 +20,8 @@ public:
 	virtual void Logic() {
         for (int i = 0; i < _inputs.size(); ++i) {
             if (_inputs[i].GetPinType() == ::bp::BpPinType::BP_VALUE) {
-                if (_inputs[i].GetValue() != nullptr) {
-                    LOG(INFO) << _inputs[i].GetValue()->DebugString();
+                if (_inputs[i].Get<pb_msg_t>() != nullptr) {
+                    LOG(INFO) << _inputs[i].Get<pb_msg_t>()->DebugString();
                 } else {
                     LOG(ERROR) << "value is nullptr";
                 }

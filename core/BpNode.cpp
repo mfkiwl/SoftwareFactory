@@ -85,9 +85,9 @@ void BpNode::Run() {
 				if (link.StartPinID == out.ID) {
 					bp:BpPin* p = graph->SearchPin(link.EndPinID);
 					if (p->AssignByRef()) {
-						p->SetValueByRef(out.GetValue(), true);
+						p->SetValueByRef(out.Get<pb_msg_t>(), true);
 					} else {
-						p->SetValue(out.GetValue(), true);
+						p->SetValue(out.Get<pb_msg_t>(), true);
 					}
 				}
 			}
