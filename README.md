@@ -1,14 +1,14 @@
 # 软件工厂
 可以制造应用程序的应用程序
 
-# 它可以干什么？
+# [功能概述](#Feature)
 1. 使用基础模块组成应用程序
 2. 使用基础模块组成更高级的模块
 3. 可视化数据展示
 4. 可视化程序调试
 5. 可视化编程
 
-# 为什么使用它？
+# [为什么使用它？](#WhyUseIt?)
 1. 使用统一接口管理众多基础模块
 2. 重复利用你所写过的每一个模块，而不是在你写过一个功能后，耦合到一个项目里，重新写的时候再造一次轮子
 3. 足够多的基础模块的积累，在你实现新功能时可以直接写核心代码，而不是重新搞一遍环境，重新写一遍辅助代码
@@ -16,11 +16,11 @@
 5. 详细的使用文档和编程示例帮助带你直接上手，实现先体验后学习的良性学习反馈循环，更容易获得成就感
 6. 编译或者使用过程中遇到问题，call me ^-^
 
-# 开发/运行环境
+# [开发/运行环境](#DevRunEnv)
 操作系统: Ubuntu 18.04+  
 开发语言：C++14
 
-# 安装依赖
+# [安装依赖](#Deps)
 ```sh
 sudo apt-get install build-essential cmake
 sudo apt-get install libjsoncpp-dev libprotobuf-dev protobuf-compiler libgflags-dev libgtest-dev libgoogle-glog-dev 
@@ -32,7 +32,7 @@ sudo make
 sudo cp *.a /usr/lib
 ```
 
-# 构建
+# [构建](#Build)
 ![build install gif](doc/pics/build_install_sf.gif)
 
 ```sh
@@ -43,7 +43,7 @@ make
 sudo make install
 ```
 
-# 基础模块开发
+# [基础模块开发](#BaseModDev)
 ![build install gif](doc/pics/create_base_mod_proj.gif)
 
 ## 创建自定义基础模块工程
@@ -129,7 +129,7 @@ fun2(std::vector<std::shared_ptr<::google::protobuf::Message>>);
 ### (三)开发模块需要定义的proto文件
 可以自定义proto消息文件, 也可以使用基础模块已经有的proto消息文件
 
-# 软件制作
+# [软件制作](#SoftwareMake)
 ## 编辑/导出/运行
 ![edit software gif](doc/pics/make_software.gif)
 ```sh
@@ -139,7 +139,7 @@ sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/SoftwareF
 sudo LD_LIBRARY_PATH=/opt/SoftwareFactory/lib /opt/SoftwareFactory/bin/bptemplate -graph_exec_file="/path/to/hello_exec.json"
 ```
 
-# 界面插件开发
+# [界面插件开发](#PanelDev)
 ## 创建界面插件工程
 ```py
 python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --type="mod_panel" --dir="/path/to/panel_dir/" --name="user_panel_name"
@@ -204,7 +204,7 @@ public:
 }
 ```
 
-# Useful example
+# [Useful example](#UsefulExample)
 > 基础模块工程例子：[https://github.com/lkpworkspace/bpio](https://github.com/lkpworkspace/bpio)  
 > 控制界面的基础模块例子: [https://github.com/lkpworkspace/uimod_bitmap](https://github.com/lkpworkspace/uimod_bitmap)  
 > 界面插件例子: [https://github.com/lkpworkspace/panel_bitmap](https://github.com/lkpworkspace/panel_bitmap)  

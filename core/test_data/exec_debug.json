@@ -1,0 +1,201 @@
+{
+   "__main__" : {
+      "links" : [
+         {
+            "color" : [ 1, 1, 1, 1 ],
+            "end_id" : 5,
+            "id" : 9,
+            "start_id" : 2
+         },
+         {
+            "color" : [ 0.98431378602981567, 0, 0.7882353663444519, 1 ],
+            "end_id" : 6,
+            "id" : 10,
+            "start_id" : 8
+         },
+         {
+            "color" : [ 1, 1, 1, 1 ],
+            "end_id" : 29,
+            "id" : 33,
+            "start_id" : 12
+         },
+         {
+            "color" : [ 0.57647061347961426, 0.070588238537311554, 0.066666670143604279, 1 ],
+            "end_id" : 30,
+            "id" : 34,
+            "start_id" : 32
+         },
+         {
+            "color" : [ 1, 1, 1, 1 ],
+            "end_id" : 20,
+            "id" : 37,
+            "start_id" : 14
+         },
+         {
+            "color" : [ 1, 1, 1, 1 ],
+            "end_id" : 24,
+            "id" : 38,
+            "start_id" : 15
+         },
+         {
+            "color" : [ 0.98431378602981567, 0, 0.7882353663444519, 1 ],
+            "end_id" : 21,
+            "id" : 43,
+            "start_id" : 40
+         },
+         {
+            "color" : [ 0.98431378602981567, 0, 0.7882353663444519, 1 ],
+            "end_id" : 25,
+            "id" : 44,
+            "start_id" : 42
+         },
+         {
+            "color" : [ 1, 1, 1, 1 ],
+            "end_id" : 47,
+            "id" : 49,
+            "start_id" : 27
+         },
+         {
+            "color" : [ 0.57647061347961426, 0.070588238537311554, 0.066666670143604279, 1 ],
+            "end_id" : 48,
+            "id" : 50,
+            "start_id" : 28
+         },
+         {
+            "color" : [ 1, 1, 1, 1 ],
+            "end_id" : 16,
+            "id" : 51,
+            "start_id" : 46
+         },
+         {
+            "color" : [ 0.57647061347961426, 0.070588238537311554, 0.066666670143604279, 1 ],
+            "end_id" : 17,
+            "id" : 54,
+            "start_id" : 53
+         }
+      ],
+      "max_id" : 55,
+      "name" : "__main__",
+      "nodes" : {
+         "1" : {
+            "id" : 1,
+            "name" : "Begin",
+            "pos" : [ -57, 84 ],
+            "style" : 1,
+            "type" : 1
+         },
+         "11" : {
+            "id" : 11,
+            "name" : "Tick",
+            "pos" : [ -79, 244 ],
+            "style" : 1,
+            "type" : 1
+         },
+         "13" : {
+            "id" : 13,
+            "name" : "Branch",
+            "pos" : [ 277, 248 ],
+            "style" : 1,
+            "type" : 4
+         },
+         "18" : {
+            "id" : 18,
+            "name" : "Print",
+            "pos" : [ 622, 244 ],
+            "style" : 1,
+            "type" : 4
+         },
+         "22" : {
+            "id" : 22,
+            "name" : "Print",
+            "pos" : [ 634, 386 ],
+            "style" : 1,
+            "type" : 4
+         },
+         "26" : {
+            "id" : 26,
+            "name" : "bpmath.logic_not_bool",
+            "pos" : [ 8, 232 ],
+            "style" : 1,
+            "type" : 3
+         },
+         "3" : {
+            "id" : 3,
+            "name" : "Print",
+            "pos" : [ 142, 120 ],
+            "style" : 1,
+            "type" : 4
+         },
+         "31" : {
+            "get" : true,
+            "id" : 31,
+            "name" : "b",
+            "pos" : [ -99, 404 ],
+            "style" : 2,
+            "type" : 2
+         },
+         "39" : {
+            "get" : true,
+            "id" : 39,
+            "name" : "bt",
+            "pos" : [ 126, 396 ],
+            "style" : 2,
+            "type" : 2
+         },
+         "41" : {
+            "get" : true,
+            "id" : 41,
+            "name" : "bf",
+            "pos" : [ 279, 446 ],
+            "style" : 2,
+            "type" : 2
+         },
+         "45" : {
+            "get" : false,
+            "id" : 45,
+            "name" : "b",
+            "pos" : [ 91, 408 ],
+            "style" : 2,
+            "type" : 2
+         },
+         "52" : {
+            "get" : true,
+            "id" : 52,
+            "name" : "b",
+            "pos" : [ 332, 156 ],
+            "style" : 2,
+            "type" : 2
+         },
+         "7" : {
+            "get" : true,
+            "id" : 7,
+            "name" : "str1",
+            "pos" : [ -96, 172 ],
+            "style" : 2,
+            "type" : 2
+         }
+      },
+      "vars" : [
+         {
+            "name" : "str1",
+            "type" : "bpbase.String",
+            "value" : "{\n   \"var\" : \"hello1\"\n}\n"
+         },
+         {
+            "name" : "b",
+            "type" : "bpbase.Bool",
+            "value" : "{\n   \"var\" : false\n}\n"
+         },
+         {
+            "name" : "bt",
+            "type" : "bpbase.String",
+            "value" : "{\n   \"var\" : \"print true\"\n}\n"
+         },
+         {
+            "name" : "bf",
+            "type" : "bpbase.String",
+            "value" : "{\n   \"var\" : \"print false\"\n}\n"
+         }
+      ]
+   }
+}

@@ -52,7 +52,7 @@ public:
 	 * 
 	 * @param[in] bp_json_path 蓝图文件
 	 * @param[out] g 蓝图对象
-	 * @param[in] desc 节点位置等信息
+	 * @param[out] desc 节点位置等信息
 	 * @return LoadSaveState 
 	 */
 	LoadSaveState LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpGraph>& g, Json::Value& desc);
@@ -62,7 +62,7 @@ public:
 	 * @param[in] root 加载到内存的蓝图文件
 	 * @param[in] graph_name 蓝图对象名称
 	 * @param[out] g 蓝图对象
-	 * @param[in] desc 节点位置等信息
+	 * @param[out] desc 节点位置等信息
 	 * @return LoadSaveState 
 	 */
 	LoadSaveState LoadGraph(const Json::Value& root, const std::string& graph_name, std::shared_ptr<BpGraph>& g, Json::Value& desc);
@@ -76,9 +76,9 @@ public:
 	 */
 	LoadSaveState SaveGraph(const std::string& bp_json_path, const std::shared_ptr<BpGraph>& g, const Json::Value& desc);
 	/**
-	 * @brief 保存蓝图对象到Json:Value
+	 * @brief 保存蓝图对象到Json::Value
 	 * 
-	 * @param[in] root 存储到Json:Value
+	 * @param[in] root 存储到Json::Value
 	 * @param[in] g 蓝图对象
 	 * @param[in] desc 节点位置等信息
 	 * @return LoadSaveState 

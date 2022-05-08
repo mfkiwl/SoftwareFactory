@@ -69,3 +69,6 @@ foreach(ut_file ${bpcore_files})
     )
     add_test(AllTests ${ut_file_target})
 endforeach(ut_file ${bpcore_files})
+
+FILE(GLOB test_data_files "test_data/*")
+FILE(COPY ${test_data_files} DESTINATION ${SF_OUTPUT_TEST_DATA_DIR})

@@ -13,6 +13,7 @@ BpNode::BpNode(const std::string& name, std::shared_ptr<BpGraph> parent)
 	, _node_style(BpNodeStyle::BP_BLUPRINT)
 	, _name(name)
 	, _tmp_next_id(0)
+	, _has_breakpoint(false)
 {
 	if (parent) {
 		_id = parent->GetNextID();
@@ -42,13 +43,15 @@ void BpNode::SetParentGraph(std::shared_ptr<BpGraph> graph) {
 	_tmp_next_id = 0;
 }
 
-void BpNode::Run() {
+BpNodeRunState BpNode::Run() {
 	if (_parent_graph.expired()) {
 		LOG(ERROR) << _name << " has no parent graph";
-		return;
+		return BpNodeRunState::BP_RUN_NO_PARENT;
 	}
     auto graph = _parent_graph.lock();
+	bool debug_mode = graph->IsDebugMode();
 
+	BpNodeRunState run_state = BpNodeRunState::BP_RUN_OK;
 	// build input
 	/*
 		如果是执行Pin，则跳过
@@ -61,10 +64,19 @@ void BpNode::Run() {
 			auto links = graph->SearchLinks(in.ID);
 			for (auto& link : links) {
 				if (link.EndPinID == in.ID) {
-					graph->SearchPin(link.StartPinID)->GetObj()->Run();
+					run_state = graph->SearchPin(link.StartPinID)->GetObj()->Run();
+					if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
+						return run_state;
+					}
 				}
 			}
 		}
+	}
+
+	// 如果有断点，返回并设置该节点
+	if (debug_mode && _has_breakpoint && graph->GetCurBreakPoint() != shared_from_this()) {
+		graph->SetCurBreakPoint(shared_from_this());
+		return BpNodeRunState::BP_RUN_BREAKPOINT;
 	}
 
 	// exec logic
@@ -100,11 +112,16 @@ void BpNode::Run() {
 			auto links = graph->SearchLinks(out.ID);
 			for (auto& link : links) {
 				if (link.StartPinID == out.ID) {
-					graph->SearchPin(link.EndPinID)->GetObj()->Run();
+					run_state = graph->SearchPin(link.EndPinID)->GetObj()->Run();
+					if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
+						return run_state;
+					}
 				}
 			}
 		}
 	}
+
+	return run_state;
 }
 
 BpPin& BpNode::AddPin(const std::string& name, BpPinKind k, BpPinType t, const BpVariable& v) {

@@ -122,7 +122,7 @@ LoadSaveState Bp::LoadGraph(const std::string& bp_json_path, std::shared_ptr<BpG
 		return LoadSaveState::ERR_JSON_FMT;
 	}
 	if (graph_name == "__main__") {
-		g = std::make_shared<BpGraph>("__main__", BpNodeType::BP_GRAPH_EXEC, nullptr);
+		g = std::make_shared<BpGraph>(graph_name, BpNodeType::BP_GRAPH_EXEC, nullptr);
 	} else {
 		g = std::make_shared<BpGraph>(graph_name, BpNodeType::BP_GRAPH, nullptr);;
 		g->AddPin("", BpPinKind::BP_INPUT, BpPinType::BP_FLOW, BpVariable());

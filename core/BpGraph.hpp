@@ -24,9 +24,9 @@ public:
 	BpGraph(std::shared_ptr<BpGraph> parent = nullptr);
 	BpGraph(std::string name, BpNodeType t, std::shared_ptr<BpGraph> parent = nullptr);
 
-	virtual void Run() override;
+	BpNodeRunState Run() override;
 
-	virtual void Logic() {
+	void Logic() override {
 		if (_node_type == BpNodeType::BP_GRAPH && !_input_node.expired()){
 			_input_node.lock()->Run();
 		}
@@ -108,7 +108,7 @@ public:
 	void Clear();
 	
 	/// 清除节点执行后的各种执行状态标记，主要用于下一次执行
-	void ClearFlag();
+	void ClearFlag() override;
 
 	/// 设置所有节点的位置，主要用于在编辑器中显示
 	void SetNodesPos(const Json::Value& desc) { _nodes_pos = desc; }
@@ -116,7 +116,36 @@ public:
 
 	/// 编辑器调用的函数
 	void RunNextEventBeign();
-	bool RunNextEvent();
+	BpNodeRunState RunNextEvent();
+
+	bool IsDebugMode() { return _debug_mode; }
+	
+	/**
+	 * @brief 启动调试
+	 * @note 收集调试信息：\n 
+	 * 		断点节点列表（不用采集，可以根据返回状态得知）\n 
+	 * 		事件节点列表 \n 
+	 * 			收集每个事件节点对应的执行链节点 TODO
+	 */
+	void StartDebug();
+
+	/**
+	 * @brief 继续执行，直到下一个断点返回
+	 */
+	BpNodeRunState ContinueDebug();
+
+	/**
+	 * @brief 结束调试
+	 * @note 清理各种调试flag
+	 */
+	void EndDebug();
+
+	std::shared_ptr<BpNode> GetCurBreakPoint() {
+		return _breakpoint_node.expired() ? nullptr : _breakpoint_node.lock();
+	}
+	void SetCurBreakPoint(std::shared_ptr<BpNode> n) {
+		_breakpoint_node = n;
+	}
 
 	/**
 	 * @brief 获得下一个节点ID
@@ -130,7 +159,7 @@ public:
 private:
 	void SetNextID(int id);
 
-	int                         _next_id;
+	int                         _next_id = 0;
 	/* 图的起点 */
 	event_node_run_t            _event_nodes_run;
 	event_node_map_t            _event_nodes;
@@ -144,8 +173,10 @@ private:
 
 	std::weak_ptr<BpNode>       _input_node;
 	std::weak_ptr<BpNode>       _output_node;
+	std::weak_ptr<BpNode>       _breakpoint_node;
 
 	Json::Value                 _nodes_pos;
+	bool                        _debug_mode = false;
 };
 
 } // namespace bp

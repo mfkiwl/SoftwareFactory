@@ -77,7 +77,7 @@ void SFEPanelGraph::Update() {
                 g->RunNextEventBeign();
                 _run_state = 2;
             } else {
-                if (!g->RunNextEvent()) {
+                if (bp::BpNodeRunState::BP_RUN_FINISH == g->RunNextEvent()) {
                     Json::Value v;
                     v["command"] = "run_cur_graph";
                     v["run"] = false;

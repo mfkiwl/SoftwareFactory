@@ -8,12 +8,10 @@
 namespace bp {
 
 BpGraph::BpGraph(std::shared_ptr<BpGraph> parent) 
-	: BpNode("", parent)
-	, _next_id(0) {}
+	: BpNode("", parent) {}
 
 BpGraph::BpGraph(std::string name, BpNodeType t, std::shared_ptr<BpGraph> parent)
-	: BpNode(name, parent)
-	, _next_id(0) {
+	: BpNode(name, parent) {
 	_node_type = t;
 }
 
@@ -262,30 +260,54 @@ void BpGraph::RunNextEventBeign() {
 	}
 }
 
-bool BpGraph::RunNextEvent() {
+BpNodeRunState BpGraph::RunNextEvent() {
 	ClearFlag();
+	BpNodeRunState run_state = BpNodeRunState::BP_RUN_OK;
 	for (const auto& it : _event_nodes_run) {
 		auto cnt = it->LoopOnce();
 		if (cnt >= 0) {
-			it->Run();
+			run_state = it->Run();
 		}
 		if (cnt == 0) {
 			LOG(INFO) << "erase event node: " << it->GetName();
 			_event_nodes_run.erase(it);
 		}
-		return cnt >= 0;
+		return run_state;
 	}
-	return false;
+	return BpNodeRunState::BP_RUN_FINISH;
 }
 
-void BpGraph::Run() {
+BpNodeRunState BpGraph::Run() {
 	if (_node_type == BpNodeType::BP_GRAPH) {
 		ClearFlag();
-		BpNode::Run();
+		return BpNode::Run();
 	} else {
 		RunNextEventBeign();
-		while(RunNextEvent());
+		while(BpNodeRunState::BP_RUN_FINISH != RunNextEvent());
 	}
+	return BpNodeRunState::BP_RUN_OK;
+}
+
+void BpGraph::StartDebug() { 
+	_debug_mode = true;
+	RunNextEventBeign(); 
+}
+
+BpNodeRunState BpGraph::ContinueDebug() {
+	/// 继续执行下一个没执行完成的节点
+	if (_breakpoint_node.expired()) {
+		return RunNextEvent();
+	}
+	auto bp_node = _breakpoint_node.lock();
+	auto run_state = bp_node->Run();
+	if (run_state == BpNodeRunState::BP_RUN_OK) {
+		_breakpoint_node.reset();
+	}
+	return run_state;
+}
+
+void BpGraph::EndDebug() {
+	_debug_mode = false;
 }
 
 } // namespace bp

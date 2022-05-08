@@ -30,6 +30,15 @@ enum class BpNodeType : int
 	BP_GRAPH_OUTPUT, ///< 图输出节点
 };
 
+/// 节点执行状态
+enum class BpNodeRunState : int
+{
+	BP_RUN_OK = 0,          ///< 成功执行一次事件
+	BP_RUN_NO_PARENT,       ///< 节点没有所属图错误
+	BP_RUN_BREAKPOINT,      ///< 执行到断点
+	BP_RUN_FINISH,          ///< 所有事件执行完成
+};
+
 class BpGraph;
 class BpNode : public std::enable_shared_from_this<BpNode>
 {
@@ -128,7 +137,7 @@ public:
 	 * @brief 设置Pin都是未赋值状态
 	 * @note 图执行前都会清除pin状态，如果用户不清楚图执行流程最好不要调用该函数
 	 */
-	void ClearFlag();
+	virtual void ClearFlag();
 
 	/**
 	 * @brief 设置节点类型
@@ -175,7 +184,17 @@ public:
 	 * @brief 节点执行函数
 	 * @note 用户不需要继承该函数
 	 */
-	virtual void Run();
+	virtual BpNodeRunState Run();
+
+	/// 设置/取消断点
+	void SetBreakpoint(bool b) {
+		_has_breakpoint = b;
+	}
+
+	/// 判断收否有断点
+	bool HasBreakpoint() {
+		return _has_breakpoint;
+	}
 
 protected:
 	std::weak_ptr<BpGraph>      _parent_graph;
@@ -188,6 +207,7 @@ protected:
     std::vector<BpPin>          _outputs;
 	BpPin                       _null_pin;
 	std::vector<BpPin>          _null_pins;
+	bool                        _has_breakpoint;
 };
 
 } // namespace bp

@@ -117,6 +117,35 @@ TEST(bpcore, BpModLib) {
     EXPECT_FALSE(func.type == bp::BpModuleFuncType::UNKNOWN);
 }
 
+TEST(bpcore, BpGraph) {
+    auto& b = bp::Bp::Instance();
+    std::shared_ptr<bp::BpGraph> g = nullptr;
+    Json::Value nodes_pos;
+    EXPECT_EQ(bp::LoadSaveState::OK, b.LoadGraph(std::string("../test_data/exec_debug.json"), g, nodes_pos));
+    // 设置断点
+    auto branch_node = g->GetNode(26);
+    branch_node->SetBreakpoint(true);
+    // 获得变量
+    auto bool_var = g->GetVariable("b").Get<bp::Bool>();
+    // 启动调试
+    g->StartDebug();
+    // 运行Begin事件
+    EXPECT_EQ(g->ContinueDebug(), bp::BpNodeRunState::BP_RUN_OK);
+    // 运行Tick事件，到达断点，判断变量
+    EXPECT_EQ(g->ContinueDebug(), bp::BpNodeRunState::BP_RUN_BREAKPOINT);
+    EXPECT_FALSE(bool_var->var());
+    // 接着断点运行
+    EXPECT_EQ(g->ContinueDebug(), bp::BpNodeRunState::BP_RUN_OK);
+    EXPECT_TRUE(bool_var->var());
+    // 继续从头运行Tick事件
+    EXPECT_EQ(g->ContinueDebug(), bp::BpNodeRunState::BP_RUN_BREAKPOINT);
+    EXPECT_TRUE(bool_var->var());
+    // 接着断点运行
+    EXPECT_EQ(g->ContinueDebug(), bp::BpNodeRunState::BP_RUN_OK);
+    EXPECT_FALSE(bool_var->var());
+    g->EndDebug();
+}
+
 TEST(bpcore, Bp) {
     auto& b = bp::Bp::Instance();
     auto g = std::make_shared<bp::BpGraph>();
