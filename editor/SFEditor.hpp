@@ -30,13 +30,15 @@ public:
 private:
     const std::shared_ptr<SFEPanel> GetPanel(const std::string& name);
     void ProcEditorMessage(const SFEMessage& msg);
+    void RunGraph();
 
     const std::string _name = "editor";
     bool _show_demo = false;
     std::unique_ptr<SFEPlugLib> _pluglib;
     std::vector<SFEMessage> _recv_que;
     sfe::RateCtl _ratectrl;
-
+    bool _runing = false;
+    int _run_state = 1;
 };
 
 } // namespace sfe

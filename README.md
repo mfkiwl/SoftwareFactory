@@ -203,6 +203,7 @@ public:
     ]
 }
 ```
+> 附: [Panel交互文档](doc/panel_cmd.md)
 
 # [Useful example](#UsefulExample)
 > 基础模块工程例子：[https://github.com/lkpworkspace/bpio](https://github.com/lkpworkspace/bpio)  

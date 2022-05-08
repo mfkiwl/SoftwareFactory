@@ -534,67 +534,50 @@ void SFEPanelBp::OnDoubleclickNode() {
 }
 
 void SFEPanelBp::OnMessage(const SFEMessage& msg) {
-    if (msg.msg == "spawnnode") {
+    if (msg.json_msg.isNull()) {
+        return;
+    }
+    auto jmsg = msg.json_msg;
+    auto cmd = msg.json_msg["command"].asString();
+    if (cmd == "set_node_pos") {
+        auto mouse_pos = ImVec2(msg.json_msg["x"].asInt(), msg.json_msg["y"].asInt());
+        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
+        ed::SetNodePosition((ed::NodeId)msg.json_msg["node_id"].asInt(), 
+            canvas_pos
+            );
+    } else if (cmd == "set_nodes_pos") {
+        SetNodesPos(msg.json_msg["desc"].asString());
+    } else if (cmd == "save_graph_step1") {
         auto g = bp::Bp::Instance().CurEditGraph();
         if (g == nullptr) {
             LOG(WARNING) << "cur edit graph is nullptr";
             return;
         }
-        auto node = bp::Bp::Instance().SpawnNode("bpmath.add_int");
-        if (node == nullptr) {
-            LOG(WARNING) << "SpawnNode failed";
-            return;
+        auto& ev_nodes = g->GetEvNodes();
+        auto& nodes = g->GetNodes();
+        Json::Value root;
+        for (const auto& it : ev_nodes) {
+            Json::Value v;
+            auto pos = ed::GetNodePosition((ed::NodeId(it.second->GetID())));
+            v["pos"].append(pos.x);
+            v["pos"].append(pos.y);
+            root[std::to_string(it.second->GetID())] = v;
         }
-        g->AddNode(node);
-        {
-            auto mouse_pos = ImGui::GetMousePos();
-	        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
-            ed::SetNodePosition((ed::NodeId)node->GetID(), canvas_pos);
+        for (const auto& it : nodes) {
+            Json::Value v;
+            auto pos = ed::GetNodePosition((ed::NodeId(it->GetID())));
+            v["pos"].append(pos.x);
+            v["pos"].append(pos.y);
+            root[std::to_string(it->GetID())] = v;
         }
-    }
-    if (msg.msg.empty()) {
-        auto jmsg = msg.json_msg;
-        auto cmd = msg.json_msg["command"].asString();
-        if (cmd == "set_node_pos") {
-            auto mouse_pos = ImVec2(msg.json_msg["x"].asInt(), msg.json_msg["y"].asInt());
-	        auto canvas_pos = ed::ScreenToCanvas(mouse_pos);
-            ed::SetNodePosition((ed::NodeId)msg.json_msg["node_id"].asInt(), 
-                canvas_pos
-                );
-        } else if (cmd == "set_nodes_pos") {
-            SetNodesPos(msg.json_msg["desc"].asString());
-        } else if (cmd == "save_graph_step1") {
-            auto g = bp::Bp::Instance().CurEditGraph();
-            if (g == nullptr) {
-                LOG(WARNING) << "cur edit graph is nullptr";
-                return;
-            }
-            auto& ev_nodes = g->GetEvNodes();
-            auto& nodes = g->GetNodes();
-            Json::Value root;
-            for (const auto& it : ev_nodes) {
-                Json::Value v;
-                auto pos = ed::GetNodePosition((ed::NodeId(it.second->GetID())));
-                v["pos"].append(pos.x);
-                v["pos"].append(pos.y);
-                root[std::to_string(it.second->GetID())] = v;
-            }
-            for (const auto& it : nodes) {
-                Json::Value v;
-                auto pos = ed::GetNodePosition((ed::NodeId(it->GetID())));
-                v["pos"].append(pos.x);
-                v["pos"].append(pos.y);
-                root[std::to_string(it->GetID())] = v;
-            }
-            Json::Value msg2;
-            msg2["command"] = "save_graph_step2";
-            msg2["path"] = msg.json_msg["path"].asString();
-            msg2["nodes_pos"] = bp::BpCommon::Json2Str(root);
-            SendMessage("editor", msg2);
-        } else if (cmd == "move_node_to_center") {
-            ed::SelectNode(jmsg["id"].asInt());
-            ed::NavigateToSelection();
-        }
+        Json::Value msg2;
+        msg2["command"] = "save_graph_step2";
+        msg2["path"] = msg.json_msg["path"].asString();
+        msg2["nodes_pos"] = bp::BpCommon::Json2Str(root);
+        SendMessage("editor", msg2);
+    } else if (cmd == "move_node_to_center") {
+        ed::SelectNode(jmsg["id"].asInt());
+        ed::NavigateToSelection();
     }
 }
 

@@ -63,30 +63,6 @@ void SFEPanelGraph::Update() {
     ShowVarSetting();
 
     ImGui::End();
-
-    if (_runing) {
-        auto g = bp::Bp::Instance().CurEditGraph();
-        if (g == nullptr) {
-            return;
-        }
-        if (g->GetNodeType() == bp::BpNodeType::BP_GRAPH) {
-            g->ClearFlag();
-            g->Logic();
-        } else {
-            if (_run_state == 1) {
-                g->RunNextEventBeign();
-                _run_state = 2;
-            } else {
-                if (bp::BpNodeRunState::BP_RUN_FINISH == g->RunNextEvent()) {
-                    Json::Value v;
-                    v["command"] = "run_cur_graph";
-                    v["run"] = false;
-                    SendMessage("all", v);
-                    OnMessage({PanelName(), "graph", "", v});
-                }
-            }
-        }
-    }
 }
 
 void SFEPanelGraph::Exit() {
@@ -199,17 +175,16 @@ void SFEPanelGraph::ShowVarSetting() {
 }
 
 void SFEPanelGraph::OnMessage(const SFEMessage& msg) {
-    if (msg.msg.empty()) {
-        auto cmd = msg.json_msg["command"].asString();
-        if (cmd == "set_cur_graph") {
-            _set_graph = msg.json_msg["graph_name"].asString();
-        }
-        if (cmd == "run_cur_graph") {
-            bool is_run = msg.json_msg["run"].asBool();
-            _runing = is_run;
-            _run_state = 1;
-            LOG(INFO) << (_runing ? "Runing" : "Stop") << " current graph";
-        }
+    if (msg.json_msg.isNull()) {
+        return;
+    }
+    auto cmd = msg.json_msg["command"].asString();
+    if (cmd == "set_cur_graph") {
+        _set_graph = msg.json_msg["graph_name"].asString();
+    }
+    if (cmd == "run_cur_graph") {
+        bool is_run = msg.json_msg["run"].asBool();
+        _runing = is_run;
     }
 }
 

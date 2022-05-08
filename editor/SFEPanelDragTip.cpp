@@ -35,16 +35,17 @@ void SFEPanelDragTip::Exit() {
 }
 
 void SFEPanelDragTip::OnMessage(const SFEMessage& msg) {
-    if (msg.msg.empty()) {
-        auto cmd = msg.json_msg["command"].asString();
-        if (cmd == "show") {
-            _visible = true;
-            _desc = msg.json_msg["desc"].asString();
-        }
-        if (cmd == "close") {
-            _visible = false;
-        }
-    }
+	if (msg.json_msg.isNull()) {
+		return;
+	}
+	auto cmd = msg.json_msg["command"].asString();
+	if (cmd == "show") {
+		_visible = true;
+		_desc = msg.json_msg["desc"].asString();
+	}
+	if (cmd == "close") {
+		_visible = false;
+	}
 }
 
 } // namespace sfe
