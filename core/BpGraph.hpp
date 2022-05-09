@@ -56,12 +56,15 @@ public:
 
 	/// 获得普通节点列表
 	node_vec_t& GetNodes() { return _nodes; }
+
 	/// 获得普通节点
 	std::shared_ptr<BpNode> GetNode(int id);
+	
 	/// 添加节点对象
 	void AddNode(std::shared_ptr<BpNode>);
 	void DelNode(std::shared_ptr<BpNode>);
 	void DelNode(int id);
+
 	/**
 	 * @brief 搜索连线
 	 * 
@@ -69,10 +72,12 @@ public:
 	 * @return std::vector<BpLink> 
 	 */
 	std::vector<BpLink> SearchLinks(int id);
+
 	/// 获得图对象中的所有连线
 	std::vector<BpLink>& GetLinks() { return _links; }
 	int AddLink(BpPin& start_pin, BpPin& end_pin);
 	void DelLink(int id);
+
 	/**
 	 * @brief 获得连线对象
 	 * 
@@ -118,6 +123,7 @@ public:
 	void RunNextEventBeign();
 	BpNodeRunState RunNextEvent();
 
+	/// 是否处于调试模式
 	bool IsDebugMode() { return _debug_mode; }
 	
 	/**
@@ -138,14 +144,32 @@ public:
 	 * @brief 结束调试
 	 * @note 清理各种调试flag
 	 */
-	void EndDebug();
+	void StopDebug();
 
+	/**
+	 * @brief 获得当前执行到的断点对象
+	 * 
+	 * @return std::shared_ptr<BpNode> 
+	 */
 	std::shared_ptr<BpNode> GetCurBreakPoint() {
 		return _breakpoint_node.expired() ? nullptr : _breakpoint_node.lock();
 	}
+
+	/**
+	 * @brief 设置图运行到的断点
+	 * @note 内部调用，请谨慎使用
+	 * @param n 
+	 */
 	void SetCurBreakPoint(std::shared_ptr<BpNode> n) {
 		_breakpoint_node = n;
 	}
+
+	/**
+	 * @brief 设置/取消所有节点断点
+	 * 
+	 * @param[in] b 
+	 */
+	void SetAllBreakpoints(bool b);
 
 	/**
 	 * @brief 获得下一个节点ID

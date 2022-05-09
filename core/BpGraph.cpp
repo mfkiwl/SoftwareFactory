@@ -302,12 +302,21 @@ BpNodeRunState BpGraph::ContinueDebug() {
 	auto run_state = bp_node->Run();
 	if (run_state == BpNodeRunState::BP_RUN_OK) {
 		_breakpoint_node.reset();
+		if (_event_nodes_run.empty()) {
+			run_state = BpNodeRunState::BP_RUN_FINISH;
+		}
 	}
 	return run_state;
 }
 
-void BpGraph::EndDebug() {
+void BpGraph::StopDebug() {
 	_debug_mode = false;
+}
+
+void BpGraph::SetAllBreakpoints(bool b) {
+	for (auto& com : _nodes) {
+		com->SetBreakpoint(b);
+	}
 }
 
 } // namespace bp

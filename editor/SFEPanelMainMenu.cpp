@@ -57,25 +57,42 @@ void SFEPanelMainMenu::Update() {
                 SendMessage("all", v);
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Start debug", "", false, _debug_mode == 1 && !_runing)) {
+            if (ImGui::MenuItem("Start Debug", "", false, _debug_mode == 1 && !_runing)) {
                 Json::Value v;
                 v["command"] = "debug_cur_graph";
                 v["type"] = "req";
                 v["stage"] = "start";
                 SendMessage("all", v);
             }
-            if (ImGui::MenuItem("Continue debug", "F10", false, _debug_mode == 2 && !_runing)) {
+            if (ImGui::MenuItem("Continue Debug", "F10", false, _debug_mode == 2 && !_runing)) {
                 Json::Value v;
                 v["command"] = "debug_cur_graph";
                 v["type"] = "req";
                 v["stage"] = "continue";
                 SendMessage("all", v);
             }
-            if (ImGui::MenuItem("Stop debug", "", false, _debug_mode == 2 && !_runing)) {
+            if (ImGui::MenuItem("Stop Debug", "", false, _debug_mode == 2 && !_runing)) {
                 Json::Value v;
                 v["command"] = "debug_cur_graph";
                 v["type"] = "req";
                 v["stage"] = "stop";
+                SendMessage("all", v);
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Enable All Breakpoints", "", false)) {
+                Json::Value v;
+                v["command"] = "breakpoint_cur_graph";
+                v["type"] = "req";
+                v["id"] = "all";
+                v["set"] = true;
+                SendMessage("all", v);
+            }
+            if (ImGui::MenuItem("Remove All Breakpoints", "", false)) {
+                Json::Value v;
+                v["command"] = "breakpoint_cur_graph";
+                v["type"] = "req";
+                v["id"] = "all";
+                v["set"] = false;
                 SendMessage("all", v);
             }
             ImGui::EndMenu();

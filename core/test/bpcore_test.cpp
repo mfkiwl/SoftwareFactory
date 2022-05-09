@@ -143,7 +143,7 @@ TEST(bpcore, BpGraph) {
     // 接着断点运行
     EXPECT_EQ(g->ContinueDebug(), bp::BpNodeRunState::BP_RUN_OK);
     EXPECT_FALSE(bool_var->var());
-    g->EndDebug();
+    g->StopDebug();
 }
 
 TEST(bpcore, Bp) {

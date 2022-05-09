@@ -55,11 +55,19 @@ void SFEditor::RunGraph() {
     if (g->GetNodeType() == bp::BpNodeType::BP_GRAPH) {
         g->ClearFlag();
         g->Logic();
+        _runing = false;
+        Json::Value v;
+        v["command"] = "run_cur_graph";
+        v["type"] = "resp";
+        v["run"] = false;
+        SFEPanel::SendMessage(_name, "all", v);
     } else {
         if (_run_state == 1) {
             g->RunNextEventBeign();
             _run_state = 2;
         } else if (bp::BpNodeRunState::BP_RUN_FINISH == g->RunNextEvent()) {
+            _run_state = 1;
+            _runing = false;
             Json::Value v;
             v["command"] = "run_cur_graph";
             v["type"] = "resp";
@@ -313,6 +321,10 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             LOG(ERROR) << "No graph";
             return;
         }
+        if (g->GetNodeType() == bp::BpNodeType::BP_GRAPH) {
+            LOG(ERROR) << "Unsupport mod graph";
+            return;
+        }
         auto stage = jmsg["stage"].asString();
         Json::Value v;
         v["command"] = "debug_cur_graph";
@@ -324,12 +336,29 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             auto run_state = g->ContinueDebug();
             if (run_state == bp::BpNodeRunState::BP_RUN_FINISH) {
                 v["stage"] = "stop";
-                g->EndDebug();
+                g->StopDebug();
             }
         } else if (stage == "stop") {
-            g->EndDebug();
+            g->StopDebug();
         }
         SFEPanel::SendMessage(_name, "all", v);
+    } else if (cmd == "breakpoint_cur_graph" && jmsg["type"].asString() == "req") {
+        auto g = bp::Bp::Instance().CurEditGraph();
+        if (g == nullptr) {
+            LOG(ERROR) << "No graph";
+            return;
+        }
+        if (jmsg["id"].asString() == "all") {
+            g->SetAllBreakpoints(jmsg["set"].asBool());
+            Json::Value v;
+            v["command"] = "breakpoint_cur_graph";
+            v["type"] = "resp";
+            v["id"] = "all";
+            v["set"] = jmsg["set"].asBool();
+            SFEPanel::SendMessage(_name, "all", v);
+        } else {
+            LOG(ERROR) << "Unimp msg";
+        }
     }
 }
 
