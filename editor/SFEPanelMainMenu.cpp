@@ -42,19 +42,40 @@ void SFEPanelMainMenu::Update() {
         //     ImGui::EndMenu();
         // }
         if (ImGui::BeginMenu("Run")) {
-            if (ImGui::MenuItem("Start", "F5", false, !_runing)) {
-                _runing = true;
+            if (ImGui::MenuItem("Start", "F5", false, _debug_mode == 1 && !_runing)) {
                 Json::Value v;
                 v["command"] = "run_cur_graph";
-                v["run"] = _runing;
+                v["type"] = "req";
+                v["run"] = true;
                 SendMessage("all", v);
             }
-            // if (ImGui::MenuItem("Pause", "CTRL+F5")) {}
-            if (ImGui::MenuItem("Stop", "SHIFT+F5", false, _runing)) {
-                _runing = false;
+            if (ImGui::MenuItem("Stop", "SHIFT+F5", false, _debug_mode == 1 && _runing)) {
                 Json::Value v;
                 v["command"] = "run_cur_graph";
-                v["run"] = _runing;
+                v["type"] = "req";
+                v["run"] = false;
+                SendMessage("all", v);
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Start debug", "", false, _debug_mode == 1 && !_runing)) {
+                Json::Value v;
+                v["command"] = "debug_cur_graph";
+                v["type"] = "req";
+                v["stage"] = "start";
+                SendMessage("all", v);
+            }
+            if (ImGui::MenuItem("Continue debug", "F10", false, _debug_mode == 2 && !_runing)) {
+                Json::Value v;
+                v["command"] = "debug_cur_graph";
+                v["type"] = "req";
+                v["stage"] = "continue";
+                SendMessage("all", v);
+            }
+            if (ImGui::MenuItem("Stop debug", "", false, _debug_mode == 2 && !_runing)) {
+                Json::Value v;
+                v["command"] = "debug_cur_graph";
+                v["type"] = "req";
+                v["stage"] = "stop";
                 SendMessage("all", v);
             }
             ImGui::EndMenu();
@@ -157,11 +178,19 @@ void SFEPanelMainMenu::SaveGraph() {
 }
 
 void SFEPanelMainMenu::OnMessage(const SFEMessage& msg) {
-    if (msg.msg.empty()) {
-        auto cmd = msg.json_msg["command"].asString();
-        if (cmd == "run_cur_graph") {
-            bool is_run = msg.json_msg["run"].asBool();
-            _runing = is_run;
+    if (msg.json_msg.isNull()) {
+        return;
+    }
+    auto jmsg = msg.json_msg;
+    auto cmd = jmsg["command"];
+    if (cmd == "run_cur_graph" && jmsg["type"].asString() == "resp") {
+        bool is_run = jmsg["run"].asBool();
+        _runing = is_run;
+    } else if (cmd == "debug_cur_graph" && jmsg["type"].asString() == "resp") {
+        if (jmsg["stage"] == "start") {
+            _debug_mode = 2;
+        } else if (jmsg["stage"] == "stop") {
+            _debug_mode = 1;
         }
     }
 }

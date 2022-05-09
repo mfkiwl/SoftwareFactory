@@ -62,6 +62,7 @@ void SFEditor::RunGraph() {
         } else if (bp::BpNodeRunState::BP_RUN_FINISH == g->RunNextEvent()) {
             Json::Value v;
             v["command"] = "run_cur_graph";
+            v["type"] = "resp";
             v["run"] = false;
             SFEPanel::SendMessage(_name, "all", v);
         }
@@ -292,11 +293,43 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
     } else if (cmd == "del_graph_pin") {
         auto g = bp::Bp::Instance().CurEditGraph();
         g->DelModGraphPin(jmsg["node_id"].asInt());
-    } else if (cmd == "run_cur_graph") {
-        bool is_run = msg.json_msg["run"].asBool();
-        _runing = is_run;
+    } else if (cmd == "run_cur_graph" && jmsg["type"] == "req") {
+        auto g = bp::Bp::Instance().CurEditGraph();
+        if (g == nullptr) {
+            LOG(ERROR) << "No graph";
+            return;
+        }
+        _runing = jmsg["run"].asBool();
         _run_state = 1;
         LOG(INFO) << (_runing ? "Runing" : "Stop") << " current graph";
+        Json::Value v;
+        v["command"] = "run_cur_graph";
+        v["type"] = "resp";
+        v["run"] = _runing;
+        SFEPanel::SendMessage(_name, "all", v);
+    } else if (cmd == "debug_cur_graph" && jmsg["type"].asString() == "req") {
+        auto g = bp::Bp::Instance().CurEditGraph();
+        if (g == nullptr) {
+            LOG(ERROR) << "No graph";
+            return;
+        }
+        auto stage = jmsg["stage"].asString();
+        Json::Value v;
+        v["command"] = "debug_cur_graph";
+        v["type"] = "resp";
+        v["stage"] = stage;
+        if (stage == "start") {
+            g->StartDebug();
+        } else if (stage == "continue") {
+            auto run_state = g->ContinueDebug();
+            if (run_state == bp::BpNodeRunState::BP_RUN_FINISH) {
+                v["stage"] = "stop";
+                g->EndDebug();
+            }
+        } else if (stage == "stop") {
+            g->EndDebug();
+        }
+        SFEPanel::SendMessage(_name, "all", v);
     }
 }
 

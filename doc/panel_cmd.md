@@ -5,7 +5,16 @@
 ```json
 {
     "command":"run_cur_graph",
-    "run": true
+    "type": [ "req" | "resp" ],
+    "run": [ true | false ]
+}
+```
+## 启动/继续/停止调试
+```json
+{
+    "command":"debug_cur_graph",
+    "type": [ "req" | "resp" ],
+    "stage": [ "start" | "continue" | "stop" ]
 }
 ```
 

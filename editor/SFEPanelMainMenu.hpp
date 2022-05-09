@@ -19,6 +19,7 @@ private:
     void SaveGraph();
 
     bool _runing = false;
+    int _debug_mode = 1;
 };
 
 } // namespace sfe

@@ -178,12 +178,12 @@ void SFEPanelGraph::OnMessage(const SFEMessage& msg) {
     if (msg.json_msg.isNull()) {
         return;
     }
-    auto cmd = msg.json_msg["command"].asString();
+    auto& jmsg = msg.json_msg;
+    auto cmd = jmsg["command"].asString();
     if (cmd == "set_cur_graph") {
-        _set_graph = msg.json_msg["graph_name"].asString();
-    }
-    if (cmd == "run_cur_graph") {
-        bool is_run = msg.json_msg["run"].asBool();
+        _set_graph = jmsg["graph_name"].asString();
+    } else if (cmd == "run_cur_graph" && jmsg["type"].asString() == "resp") {
+        bool is_run = jmsg["run"].asBool();
         _runing = is_run;
     }
 }
