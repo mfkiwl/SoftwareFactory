@@ -337,6 +337,8 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
             if (run_state == bp::BpNodeRunState::BP_RUN_FINISH) {
                 v["stage"] = "stop";
                 g->StopDebug();
+            } else {
+                v["run_state"] = (int)run_state;
             }
         } else if (stage == "stop") {
             g->StopDebug();
