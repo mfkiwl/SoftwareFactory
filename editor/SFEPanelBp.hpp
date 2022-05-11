@@ -67,6 +67,7 @@ private:
     ed::LinkId _right_click_linkid;
     bool _show_graph_setting = false;
     Json::Value _graph_pin_info;
+    std::vector<int> _flow_links;
 };
 
 } // namespace sfe

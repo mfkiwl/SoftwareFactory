@@ -14,7 +14,19 @@
 {
     "command":"debug_cur_graph",
     "type": [ "req" | "resp" ],
-    "stage": [ "start" | "continue" | "stop" ]
+    "stage": [ "start" | "continue" | "stop" ],
+    "flow_links": [ 1, 3, 10 ],
+    "run_state": 2
+}
+```
+
+## 设置/取消断点
+```json
+{
+    "command":"breakpoint_cur_graph",
+    "type": [ "req" | "resp" ],
+    "id": "all",
+    "set": [ true | false ]
 }
 ```
 

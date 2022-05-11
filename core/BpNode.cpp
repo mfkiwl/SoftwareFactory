@@ -64,10 +64,7 @@ BpNodeRunState BpNode::Run() {
 			auto links = graph->SearchLinks(in.ID);
 			for (auto& link : links) {
 				if (link.EndPinID == in.ID) {
-					run_state = graph->SearchPin(link.StartPinID)->GetObj()->Run();
-					if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
-						return run_state;
-					}
+					graph->SearchPin(link.StartPinID)->GetObj()->Run();
 				}
 			}
 		}
@@ -75,7 +72,7 @@ BpNodeRunState BpNode::Run() {
 
 	// 如果有断点，返回并设置该节点
 	if (debug_mode && _has_breakpoint && graph->GetCurBreakPoint() != shared_from_this()) {
-		graph->SetCurBreakPoint(shared_from_this());
+		graph->SetCurBreakpoint(shared_from_this());
 		return BpNodeRunState::BP_RUN_BREAKPOINT;
 	}
 
@@ -112,6 +109,9 @@ BpNodeRunState BpNode::Run() {
 			auto links = graph->SearchLinks(out.ID);
 			for (auto& link : links) {
 				if (link.StartPinID == out.ID) {
+					if (debug_mode) {
+						graph->AddCurDebugLinkFlow(link.ID);
+					}
 					run_state = graph->SearchPin(link.EndPinID)->GetObj()->Run();
 					if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
 						return run_state;
@@ -176,6 +176,17 @@ void BpNode::ClearFlag() {
 	for (auto& out : _outputs) {
 		out.SetVaild(false);
 	}
+}
+
+void BpNode::SetBreakpoint(bool b) {
+	if (_node_type == BpNodeType::BP_NODE_VAR 
+		|| _node_type == BpNodeType::BP_NONE
+		|| _node_type == BpNodeType::BP_GRAPH_EXEC
+		|| _node_type == BpNodeType::BP_GRAPH_INPUT
+		|| _node_type == BpNodeType::BP_GRAPH_OUTPUT) {
+		return;
+	}
+	_has_breakpoint = b;
 }
 
 } // namespace bp

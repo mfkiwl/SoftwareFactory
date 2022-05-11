@@ -6,7 +6,7 @@ import re
 import shutil
 
 def dumpUsage():
-    print("Usage: python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --name=MOD_NAME --dir=MOD_DIR")
+    print("Usage: python3 /opt/SoftwareFactory/tools/gen_base_mod_proj.py --type=MOD_TYPE --name=MOD_NAME --dir=MOD_DIR")
     print("Options:")
     print("  --type   MOD_TYPE            Base module type: [ mod | mod_with_ui | mod_panel ]")
     print("  --name   MOD_NAME            Base module name, for example: usermod")

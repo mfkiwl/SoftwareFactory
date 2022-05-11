@@ -30,6 +30,7 @@ void SFEPanelBp::Update() {
         ImGui::End();
         return;
     }
+
     ed::SetCurrentEditor(_node_editor);
     // double click node
     ed::NodeId n_id = ed::GetDoubleClickedNode();
@@ -59,7 +60,13 @@ void SFEPanelBp::Update() {
         auto& links = graph->GetLinks();
         for (auto it = links.begin(); it != links.end(); ++it)
             ed::Link((*it).ID, (*it).StartPinID, (*it).EndPinID, ImColor((*it).Color[0], (*it).Color[1], (*it).Color[2], (*it).Color[3]), 2.0f);
-    
+        // links flow
+        if (!_flow_links.empty()) {
+             for (int i = 0; i < _flow_links.size(); ++i) {
+                ed::Flow(_flow_links[i]);
+            }
+            _flow_links.clear();
+        }
         // create/delete
         NodeLinkCreate(graph);
         NodeLinkDelete(graph);
@@ -578,6 +585,13 @@ void SFEPanelBp::OnMessage(const SFEMessage& msg) {
     } else if (cmd == "move_node_to_center") {
         ed::SelectNode(jmsg["id"].asInt());
         ed::NavigateToSelection();
+    } else if (cmd == "debug_cur_graph" && jmsg["type"].asString() == "resp") {
+        if (jmsg["stage"] == "continue") {
+            auto flow_links = jmsg["flow_links"];
+            for (auto it = flow_links.begin(); it != flow_links.end(); ++it) {
+                _flow_links.push_back((*it).asInt());
+            }
+        }
     }
 }
 
