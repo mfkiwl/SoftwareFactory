@@ -339,6 +339,11 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
                 g->StopDebug();
             } else {
                 v["run_state"] = (int)run_state;
+                // 添加flow
+                auto flow_links = g->GetCurDebugLinksFlow();
+                for (int i = 0; i < flow_links.size(); ++i) {
+                    v["flow_links"].append(flow_links[i]);
+                }
             }
         } else if (stage == "stop") {
             g->StopDebug();

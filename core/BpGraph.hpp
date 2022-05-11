@@ -160,9 +160,12 @@ public:
 	 * @note 内部调用，请谨慎使用
 	 * @param n 
 	 */
-	void SetCurBreakPoint(std::shared_ptr<BpNode> n) {
+	void SetCurBreakpoint(std::shared_ptr<BpNode> n) {
 		_breakpoint_node = n;
 	}
+
+	const std::vector<int>& GetCurDebugLinksFlow() { return _debug_cur_links_flow; }
+	void AddCurDebugLinkFlow(int link_id) { _debug_cur_links_flow.push_back(link_id); }
 
 	/**
 	 * @brief 设置/取消所有节点断点
@@ -201,6 +204,7 @@ private:
 
 	Json::Value                 _nodes_pos;
 	bool                        _debug_mode = false;
+	std::vector<int>            _debug_cur_links_flow;
 };
 
 } // namespace bp

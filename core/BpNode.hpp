@@ -187,9 +187,7 @@ public:
 	virtual BpNodeRunState Run();
 
 	/// 设置/取消断点
-	void SetBreakpoint(bool b) {
-		_has_breakpoint = b;
-	}
+	void SetBreakpoint(bool b);
 
 	/// 判断收否有断点
 	bool HasBreakpoint() {

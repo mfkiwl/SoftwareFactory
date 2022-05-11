@@ -294,6 +294,7 @@ void BpGraph::StartDebug() {
 }
 
 BpNodeRunState BpGraph::ContinueDebug() {
+	_debug_cur_links_flow.clear();
 	/// 继续执行下一个没执行完成的节点
 	if (_breakpoint_node.expired()) {
 		return RunNextEvent();
