@@ -105,11 +105,4 @@ void SFEPanelLog::Exit() {
     bp::UnRegisterWriteCallback();
 }
 
-void SFEPanelLog::OnMessage(const SFEMessage& msg) {
-    if (msg.msg.empty()) {
-        return;
-    }
-    AddLog(msg.msg.c_str());
-}
-
 } // namespace sfe

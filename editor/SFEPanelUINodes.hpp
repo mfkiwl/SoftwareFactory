@@ -6,11 +6,11 @@ namespace sfe {
 
 class SFEPanelUINodes : public SFEPanel {
 public:
-    virtual bool Init() override;
+    bool Init() override;
 
-    virtual void Update() override;
+    void Update() override;
 
-    virtual void Exit() override;
+    void Exit() override;
     /*
         注册生成节点函数
         注册目录

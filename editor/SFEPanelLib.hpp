@@ -6,11 +6,11 @@ namespace sfe {
 
 class SFEPanelLib : public SFEPanel {
 public:
-    virtual bool Init() override;
+    bool Init() override;
 
-    virtual void Update() override;
+    void Update() override;
 
-    virtual void Exit() override;
+    void Exit() override;
 
 private:
     void ShowLib(std::shared_ptr<BpContents> c);
