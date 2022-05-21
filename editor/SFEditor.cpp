@@ -290,8 +290,8 @@ void SFEditor::ProcEditorMessage(const SFEMessage& msg) {
         g->DelLink(jmsg["id"].asInt());
     } else if (cmd == "create_link") {
         auto g = bp::Bp::Instance().CurEditGraph();
-        auto start_pin = g->SearchPin(jmsg["start_pin_id"].asInt());
-        auto end_pin = g->SearchPin(jmsg["end_pin_id"].asInt());
+        auto start_pin = g->GetPin(jmsg["start_pin_id"].asInt());
+        auto end_pin = g->GetPin(jmsg["end_pin_id"].asInt());
         g->AddLink(*start_pin, *end_pin);
         g->GetLinks().back().SetColor(jmsg["color"][0].asFloat(), jmsg["color"][1].asFloat(), jmsg["color"][2].asFloat(), jmsg["color"][3].asFloat());
     } else if (cmd == "add_graph_pin") {

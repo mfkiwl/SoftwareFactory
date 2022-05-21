@@ -59,6 +59,8 @@ public:
 
 	/// 获得普通节点
 	std::shared_ptr<BpNode> GetNode(int id);
+	std::shared_ptr<BpNode> GetNextNodeByOutPinID(int pin_id);
+	std::shared_ptr<BpNode> GetPreNodeByInPinID(int pin_id);
 	
 	/// 添加节点对象
 	void AddNode(std::shared_ptr<BpNode>);
@@ -69,9 +71,9 @@ public:
 	 * @brief 搜索连线
 	 * 
 	 * @param id pin id
-	 * @return std::vector<BpLink> 
+	 * @return cosnt BpLink 
 	 */
-	std::vector<BpLink> SearchLinks(int id);
+	const BpLink* GetLinkByPinID(int pin_id);
 
 	/// 获得图对象中的所有连线
 	std::vector<BpLink>& GetLinks() { return _links; }
@@ -84,7 +86,7 @@ public:
 	 * @param id link id
 	 * @return BpLink 
 	 */
-	BpLink GetLink(int id);
+	BpLink* GetLink(int id);
 	
 	/**
 	 * @brief 搜索pin对象
@@ -92,7 +94,7 @@ public:
 	 * @param id pin id
 	 * @return BpPin* 
 	 */
-	BpPin* SearchPin(int id);
+	BpPin* GetPin(int id);
 
 	/// 获得变量列表
 	const variable_map_t& GetVariables() { return _vars; }
@@ -114,6 +116,7 @@ public:
 	
 	/// 清除节点执行后的各种执行状态标记，主要用于下一次执行
 	void ClearFlag() override;
+	void ClearChildrenFlagByOutPinID(int id);
 
 	/// 设置所有节点的位置，主要用于在编辑器中显示
 	void SetNodesPos(const Json::Value& desc) { _nodes_pos = desc; }
@@ -185,6 +188,7 @@ public:
 
 private:
 	void SetNextID(int id);
+	void ClearChildrenFlagByOutPinIDHelper(int pin_id, std::shared_ptr<BpNode> node);
 
 	int                         _next_id = 0;
 	/* 图的起点 */

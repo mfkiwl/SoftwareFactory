@@ -119,6 +119,13 @@ pb_msg_ptr_t logic_not_bool(pb_msg_ptr_t msg) {
     res->set_var(!a->var());
     return res;
 }
+pb_msg_ptr_t equal_bool(std::vector<pb_msg_ptr_t> msgs) {
+    auto a = std::dynamic_pointer_cast<::bp::Bool>(msgs[0]);
+    auto b = std::dynamic_pointer_cast<::bp::Bool>(msgs[1]);
+    auto res = std::make_shared<bp::Bool>();
+    res->set_var(a->var() == b->var());
+    return res;
+}
 
 //// int32
 pb_msg_ptr_t add_int32(std::vector<pb_msg_ptr_t> msgs) {
@@ -149,6 +156,13 @@ pb_msg_ptr_t div_int32(std::vector<pb_msg_ptr_t> msgs) {
     res->set_var(a->var() / b->var());
     return res;
 }
+pb_msg_ptr_t equal_int32(std::vector<pb_msg_ptr_t> msgs) {
+    auto a = std::dynamic_pointer_cast<::bp::Int32>(msgs[0]);
+    auto b = std::dynamic_pointer_cast<::bp::Int32>(msgs[1]);
+    auto res = std::make_shared<bp::Bool>();
+    res->set_var(a->var() == b->var());
+    return res;
+}
 
 //// uint32
 pb_msg_ptr_t add_uint32(std::vector<pb_msg_ptr_t> msgs) {
@@ -177,6 +191,13 @@ pb_msg_ptr_t div_uint32(std::vector<pb_msg_ptr_t> msgs) {
     auto b = std::dynamic_pointer_cast<::bp::UInt32>(msgs[1]);
     auto res = std::make_shared<bp::UInt32>();
     res->set_var(a->var() / b->var());
+    return res;
+}
+pb_msg_ptr_t equal_uint32(std::vector<pb_msg_ptr_t> msgs) {
+    auto a = std::dynamic_pointer_cast<::bp::UInt32>(msgs[0]);
+    auto b = std::dynamic_pointer_cast<::bp::UInt32>(msgs[1]);
+    auto res = std::make_shared<bp::Bool>();
+    res->set_var(a->var() == b->var());
     return res;
 }
 

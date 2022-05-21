@@ -110,8 +110,8 @@ void SFEPanelBp::NodeLinkCreate(std::shared_ptr<bp::BpGraph>& graph) {
         ed::PinId startPinId = 0, endPinId = 0;
         bp::BpPin* new_link_pin = nullptr;
         if (ed::QueryNewLink(&startPinId, &endPinId)) {
-            auto startPin = graph->SearchPin((int)startPinId.Get());
-            auto endPin = graph->SearchPin((int)endPinId.Get());
+            auto startPin = graph->GetPin((int)startPinId.Get());
+            auto endPin = graph->GetPin((int)endPinId.Get());
 
             new_link_pin = startPin ? startPin : endPin;
 
@@ -155,13 +155,13 @@ void SFEPanelBp::NodeLinkCreate(std::shared_ptr<bp::BpGraph>& graph) {
 
         ed::PinId pinId = 0;
         if (ed::QueryNewNode(&pinId)) {
-            new_link_pin = graph->SearchPin((int)pinId.Get());
+            new_link_pin = graph->GetPin((int)pinId.Get());
             if (new_link_pin)
                 showLabel("+ Create Node", ImColor(32, 45, 32, 180));
 
             if (ed::AcceptNewItem()) {
                 // m_create_new_node = true;
-                // m_new_node_link_pin = graph->SearchPin((int)pinId.Get());
+                // m_new_node_link_pin = graph->GetPin((int)pinId.Get());
                 ed::Suspend();
                 ImGui::OpenPopup("Create New Node");
                 ed::Resume();
@@ -391,7 +391,7 @@ void SFEPanelBp::ShowNodeInfo()
 	}
 	// 显示针脚信息
 	if (ImGui::BeginPopup("Pin Context Menu")) {
-		auto pin = g->SearchPin((int)_right_click_pinid.Get());
+		auto pin = g->GetPin((int)_right_click_pinid.Get());
 		ImGui::TextUnformatted("Pin Context Menu");
 		ImGui::Separator();
 		if (pin) {
@@ -411,10 +411,10 @@ void SFEPanelBp::ShowNodeInfo()
 		auto link = g->GetLink((int)_right_click_linkid.Get());
 		ImGui::TextUnformatted("Link Context Menu");
 		ImGui::Separator();
-		if (link.ID != 0) {
-			ImGui::Text("ID: %d", link.ID);
-			ImGui::Text("From: %d", link.StartPinID);
-			ImGui::Text("To: %d", link.EndPinID);
+		if (link->ID != 0) {
+			ImGui::Text("ID: %d", link->ID);
+			ImGui::Text("From: %d", link->StartPinID);
+			ImGui::Text("To: %d", link->EndPinID);
 		} else {
 			ImGui::Text("Unknown link: %p", _right_click_linkid.AsPointer());
         }

@@ -6,6 +6,7 @@
 #include "basenode/BpNodeBasePrint.hpp"
 #include "basenode/BpNodeBaseDelay.hpp"
 #include "basenode/BpNodeBaseBranch.hpp"
+#include "basenode/BpNodeBaseWhile.hpp"
 
 namespace bp {
 BpNodeLib::BpNodeLib() 
@@ -36,6 +37,11 @@ BpNodeLib::BpNodeLib()
             auto node = std::make_shared<BpNodeBaseBranch>(nullptr);
             node->Init();
             return node;
+        }},
+        {"While", [](){
+            auto node = std::make_shared<BpNodeBaseWhile>(nullptr);
+            node->Init();
+            return node;
         }}
     }
 {
@@ -50,6 +56,7 @@ BpNodeLib::BpNodeLib()
     _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Print", BpContents::Type::LEAF, BpContents::LeafType::BASE));
     _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Delay", BpContents::Type::LEAF, BpContents::LeafType::BASE));
     _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "Branch", BpContents::Type::LEAF, BpContents::LeafType::BASE));
+    _base_contents->AddChild(std::make_shared<BpContents>(nullptr, "While", BpContents::Type::LEAF, BpContents::LeafType::BASE));
     _root_contents->AddChild(_base_contents);
 }
 

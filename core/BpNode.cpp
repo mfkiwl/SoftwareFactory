@@ -61,11 +61,9 @@ BpNodeRunState BpNode::Run() {
 	*/
 	for (BpPin& in : _inputs) {
 		if (in.IsLinked() && !in.IsVaild() && in.GetPinType() != BpPinType::BP_FLOW) {
-			auto links = graph->SearchLinks(in.ID);
-			for (auto& link : links) {
-				if (link.EndPinID == in.ID) {
-					graph->SearchPin(link.StartPinID)->GetObj()->Run();
-				}
+			auto link = graph->GetLinkByPinID(in.ID);
+			if (link->EndPinID == in.ID) {
+				graph->GetPin(link->StartPinID)->GetObj()->Run();
 			}
 		}
 	}
@@ -89,15 +87,13 @@ BpNodeRunState BpNode::Run() {
 	*/
 	for (auto& out : _outputs) {
 		if (out.IsLinked() && out.GetPinType() != BpPinType::BP_FLOW) {
-			auto links = graph->SearchLinks(out.ID);
-			for (auto& link : links) {
-				if (link.StartPinID == out.ID) {
-					bp:BpPin* p = graph->SearchPin(link.EndPinID);
-					if (p->AssignByRef()) {
-						p->SetValueByRef(out.Get<pb_msg_t>(), true);
-					} else {
-						p->SetValue(out.Get<pb_msg_t>(), true);
-					}
+			auto link = graph->GetLinkByPinID(out.ID);
+			if (link->StartPinID == out.ID) {
+				bp:BpPin* p = graph->GetPin(link->EndPinID);
+				if (p->AssignByRef()) {
+					p->SetValueByRef(out.Get<pb_msg_t>(), true);
+				} else {
+					p->SetValue(out.Get<pb_msg_t>(), true);
 				}
 			}
 		}
@@ -106,16 +102,14 @@ BpNodeRunState BpNode::Run() {
 	// exec next coms
 	for (auto& out : _outputs) {
 		if (out.IsLinked() && out.GetPinType() == BpPinType::BP_FLOW && out.IsExecutable()) {
-			auto links = graph->SearchLinks(out.ID);
-			for (auto& link : links) {
-				if (link.StartPinID == out.ID) {
-					if (debug_mode) {
-						graph->AddCurDebugLinkFlow(link.ID);
-					}
-					run_state = graph->SearchPin(link.EndPinID)->GetObj()->Run();
-					if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
-						return run_state;
-					}
+			auto link = graph->GetLinkByPinID(out.ID);
+			if (link->StartPinID == out.ID) {
+				if (debug_mode) {
+					graph->AddCurDebugLinkFlow(link->ID);
+				}
+				run_state = graph->GetPin(link->EndPinID)->GetObj()->Run();
+				if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
+					return run_state;
 				}
 			}
 		}

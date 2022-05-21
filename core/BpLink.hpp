@@ -18,6 +18,11 @@ public:
 		Color[2] = b;
 		Color[3] = a;
 	}
+	BpLink()
+		: ID(-1)
+		, StartPinID(-1)
+		, EndPinID(-1)
+    {}
     BpLink(int id, int startPinId, int endPinId)
 		: ID(id)
 		, StartPinID(startPinId)
