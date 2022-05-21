@@ -264,30 +264,44 @@ void BpGraph::ClearFlag() {
 
 void BpGraph::ClearChildrenFlagByOutPinID(int pin_id) {
 	auto link_id = GetLinkByPinID(pin_id);
-	auto pin = GetPin(link_id->EndPinID);
+	ClearChildrenFlagByInPinID(link_id->EndPinID);
+}
+
+void BpGraph::ClearChildrenFlagByInPinID(int pin_id) {
+	auto pin = GetPin(pin_id);
 	auto node = pin->GetObj();
 	if (node == nullptr) {
 		return;
 	}
-	ClearChildrenFlagByOutPinIDHelper(link_id->EndPinID, node);
+	std::unordered_set<std::shared_ptr<BpNode>> visited;
+	ClearChildrenFlagHelper(pin_id, visited, node);
 }
 
-void BpGraph::ClearChildrenFlagByOutPinIDHelper(int pin_id, std::shared_ptr<BpNode> node) {
-	auto& in_pins = GetPins(BpPinKind::BP_INPUT);
+void BpGraph::ClearChildrenFlagHelper(int pin_id, std::unordered_set<std::shared_ptr<BpNode>>& visited, std::shared_ptr<BpNode> node) {
+	if (visited.find(node) != visited.end()) {
+		return;
+	}
+	auto& in_pins = node->GetPins(BpPinKind::BP_INPUT);
 	for (int i = 0; i < in_pins.size(); ++i) {
 		if (pin_id == in_pins[i].ID) {
 			continue;
 		}
-		auto pre_node = GetPreNodeByInPinID(in_pins[i].ID);
-		ClearChildrenFlagByOutPinIDHelper(pin_id, pre_node);
+		if (in_pins[i].IsLinked() 
+			&& in_pins[i].GetPinType() != BpPinType::BP_FLOW) {
+			auto pre_node = GetPreNodeByInPinID(in_pins[i].ID);
+			ClearChildrenFlagHelper(pin_id, visited, pre_node);
+		}
 	}
-
+	
+	visited.insert(node);
 	node->ClearFlag();
 
-	auto& out_pins = GetPins(BpPinKind::BP_OUTPUT);
+	auto& out_pins = node->GetPins(BpPinKind::BP_OUTPUT);
 	for (int i = 0; i < out_pins.size(); ++i) {
-		auto next_node = GetNextNodeByOutPinID(out_pins[i].ID);
-		ClearChildrenFlagByOutPinIDHelper(pin_id, next_node);
+		if (out_pins[i].IsLinked() && out_pins[i].GetPinType() == BpPinType::BP_FLOW) {
+			auto next_node = GetNextNodeByOutPinID(out_pins[i].ID);
+			ClearChildrenFlagHelper(pin_id, visited, next_node);
+		}
 	}
 }
 

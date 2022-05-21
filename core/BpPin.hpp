@@ -45,7 +45,7 @@ public:
 	 * @return true 
 	 * @return false 
 	 */
-	bool IsVaild() { return _vaild; }
+	bool IsVaild() const { return _vaild; }
 	void SetVaild(bool b) { _vaild = b; }
 
 	/**
@@ -64,7 +64,7 @@ public:
 	 * @note 仅针对BpPinType::BP_FLOW类型的pin
 	 */
 	void SetExecutable(bool b = true) { _executable = b; }
-	bool IsExecutable() { return _executable; }
+	bool IsExecutable() const { return _executable; }
 
 	/**
 	 * @brief 获得pin名称

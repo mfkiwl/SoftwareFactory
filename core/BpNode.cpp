@@ -43,16 +43,13 @@ void BpNode::SetParentGraph(std::shared_ptr<BpGraph> graph) {
 	_tmp_next_id = 0;
 }
 
-BpNodeRunState BpNode::Run() {
-	if (_parent_graph.expired()) {
-		LOG(ERROR) << _name << " has no parent graph";
-		return BpNodeRunState::BP_RUN_NO_PARENT;
-	}
-    auto graph = _parent_graph.lock();
-	bool debug_mode = graph->IsDebugMode();
+bool BpNode::NeedBuildInputPin(const BpPin& in) {
+	return (in.IsLinked() 
+			&& !in.IsVaild() 
+			&& in.GetPinType() != BpPinType::BP_FLOW);
+}
 
-	BpNodeRunState run_state = BpNodeRunState::BP_RUN_OK;
-	// build input
+void BpNode::BuildInput(std::shared_ptr<BpGraph>& graph) {
 	/*
 		如果是执行Pin，则跳过
 		如果是没有连线，则跳过
@@ -60,24 +57,16 @@ BpNodeRunState BpNode::Run() {
 		如果有连线并且是参数Pin，并且参数无效，则搜索连线节点，并执行该节点
 	*/
 	for (BpPin& in : _inputs) {
-		if (in.IsLinked() && !in.IsVaild() && in.GetPinType() != BpPinType::BP_FLOW) {
+		if (NeedBuildInputPin(in)) {
 			auto link = graph->GetLinkByPinID(in.ID);
 			if (link->EndPinID == in.ID) {
 				graph->GetPin(link->StartPinID)->GetObj()->Run();
 			}
 		}
 	}
+}
 
-	// 如果有断点，返回并设置该节点
-	if (debug_mode && _has_breakpoint && graph->GetCurBreakPoint() != shared_from_this()) {
-		graph->SetCurBreakpoint(shared_from_this());
-		return BpNodeRunState::BP_RUN_BREAKPOINT;
-	}
-
-	// exec logic
-	Logic();
-
-	// set output
+void BpNode::BuildOutput(std::shared_ptr<BpGraph>& graph) {
 	/* 
 		循环1：
 			如果是参数Pin并且有连线，则搜索连线节点的pin，设置该节点值
@@ -98,10 +87,39 @@ BpNodeRunState BpNode::Run() {
 			}
 		}
 	}
+}
+
+bool BpNode::IsRunableOutputPin(const BpPin& out) {
+	return (out.IsLinked() && out.GetPinType() == BpPinType::BP_FLOW && out.IsExecutable());
+}
+
+BpNodeRunState BpNode::Run() {
+	if (_parent_graph.expired()) {
+		LOG(ERROR) << _name << " has no parent graph";
+		return BpNodeRunState::BP_RUN_NO_PARENT;
+	}
+    auto graph = _parent_graph.lock();
+	bool debug_mode = graph->IsDebugMode();
+
+	BpNodeRunState run_state = BpNodeRunState::BP_RUN_OK;
+	// build input
+	BuildInput(graph);
+
+	// 如果有断点，返回并设置该节点
+	if (debug_mode && _has_breakpoint && graph->GetCurBreakPoint() != shared_from_this()) {
+		graph->SetCurBreakpoint(shared_from_this());
+		return BpNodeRunState::BP_RUN_BREAKPOINT;
+	}
+
+	// exec logic
+	Logic();
+
+	// set output
+	BuildOutput(graph);
 
 	// exec next coms
 	for (auto& out : _outputs) {
-		if (out.IsLinked() && out.GetPinType() == BpPinType::BP_FLOW && out.IsExecutable()) {
+		if (IsRunableOutputPin(out)) {
 			auto link = graph->GetLinkByPinID(out.ID);
 			if (link->StartPinID == out.ID) {
 				if (debug_mode) {

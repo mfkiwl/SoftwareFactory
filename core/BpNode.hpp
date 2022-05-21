@@ -194,7 +194,16 @@ public:
 		return _has_breakpoint;
 	}
 
+	/// 判断是否需要构建输入pin
+	bool NeedBuildInputPin(const BpPin&);
+
+	/// 判断是否是可执行的输出pin
+	bool IsRunableOutputPin(const BpPin&);
+	
 protected:
+	void BuildInput(std::shared_ptr<BpGraph>&);
+	void BuildOutput(std::shared_ptr<BpGraph>&);
+
 	std::weak_ptr<BpGraph>      _parent_graph;
 	BpNodeType                  _node_type;
 	BpNodeStyle                 _node_style;

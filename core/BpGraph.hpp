@@ -2,6 +2,7 @@
 #define __BpGraph_hpp__
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "BpLink.hpp"
 #include "BpVariable.hpp"
@@ -116,7 +117,8 @@ public:
 	
 	/// 清除节点执行后的各种执行状态标记，主要用于下一次执行
 	void ClearFlag() override;
-	void ClearChildrenFlagByOutPinID(int id);
+	void ClearChildrenFlagByOutPinID(int out_pin_id);
+	void ClearChildrenFlagByInPinID(int in_pin_id);
 
 	/// 设置所有节点的位置，主要用于在编辑器中显示
 	void SetNodesPos(const Json::Value& desc) { _nodes_pos = desc; }
@@ -188,7 +190,7 @@ public:
 
 private:
 	void SetNextID(int id);
-	void ClearChildrenFlagByOutPinIDHelper(int pin_id, std::shared_ptr<BpNode> node);
+	void ClearChildrenFlagHelper(int pin_id, std::unordered_set<std::shared_ptr<BpNode>>& visited, std::shared_ptr<BpNode> node);
 
 	int                         _next_id = 0;
 	/* 图的起点 */

@@ -26,16 +26,16 @@ public:
     }
 
 	void Logic() override {
+        auto parent = GetParentGraph();
         auto& in_pins = GetPins(BpPinKind::BP_INPUT);
         auto& out_pins = GetPins(BpPinKind::BP_OUTPUT);
         out_pins[0].SetExecutable(true);
         out_pins[1].SetExecutable(false);
         while (in_pins[1].GetBpValue().Get<bp::Bool>()->var()) {
-            auto parent = GetParentGraph();
-            parent->ClearChildrenFlagByOutPinID(out_pins[0].ID);
+            parent->ClearChildrenFlagByInPinID(in_pins[0].ID);
             auto next_node = parent->GetNextNodeByOutPinID(out_pins[0].ID);
             next_node->Run();
-            LOG(INFO) << "RUN while";
+            BuildInput(parent);
         }
         out_pins[0].SetExecutable(false);
         out_pins[1].SetExecutable(true);
