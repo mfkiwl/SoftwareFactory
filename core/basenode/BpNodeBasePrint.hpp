@@ -17,7 +17,7 @@ public:
         AddPin("any", ::bp::BpPinKind::BP_INPUT, ::bp::BpPinType::BP_VALUE, ::bp::BpVariable("any", "any", nullptr)).SetAssignByRef(true); 
     }
 
-	virtual void Logic() {
+	BpNodeRunState Logic() override {
         for (int i = 0; i < _inputs.size(); ++i) {
             if (_inputs[i].GetPinType() == ::bp::BpPinType::BP_VALUE) {
                 if (_inputs[i].Get<pb_msg_t>() != nullptr) {
@@ -28,6 +28,7 @@ public:
                 _inputs[i].SetValueByRef(nullptr);
             }
         }
+        return BpNodeRunState::BP_RUN_LOGIC_OK;
     }
 };
 

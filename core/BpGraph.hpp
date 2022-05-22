@@ -27,10 +27,11 @@ public:
 
 	BpNodeRunState Run() override;
 
-	void Logic() override {
+	BpNodeRunState Logic() override {
 		if (_node_type == BpNodeType::BP_GRAPH && !_input_node.expired()){
 			_input_node.lock()->Run();
 		}
+		return BpNodeRunState::BP_RUN_LOGIC_OK;
 	}
 
 	/**
@@ -169,6 +170,14 @@ public:
 		_breakpoint_node = n;
 	}
 
+	void PushLoopNode(std::shared_ptr<BpNode> n) {
+		if (!_breakpoint_loop_stack.empty() && _breakpoint_loop_stack.top().lock() == n) {
+			return;
+		}
+		LOG(INFO) << "push loop node: " << n->GetName() << "("<< n->GetID() << ")";
+		_breakpoint_loop_stack.push(n);
+	}
+
 	const std::vector<int>& GetCurDebugLinksFlow() { return _debug_cur_links_flow; }
 	void AddCurDebugLinkFlow(int link_id) { _debug_cur_links_flow.push_back(link_id); }
 
@@ -207,6 +216,7 @@ private:
 	std::weak_ptr<BpNode>       _input_node;
 	std::weak_ptr<BpNode>       _output_node;
 	std::weak_ptr<BpNode>       _breakpoint_node;
+	std::stack<std::weak_ptr<BpNode>> _breakpoint_loop_stack;
 
 	Json::Value                 _nodes_pos;
 	bool                        _debug_mode = false;

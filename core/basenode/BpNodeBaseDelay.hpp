@@ -25,7 +25,7 @@ public:
         pin.SetExecutable(true);
     }
 
-	void Logic() override {
+	BpNodeRunState Logic() override {
         if (_outputs[0].IsExecutable()) {
             _time = 0;
             _last_timestamp = BpCommon::GetTimestamp();
@@ -40,6 +40,7 @@ public:
                 _outputs[0].SetExecutable(true);
             }
         }
+        return BpNodeRunState::BP_RUN_LOGIC_OK;
     };
     
 private:

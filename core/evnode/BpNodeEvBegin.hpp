@@ -12,8 +12,6 @@ public:
 	BpNodeEvBegin(std::shared_ptr<BpGraph> parent)
 	    : BpNodeEv("Begin", parent, 1, 1)
     {}
-
-	void Logic() override {}
 };
 
 } // namespace bp

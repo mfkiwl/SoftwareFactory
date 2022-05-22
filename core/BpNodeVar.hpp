@@ -14,7 +14,7 @@ public:
         _node_style = BpNodeStyle::BP_SIMPLE;
     }
 
-	virtual void Logic() {}
+	virtual BpNodeRunState Logic() { return BpNodeRunState::BP_RUN_LOGIC_OK; }
 
     bool IsGet() { return _is_get; }
 private:

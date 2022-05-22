@@ -14,10 +14,10 @@ public:
         _node_type = bp::BpNodeType::BP_NODE_USER;
     }
 
-	virtual void Logic() {
+	bp::BpNodeRunState Logic() override {
         if (_panel.expired()) {
             LOG(ERROR) << "Plot node has no panel";
-            return;
+            return bp::BpNodeRunState::BP_RUN_LOGIC_OK;
         }
         auto p = _panel.lock();
         Json::Value v;
@@ -25,6 +25,7 @@ public:
         v["x"] = _inputs[2].Get<::bp::Float>()->var();;
         v["y"] = _inputs[3].Get<::bp::Float>()->var();;
         p->SendMessage("plot", v);
+        return bp::BpNodeRunState::BP_RUN_LOGIC_OK;
     }
 
 private:

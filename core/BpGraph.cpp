@@ -355,7 +355,15 @@ BpNodeRunState BpGraph::ContinueDebug() {
 	}
 	auto bp_node = _breakpoint_node.lock();
 	auto run_state = bp_node->Run();
-	if (run_state == BpNodeRunState::BP_RUN_OK) {
+	if (run_state == BpNodeRunState::BP_RUN_OK
+		|| run_state == BpNodeRunState::BP_RUN_LOOP_INTERNAL) {
+		// 执行loop stack的节点
+		if (!_breakpoint_loop_stack.empty()) {
+			auto loop_node = _breakpoint_loop_stack.top();
+			_breakpoint_node = loop_node;
+			_breakpoint_loop_stack.pop();
+			return BpNodeRunState::BP_RUN_BREAKPOINT;
+		}
 		_breakpoint_node.reset();
 		if (_event_nodes_run.empty()) {
 			run_state = BpNodeRunState::BP_RUN_FINISH;

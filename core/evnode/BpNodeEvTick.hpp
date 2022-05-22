@@ -13,7 +13,7 @@ public:
 		: BpNodeEv("Tick", parent, 2, -1)
 	{}
 
-	void Logic() override {}
+	BpNodeRunState Logic() override { return BpNodeRunState::BP_RUN_LOGIC_OK; }
 };
 
 } // namespace bp

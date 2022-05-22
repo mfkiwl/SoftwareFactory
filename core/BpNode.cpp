@@ -108,11 +108,18 @@ BpNodeRunState BpNode::Run() {
 	// 如果有断点，返回并设置该节点
 	if (debug_mode && _has_breakpoint && graph->GetCurBreakPoint() != shared_from_this()) {
 		graph->SetCurBreakpoint(shared_from_this());
+		LOG(INFO) << "Breakpoint: Stop at " << _name;
 		return BpNodeRunState::BP_RUN_BREAKPOINT;
 	}
 
 	// exec logic
-	Logic();
+	auto state = Logic();
+	if (debug_mode 
+		&& (state == BpNodeRunState::BP_RUN_BREAKPOINT 
+			|| state == BpNodeRunState::BP_RUN_LOOP_INTERNAL)) {
+		LOG(INFO) << "Logic Breakpoint: Stop at " << _name;
+		return state;
+	}
 
 	// set output
 	BuildOutput(graph);

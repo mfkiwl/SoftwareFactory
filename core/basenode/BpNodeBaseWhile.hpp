@@ -25,20 +25,32 @@ public:
         AddPin("Completed", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable());
     }
 
-	void Logic() override {
+	BpNodeRunState Logic() override {
         auto parent = GetParentGraph();
         auto& in_pins = GetPins(BpPinKind::BP_INPUT);
         auto& out_pins = GetPins(BpPinKind::BP_OUTPUT);
         out_pins[0].SetExecutable(true);
         out_pins[1].SetExecutable(false);
-        while (in_pins[1].GetBpValue().Get<bp::Bool>()->var()) {
+        do {
             parent->ClearChildrenFlagByInPinID(in_pins[0].ID);
-            auto next_node = parent->GetNextNodeByOutPinID(out_pins[0].ID);
-            next_node->Run();
             BuildInput(parent);
-        }
+            if (!in_pins[1].GetBpValue().Get<bp::Bool>()->var()) {
+                break;
+            }
+            if (parent->IsDebugMode()) {
+                auto flow_link = parent->GetLinkByPinID(out_pins[0].ID);
+                parent->AddCurDebugLinkFlow(flow_link->ID);
+            }
+            auto next_node = parent->GetNextNodeByOutPinID(out_pins[0].ID);
+            auto state = next_node->Run();
+            if (parent->IsDebugMode()) {
+                parent->PushLoopNode(shared_from_this());
+                return state == BpNodeRunState::BP_RUN_OK ? BpNodeRunState::BP_RUN_LOOP_INTERNAL : state;
+            }
+        } while(1);
         out_pins[0].SetExecutable(false);
         out_pins[1].SetExecutable(true);
+        return BpNodeRunState::BP_RUN_LOGIC_OK;
     };
 };
 

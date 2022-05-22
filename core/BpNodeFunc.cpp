@@ -10,7 +10,7 @@ BpNodeFunc::BpNodeFunc(const std::string& func_full_path, std::shared_ptr<BpGrap
     _node_type = BpNodeType::BP_NODE_FUNC;
 }
 
-void BpNodeFunc::Logic() {
+BpNodeRunState BpNodeFunc::Logic() {
     // 根据输入参数,输出参数数量,转换指针并调用
     // 获得返回值并设置到输出pin保存的值里
     int in_n = _info.type_args.size();
@@ -72,6 +72,7 @@ void BpNodeFunc::Logic() {
     } else if (_info.type == BpModuleFuncType::RES0_ARGN) {
         reinterpret_cast<module_func7_t>(_info.func)(args);
     }
+    return BpNodeRunState::BP_RUN_LOGIC_OK;
 }
 
 } // namespace bp

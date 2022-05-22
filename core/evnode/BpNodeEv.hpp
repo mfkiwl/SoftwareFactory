@@ -14,8 +14,6 @@ public:
     {
         _node_type = bp::BpNodeType::BP_NODE_EV;
     }
-
-	virtual void Logic() {};
     
     /* 数字越小优先级越高 */
     int GetWeight() { return _lv; }
