@@ -1,6 +1,6 @@
 # 软件工厂
 可以制造应用程序的应用程序
-
+![SoftwareFactory](doc/pics/SoftwareFactory.png)
 # [功能概述](#Feature)
 1. 使用基础模块组成应用程序
 2. 使用基础模块组成更高级的模块
