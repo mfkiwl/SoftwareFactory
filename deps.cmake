@@ -1,0 +1,13 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+
+IF(USE_SYSTEM_LIBS)
+    MESSAGE(STATUS "Using system deps libs...")
+    FIND_PACKAGE(jsoncpp REQUIRED)
+    FIND_PACKAGE(gflags REQUIRED)
+    FIND_PACKAGE(Protobuf REQUIRED)
+    FIND_PACKAGE(GLEW REQUIRED)
+    FIND_PACKAGE(GTest REQUIRED)
+ELSE()
+    # TODO by yourself
+    MESSAGE(STATUS "Using yourself deps libs...")
+ENDIF()

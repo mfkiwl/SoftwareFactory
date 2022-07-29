@@ -1,0 +1,38 @@
+syntax = "proto2";
+package bp;
+
+message Bool {
+    required bool var = 1;
+}
+
+message Int32 {
+    required int32 var = 1;
+}
+
+message UInt32 {
+    required uint32 var = 1;
+}
+
+message Float {
+    required float var = 1;
+}
+
+message String {
+    required string var = 1;
+}
+
+message Bytes {
+    required bytes var = 1;
+}
+
+message Int32Ary {
+    repeated int32 ary = 1;
+}
+
+message UInt32Ary {
+    repeated uint32 ary = 1;
+}
+
+message FloatAry {
+    repeated float ary = 1;
+}
