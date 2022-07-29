@@ -1,14 +1,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
-FILE(GLOB proto_files "*.proto")
-#PROTOBUF_GENERATE(
-#    APPEND_PATH
-#    LANGUAGE cpp
-#    OUT_VAR pb_gen
-#    PROTOC_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
-#    PROTOS ${proto_files}
-#)
-#ADD_LIBRARY(bppb SHARED ${pb_gen})
+IF(USE_PB_VER_2)
+    MESSAGE(STATUS "Using protobuf2 proto...")
+    FILE(GLOB proto_files "pb2/*.proto")
+ELSE()
+    MESSAGE(STATUS "Using protobuf3 proto...")
+    FILE(GLOB proto_files "*.proto")
+ENDIF()
 
 include_directories(${Protobuf_INCLUDE_DIRS})
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${proto_files})

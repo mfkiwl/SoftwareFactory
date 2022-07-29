@@ -177,6 +177,24 @@
                 }
             ]
         },
+        "equal_bool":{
+            "_input":[
+                {
+                    "type":"bpbase.Bool",
+                    "name":"a"
+                },
+                {
+                    "type":"bpbase.Bool",
+                    "name":"b"
+                }
+            ],
+            "_output":[
+                {
+                    "type":"bpbase.Bool",
+                    "name":"Is Equal"
+                }
+            ]
+        },
         "add_int32":{
             "_input":[
                 {
@@ -249,6 +267,24 @@
                 }
             ]
         },
+        "equal_int32":{
+            "_input":[
+                {
+                    "type":"bpbase.Int32",
+                    "name":"a"
+                },
+                {
+                    "type":"bpbase.Int32",
+                    "name":"b"
+                }
+            ],
+            "_output":[
+                {
+                    "type":"bpbase.Bool",
+                    "name":"Is Equal"
+                }
+            ]
+        },
         "add_uint32":{
             "_input":[
                 {
@@ -318,6 +354,24 @@
                 {
                     "type":"bpbase.UInt32",
                     "name":"c"
+                }
+            ]
+        },
+        "equal_uint32":{
+            "_input":[
+                {
+                    "type":"bpbase.UInt32",
+                    "name":"a"
+                },
+                {
+                    "type":"bpbase.UInt32",
+                    "name":"b"
+                }
+            ],
+            "_output":[
+                {
+                    "type":"bpbase.Bool",
+                    "name":"Is Equal"
                 }
             ]
         },

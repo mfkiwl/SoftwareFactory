@@ -230,8 +230,8 @@ LoadSaveState Bp::LoadGraph(const Json::Value& root, const Json::Value& json_gra
 		int start_id = links[i]["start_id"].asInt();
 		int end_id = links[i]["end_id"].asInt();
 		
-		auto sp = g->SearchPin(start_id);
-		auto ep = g->SearchPin(end_id);
+		auto sp = g->GetPin(start_id);
+		auto ep = g->GetPin(end_id);
 		if (sp == nullptr || ep == nullptr) {
 			LOG(ERROR) << "Search pin " << start_id << " or " << end_id << " failed";
 			return LoadSaveState::ERR_SEARCH_PIN;

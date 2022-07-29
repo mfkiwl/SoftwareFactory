@@ -43,6 +43,56 @@ void BpNode::SetParentGraph(std::shared_ptr<BpGraph> graph) {
 	_tmp_next_id = 0;
 }
 
+bool BpNode::NeedBuildInputPin(const BpPin& in) {
+	return (in.IsLinked() 
+			&& !in.IsVaild() 
+			&& in.GetPinType() != BpPinType::BP_FLOW);
+}
+
+void BpNode::BuildInput(std::shared_ptr<BpGraph>& graph) {
+	/*
+		如果是执行Pin，则跳过
+		如果是没有连线，则跳过
+		如果有连线并且是参数Pin，并且参数有效，则跳过
+		如果有连线并且是参数Pin，并且参数无效，则搜索连线节点，并执行该节点
+	*/
+	for (BpPin& in : _inputs) {
+		if (NeedBuildInputPin(in)) {
+			auto link = graph->GetLinkByPinID(in.ID);
+			if (link->EndPinID == in.ID) {
+				graph->GetPin(link->StartPinID)->GetObj()->Run();
+			}
+		}
+	}
+}
+
+void BpNode::BuildOutput(std::shared_ptr<BpGraph>& graph) {
+	/* 
+		循环1：
+			如果是参数Pin并且有连线，则搜索连线节点的pin，设置该节点值
+			其他则跳过
+		循环2：
+			如果是执行Pin并且有连线，则搜索连线节点的com，执行该com
+	*/
+	for (auto& out : _outputs) {
+		if (out.IsLinked() && out.GetPinType() != BpPinType::BP_FLOW) {
+			auto link = graph->GetLinkByPinID(out.ID);
+			if (link->StartPinID == out.ID) {
+				bp:BpPin* p = graph->GetPin(link->EndPinID);
+				if (p->AssignByRef()) {
+					p->SetValueByRef(out.Get<pb_msg_t>(), true);
+				} else {
+					p->SetValue(out.Get<pb_msg_t>(), true);
+				}
+			}
+		}
+	}
+}
+
+bool BpNode::IsRunableOutputPin(const BpPin& out) {
+	return (out.IsLinked() && out.GetPinType() == BpPinType::BP_FLOW && out.IsExecutable());
+}
+
 BpNodeRunState BpNode::Run() {
 	if (_parent_graph.expired()) {
 		LOG(ERROR) << _name << " has no parent graph";
@@ -53,69 +103,38 @@ BpNodeRunState BpNode::Run() {
 
 	BpNodeRunState run_state = BpNodeRunState::BP_RUN_OK;
 	// build input
-	/*
-		如果是执行Pin，则跳过
-		如果是没有连线，则跳过
-		如果有连线并且是参数Pin，并且参数有效，则跳过
-		如果有连线并且是参数Pin，并且参数无效，则搜索连线节点，并执行该节点
-	*/
-	for (BpPin& in : _inputs) {
-		if (in.IsLinked() && !in.IsVaild() && in.GetPinType() != BpPinType::BP_FLOW) {
-			auto links = graph->SearchLinks(in.ID);
-			for (auto& link : links) {
-				if (link.EndPinID == in.ID) {
-					graph->SearchPin(link.StartPinID)->GetObj()->Run();
-				}
-			}
-		}
-	}
+	BuildInput(graph);
 
 	// 如果有断点，返回并设置该节点
 	if (debug_mode && _has_breakpoint && graph->GetCurBreakPoint() != shared_from_this()) {
 		graph->SetCurBreakpoint(shared_from_this());
+		LOG(INFO) << "Breakpoint: Stop at " << _name;
 		return BpNodeRunState::BP_RUN_BREAKPOINT;
 	}
 
 	// exec logic
-	Logic();
+	auto state = Logic();
+	if (debug_mode 
+		&& (state == BpNodeRunState::BP_RUN_BREAKPOINT 
+			|| state == BpNodeRunState::BP_RUN_LOOP_INTERNAL)) {
+		LOG(INFO) << "Logic Breakpoint: Stop at " << _name;
+		return state;
+	}
 
 	// set output
-	/* 
-		循环1：
-			如果是参数Pin并且有连线，则搜索连线节点的pin，设置该节点值
-			其他则跳过
-		循环2：
-			如果是执行Pin并且有连线，则搜索连线节点的com，执行该com
-	*/
-	for (auto& out : _outputs) {
-		if (out.IsLinked() && out.GetPinType() != BpPinType::BP_FLOW) {
-			auto links = graph->SearchLinks(out.ID);
-			for (auto& link : links) {
-				if (link.StartPinID == out.ID) {
-					bp:BpPin* p = graph->SearchPin(link.EndPinID);
-					if (p->AssignByRef()) {
-						p->SetValueByRef(out.Get<pb_msg_t>(), true);
-					} else {
-						p->SetValue(out.Get<pb_msg_t>(), true);
-					}
-				}
-			}
-		}
-	}
+	BuildOutput(graph);
 
 	// exec next coms
 	for (auto& out : _outputs) {
-		if (out.IsLinked() && out.GetPinType() == BpPinType::BP_FLOW && out.IsExecutable()) {
-			auto links = graph->SearchLinks(out.ID);
-			for (auto& link : links) {
-				if (link.StartPinID == out.ID) {
-					if (debug_mode) {
-						graph->AddCurDebugLinkFlow(link.ID);
-					}
-					run_state = graph->SearchPin(link.EndPinID)->GetObj()->Run();
-					if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
-						return run_state;
-					}
+		if (IsRunableOutputPin(out)) {
+			auto link = graph->GetLinkByPinID(out.ID);
+			if (link->StartPinID == out.ID) {
+				if (debug_mode) {
+					graph->AddCurDebugLinkFlow(link->ID);
+				}
+				run_state = graph->GetPin(link->EndPinID)->GetObj()->Run();
+				if (debug_mode && run_state == BpNodeRunState::BP_RUN_BREAKPOINT) {
+					return run_state;
 				}
 			}
 		}

@@ -4,11 +4,11 @@ namespace sfe {
 
 class @template_name@ : public SFEPanel {
 public:
-    virtual bool Init() override {
+    bool Init() override {
         return true;
     }
 
-    virtual void Update() override {
+    void Update() override {
         ImGui::Begin(PanelName().c_str());
 
         ImGui::Button("Hello");
@@ -16,11 +16,11 @@ public:
         ImGui::End();
     }
 
-    virtual void Exit() override {
+    void Exit() override {
 
     }
 
-    virtual void OnMessage(const SFEMessage& msg) override {
+    void OnMessage(const SFEMessage& msg) override {
 
     }
 };

@@ -13,7 +13,7 @@ class BpNodeFunc : public BpNode
 public:
 	BpNodeFunc(const std::string& func_full_path, std::shared_ptr<BpGraph> parent);
 
-	virtual void Logic() override;
+	virtual BpNodeRunState Logic() override;
 
 	void SetFuncInfo(const BpModuleFunc& info) { _info = info; }
 

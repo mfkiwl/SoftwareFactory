@@ -5,15 +5,14 @@ namespace sfe {
 
 class SFEPanelLog : public SFEPanel {
 public:
-    virtual bool Init() override;
+    bool Init() override;
 
-    virtual void Update() override;
+    void Update() override;
 
-    virtual void Exit() override;
-
-    virtual void OnMessage(const SFEMessage& msg) override;
+    void Exit() override;
 
     void AddLogCB(const std::string& msg);
+    
 private:
     void Clear();
     void AddLog(const char* fmt, ...) IM_FMTARGS(2);

@@ -127,8 +127,8 @@ int BpGraph::AddLink(BpPin& start_pin, BpPin& end_pin) {
 void BpGraph::DelLink(int id) {
 	for (auto it = _links.begin(); it != _links.end(); ++it) {
 		if ((*it).ID == id) {
-			BpPin* sp = SearchPin((*it).StartPinID);
-			BpPin* ep = SearchPin((*it).EndPinID);
+			BpPin* sp = GetPin((*it).StartPinID);
+			BpPin* ep = GetPin((*it).EndPinID);
 			sp->SetLinked(false);
 			ep->SetLinked(false);
 			_links.erase(it);
@@ -161,26 +161,25 @@ void BpGraph::DelNode(int id) {
 	}
 }
 
-std::vector<BpLink> BpGraph::SearchLinks(int id) {
-	std::vector<BpLink> ret;
+const BpLink* BpGraph::GetLinkByPinID(int pin_id) {
 	for (int i = 0; i < _links.size(); ++i) {
-		if (_links[i].StartPinID == id || _links[i].EndPinID == id) {
-			ret.push_back(_links[i]);
+		if (_links[i].StartPinID == pin_id || _links[i].EndPinID == pin_id) {
+			return &_links[i];
 		}
 	}
-	return ret;
+	return nullptr;
 }
 
-BpLink BpGraph::GetLink(int id) {
+BpLink* BpGraph::GetLink(int id) {
 	for (int i = 0; i < _links.size(); ++i) {
 		if (_links[i].ID == id) {
-			return _links[i];
+			return &_links[i];
 		}
 	}
-	return BpLink(0, 0, 0);
+	return nullptr;
 }
 
-BpPin* BpGraph::SearchPin(int id) {
+BpPin* BpGraph::GetPin(int id) {
 	for (auto p : _event_nodes) {
 		auto com = p.second;
 		std::vector<BpPin>& inputs = com->GetPins(BpPinKind::BP_INPUT);
@@ -216,6 +215,18 @@ std::shared_ptr<BpNode> BpGraph::GetNode(int id) {
 	return nullptr;
 }
 
+std::shared_ptr<BpNode> BpGraph::GetNextNodeByOutPinID(int pin_id) {
+	auto link_id = GetLinkByPinID(pin_id);
+	auto pin = GetPin(link_id->EndPinID);
+	return pin->GetObj();
+}
+
+std::shared_ptr<BpNode> BpGraph::GetPreNodeByInPinID(int pin_id) {
+	auto link_id = GetLinkByPinID(pin_id);
+	auto pin = GetPin(link_id->StartPinID);
+	return pin->GetObj();
+}
+
 bool BpGraph::AddEventNode(std::shared_ptr<BpNode> node) {
 	if (_node_type == BpNodeType::BP_GRAPH) {
 		LOG(ERROR) << _name << " not exec graph";
@@ -248,6 +259,49 @@ void BpGraph::ClearFlag() {
 	}
 	for (auto& com : _nodes) {
 		com->ClearFlag();
+	}
+}
+
+void BpGraph::ClearChildrenFlagByOutPinID(int pin_id) {
+	auto link_id = GetLinkByPinID(pin_id);
+	ClearChildrenFlagByInPinID(link_id->EndPinID);
+}
+
+void BpGraph::ClearChildrenFlagByInPinID(int pin_id) {
+	auto pin = GetPin(pin_id);
+	auto node = pin->GetObj();
+	if (node == nullptr) {
+		return;
+	}
+	std::unordered_set<std::shared_ptr<BpNode>> visited;
+	ClearChildrenFlagHelper(pin_id, visited, node);
+}
+
+void BpGraph::ClearChildrenFlagHelper(int pin_id, std::unordered_set<std::shared_ptr<BpNode>>& visited, std::shared_ptr<BpNode> node) {
+	if (visited.find(node) != visited.end()) {
+		return;
+	}
+	auto& in_pins = node->GetPins(BpPinKind::BP_INPUT);
+	for (int i = 0; i < in_pins.size(); ++i) {
+		if (pin_id == in_pins[i].ID) {
+			continue;
+		}
+		if (in_pins[i].IsLinked() 
+			&& in_pins[i].GetPinType() != BpPinType::BP_FLOW) {
+			auto pre_node = GetPreNodeByInPinID(in_pins[i].ID);
+			ClearChildrenFlagHelper(pin_id, visited, pre_node);
+		}
+	}
+	
+	visited.insert(node);
+	node->ClearFlag();
+
+	auto& out_pins = node->GetPins(BpPinKind::BP_OUTPUT);
+	for (int i = 0; i < out_pins.size(); ++i) {
+		if (out_pins[i].IsLinked() && out_pins[i].GetPinType() == BpPinType::BP_FLOW) {
+			auto next_node = GetNextNodeByOutPinID(out_pins[i].ID);
+			ClearChildrenFlagHelper(pin_id, visited, next_node);
+		}
 	}
 }
 
@@ -301,7 +355,15 @@ BpNodeRunState BpGraph::ContinueDebug() {
 	}
 	auto bp_node = _breakpoint_node.lock();
 	auto run_state = bp_node->Run();
-	if (run_state == BpNodeRunState::BP_RUN_OK) {
+	if (run_state == BpNodeRunState::BP_RUN_OK
+		|| run_state == BpNodeRunState::BP_RUN_LOOP_INTERNAL) {
+		// 执行loop stack的节点
+		if (!_breakpoint_loop_stack.empty()) {
+			auto loop_node = _breakpoint_loop_stack.top();
+			_breakpoint_node = loop_node;
+			_breakpoint_loop_stack.pop();
+			return BpNodeRunState::BP_RUN_BREAKPOINT;
+		}
 		_breakpoint_node.reset();
 		if (_event_nodes_run.empty()) {
 			run_state = BpNodeRunState::BP_RUN_FINISH;

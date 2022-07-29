@@ -24,7 +24,7 @@ public:
         AddPin("False", BpPinKind::BP_OUTPUT, BpPinType::BP_FLOW, BpVariable()); // false
     }
 
-	void Logic() override {
+	BpNodeRunState Logic() override {
         bool b = _inputs[1].GetBpValue().Get<bp::Bool>()->var();
         if (b) {
             _outputs[0].SetExecutable(true);
@@ -34,6 +34,7 @@ public:
             _outputs[0].SetExecutable(false);
             _outputs[1].SetExecutable(true);
         }
+        return BpNodeRunState::BP_RUN_LOGIC_OK;
     };
 };
 

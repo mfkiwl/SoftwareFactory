@@ -37,6 +37,8 @@ enum class BpNodeRunState : int
 	BP_RUN_NO_PARENT,       ///< 节点没有所属图错误
 	BP_RUN_BREAKPOINT,      ///< 执行到断点
 	BP_RUN_FINISH,          ///< 所有事件执行完成
+	BP_RUN_LOGIC_OK,        ///< 成功执行logic
+	BP_RUN_LOOP_INTERNAL,   ///< 循环节点中间状态
 };
 
 class BpGraph;
@@ -54,7 +56,7 @@ public:
 	/**
 	 * @brief 节点逻辑执行函数
 	 */
-    virtual void Logic() {};
+    virtual BpNodeRunState Logic() { return BpNodeRunState::BP_RUN_LOGIC_OK; }
 	
 	/**
 	 * @brief 获得该节点所属于的图对象
@@ -194,7 +196,16 @@ public:
 		return _has_breakpoint;
 	}
 
+	/// 判断是否需要构建输入pin
+	bool NeedBuildInputPin(const BpPin&);
+
+	/// 判断是否是可执行的输出pin
+	bool IsRunableOutputPin(const BpPin&);
+	
 protected:
+	void BuildInput(std::shared_ptr<BpGraph>&);
+	void BuildOutput(std::shared_ptr<BpGraph>&);
+
 	std::weak_ptr<BpGraph>      _parent_graph;
 	BpNodeType                  _node_type;
 	BpNodeStyle                 _node_style;

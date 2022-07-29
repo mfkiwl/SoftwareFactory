@@ -2,6 +2,7 @@
 #define __BpGraph_hpp__
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "BpLink.hpp"
 #include "BpVariable.hpp"
@@ -26,10 +27,11 @@ public:
 
 	BpNodeRunState Run() override;
 
-	void Logic() override {
+	BpNodeRunState Logic() override {
 		if (_node_type == BpNodeType::BP_GRAPH && !_input_node.expired()){
 			_input_node.lock()->Run();
 		}
+		return BpNodeRunState::BP_RUN_LOGIC_OK;
 	}
 
 	/**
@@ -59,6 +61,8 @@ public:
 
 	/// 获得普通节点
 	std::shared_ptr<BpNode> GetNode(int id);
+	std::shared_ptr<BpNode> GetNextNodeByOutPinID(int pin_id);
+	std::shared_ptr<BpNode> GetPreNodeByInPinID(int pin_id);
 	
 	/// 添加节点对象
 	void AddNode(std::shared_ptr<BpNode>);
@@ -69,9 +73,9 @@ public:
 	 * @brief 搜索连线
 	 * 
 	 * @param id pin id
-	 * @return std::vector<BpLink> 
+	 * @return cosnt BpLink 
 	 */
-	std::vector<BpLink> SearchLinks(int id);
+	const BpLink* GetLinkByPinID(int pin_id);
 
 	/// 获得图对象中的所有连线
 	std::vector<BpLink>& GetLinks() { return _links; }
@@ -84,7 +88,7 @@ public:
 	 * @param id link id
 	 * @return BpLink 
 	 */
-	BpLink GetLink(int id);
+	BpLink* GetLink(int id);
 	
 	/**
 	 * @brief 搜索pin对象
@@ -92,7 +96,7 @@ public:
 	 * @param id pin id
 	 * @return BpPin* 
 	 */
-	BpPin* SearchPin(int id);
+	BpPin* GetPin(int id);
 
 	/// 获得变量列表
 	const variable_map_t& GetVariables() { return _vars; }
@@ -114,6 +118,8 @@ public:
 	
 	/// 清除节点执行后的各种执行状态标记，主要用于下一次执行
 	void ClearFlag() override;
+	void ClearChildrenFlagByOutPinID(int out_pin_id);
+	void ClearChildrenFlagByInPinID(int in_pin_id);
 
 	/// 设置所有节点的位置，主要用于在编辑器中显示
 	void SetNodesPos(const Json::Value& desc) { _nodes_pos = desc; }
@@ -164,6 +170,14 @@ public:
 		_breakpoint_node = n;
 	}
 
+	void PushLoopNode(std::shared_ptr<BpNode> n) {
+		if (!_breakpoint_loop_stack.empty() && _breakpoint_loop_stack.top().lock() == n) {
+			return;
+		}
+		LOG(INFO) << "push loop node: " << n->GetName() << "("<< n->GetID() << ")";
+		_breakpoint_loop_stack.push(n);
+	}
+
 	const std::vector<int>& GetCurDebugLinksFlow() { return _debug_cur_links_flow; }
 	void AddCurDebugLinkFlow(int link_id) { _debug_cur_links_flow.push_back(link_id); }
 
@@ -185,6 +199,7 @@ public:
 
 private:
 	void SetNextID(int id);
+	void ClearChildrenFlagHelper(int pin_id, std::unordered_set<std::shared_ptr<BpNode>>& visited, std::shared_ptr<BpNode> node);
 
 	int                         _next_id = 0;
 	/* 图的起点 */
@@ -201,6 +216,7 @@ private:
 	std::weak_ptr<BpNode>       _input_node;
 	std::weak_ptr<BpNode>       _output_node;
 	std::weak_ptr<BpNode>       _breakpoint_node;
+	std::stack<std::weak_ptr<BpNode>> _breakpoint_loop_stack;
 
 	Json::Value                 _nodes_pos;
 	bool                        _debug_mode = false;

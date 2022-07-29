@@ -5,13 +5,13 @@ namespace sfe {
 
 class SFEPanelDragTip : public SFEPanel {
 public:
-    virtual bool Init() override;
+    bool Init() override;
 
-    virtual void Update() override;
+    void Update() override;
 
-    virtual void Exit() override;
+    void Exit() override;
 
-    virtual void OnMessage(const SFEMessage& msg) override;
+    void OnMessage(const SFEMessage& msg) override;
 
 private:
     bool _visible = false;
